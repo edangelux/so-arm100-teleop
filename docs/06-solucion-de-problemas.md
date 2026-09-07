@@ -52,6 +52,63 @@ El repositorio incluye un `.gitattributes` que fuerza finales de línea LF preci
 
 ---
 
+### `✗ No hay conexión a internet (o packages.ros.org no responde)` pero sí tengo internet
+
+**Era un fallo del script, corregido.** Si te aparece, actualiza el repositorio:
+
+```bash
+cd ~/so-arm100-teleop
+git pull
+bash scripts/install.sh
+```
+
+<details>
+<summary><b>Qué pasaba, por si te interesa</b></summary>
+
+La comprobación de red hacía `curl -fsS https://packages.ros.org`. Dos errores en una sola línea:
+
+- **`https`**: ese host sirve un certificado que no coincide con su propio nombre, así que `curl` lo rechaza con `CERTIFICATE_VERIFY_FAILED` aunque la red esté perfecta. El repositorio de ROS se sirve por **http**, no por https.
+- **`-f`**: con `--fail`, `curl` devuelve error ante un 404, y varias raíces de servidor no tienen índice. Lo que interesa es que el servidor **responda**, no que responda 200.
+
+Ahora se prueban tres destinos distintos, sin `-f`, y la comprobación **nunca aborta la instalación**: si falla pero la red funciona, `apt` sigue sin problema.
+
+**Cómo saber si tu red está bien:** mira más arriba en la salida del script. Si ves líneas `Hit:1 http://...ubuntu.com... InRelease`, `apt` ya alcanzó los servidores de Ubuntu y tu red funciona.
+
+</details>
+
+---
+
+### La máquina virtual no tiene internet (de verdad)
+
+Primero confirma dentro de Ubuntu:
+
+```bash
+ping -c 3 8.8.8.8        # ¿hay ruta hacia afuera?
+ping -c 3 google.com     # ¿funciona el DNS?
+sudo apt update          # ¿llega a los repositorios?
+```
+
+| Resultado | Qué significa |
+|---|---|
+| Los tres funcionan | Tienes internet. Si el script decía lo contrario, mira el punto anterior. |
+| `8.8.8.8` sí, `google.com` no | Es DNS, no conectividad. En VirtualBox suele arreglarse cambiando el adaptador de red y volviéndolo a poner, o reiniciando la VM. |
+| Ninguno funciona | Revisa la configuración de red de la máquina virtual. |
+
+> ### NAT ya te da internet
+> **No necesitas «Adaptador puente» para navegar ni para instalar paquetes.** Con **NAT** la VM sale a internet sin configurar nada.
+>
+> El adaptador puente sirve para otra cosa: hace que la VM aparezca como un equipo más de tu red local, con IP propia visible desde Windows. Eso solo hace falta si algún día quieres repartir nodos de ROS 2 entre tu Windows y la VM. **Para este proyecto no es necesario en ningún momento**: Gazebo, ROS 2 y el script de visión corren todos dentro de la misma VM, y el robot físico entra por USB, no por red.
+
+**Si el desplegable de «Adaptador puente» aparece vacío** (no sale tu tarjeta de red), es casi siempre una de estas:
+
+1. **Falta el driver de puente.** En Windows: `Win + R` → `ncpa.cpl` → clic derecho en tu adaptador → **Propiedades**. Busca **VirtualBox NDIS6 Bridged Networking Driver** en la lista y márcalo.
+2. **VirtualBox se instaló sin los componentes de red.** Vuelve a correr su instalador, elige **Repair**, y **reinicia Windows** — este último paso se salta mucha gente y es justo el que hace que aparezca.
+3. **Estás sobre Wi-Fi.** Muchos drivers de Wi-Fi no permiten el modo promiscuo que el puente necesita, así que la tarjeta no aparece, o aparece pero no pasa tráfico. Por cable suele funcionar a la primera.
+
+Ante la duda: deja **NAT** y sigue adelante.
+
+---
+
 ## Instalación de paquetes
 
 ### `GPG error` / `NO_PUBKEY` / `The following signatures were invalid` al hacer `apt update`

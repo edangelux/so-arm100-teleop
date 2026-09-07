@@ -141,6 +141,12 @@ Ve a **Red** y configura el **NAT** a **Adaptador puente**, así usa la misma ta
 
 ![Red en modo Adaptador puente](img/vm-20-vbox-red-puente.png)
 
+> **Este paso es opcional. Si te da problemas, déjalo en NAT y sigue.**
+>
+> Con **NAT** la máquina virtual ya sale a internet y descarga paquetes sin configurar nada. El puente sirve para otra cosa: hace que la VM aparezca como un equipo más de tu red local, con IP propia visible desde Windows. Eso solo hace falta si algún día quieres repartir nodos de ROS 2 entre tu Windows y la VM — **para esta guía no es necesario en ningún momento**, porque todo corre dentro de la misma VM y el robot físico entra por USB.
+>
+> Si el desplegable aparece vacío y no sale tu tarjeta de red, es un problema conocido de VirtualBox en Windows: está en [docs/06](06-solucion-de-problemas.md#la-máquina-virtual-no-tiene-internet-de-verdad). No te detengas ahí; deja NAT y continúa.
+
 Ve a **USB**, para la entrada de los servomotores. Si no los tienes, *chill*: esto es por si en el dado caso tienes el robot en físico y quieras accionarlo.
 
 ![USB para los servomotores](img/vm-21-vbox-usb-servomotores.png)

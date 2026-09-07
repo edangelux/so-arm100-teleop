@@ -48,12 +48,39 @@ comprobar_ubuntu_2204() {
     ok "Ubuntu 22.04 (${codename}) detectado"
 }
 
+# Comprueba que haya salida a internet.
+#
+# Dos cosas que esta función NO debe hacer, porque ya dieron falsos negativos:
+#
+#   1. Usar https://packages.ros.org — ese host sirve un certificado que no
+#      coincide con su propio nombre, así que curl lo rechaza con
+#      CERTIFICATE_VERIFY_FAILED aunque la red esté perfecta. El repositorio
+#      de ROS se sirve por http, no por https.
+#   2. Usar 'curl -f' — con --fail, curl devuelve error ante un 404, y varias
+#      de estas raíces no tienen índice. Aquí nos interesa que el servidor
+#      RESPONDA, no que responda 200.
+#
+# Además nunca aborta la instalación: si la comprobación falla pero la red sí
+# funciona, apt seguiría adelante sin problema. Un aviso equivocado no debe
+# detener una instalación buena; y si de verdad no hay red, apt fallará
+# enseguida con un mensaje claro.
 comprobar_internet() {
-    if ! curl -fsS --max-time 10 https://packages.ros.org >/dev/null 2>&1; then
-        morir "No hay conexión a internet (o packages.ros.org no responde).
-       Si estás en VirtualBox, revisa Configuración → Red."
-    fi
-    ok "Conexión a internet verificada"
+    local destinos=(
+        "http://packages.ros.org/ros2/ubuntu/dists/jammy/InRelease"
+        "http://archive.ubuntu.com/ubuntu/"
+        "https://github.com"
+    )
+    local url
+    for url in "${destinos[@]}"; do
+        if curl -sS --max-time 8 -o /dev/null "${url}" >/dev/null 2>&1; then
+            ok "Conexión a internet verificada"
+            return 0
+        fi
+    done
+    aviso "No se pudo verificar la conexión a internet con ninguno de los destinos de prueba."
+    aviso "  Si 'sudo apt update' te funciona, ignora este aviso: la instalación continúa."
+    aviso "  Si no, revisa la red de la máquina virtual (ver docs/06)."
+    return 0
 }
 
 # Agrega una línea a ~/.bashrc solo si no está ya presente.
