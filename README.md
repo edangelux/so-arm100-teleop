@@ -36,6 +36,7 @@ El script tarda entre 20 y 40 minutos según tu conexión. Al terminar, **cierra
 | 04 | [Workspace y compilación](docs/04-workspace-y-compilacion.md) | `~/ros2_ws`, paquetes del SO-ARM100, `rosdep`, `colcon build` |
 | 05 | [Ejecución y control](docs/05-ejecucion.md) | Lanzar Gazebo, lanzar la teleoperación, calibrar, gestos |
 | 06 | [Solución de problemas](docs/06-solucion-de-problemas.md) | Todos los errores reales que aparecen y cómo se arreglan |
+| 07 | [**Cómo funciona el sistema**](docs/07-como-funciona.md) | Arquitectura: nodos, tópicos y acciones; el recorrido de la cámara al robot; qué hace cada parte del código |
 
 ---
 
@@ -142,6 +143,8 @@ python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py
 | Cambiar de brazo | **`B`** (requiere recalibrar) · Pausa: **`P`** · Salir: **`Q`** |
 
 La guía completa, con la explicación de cada parámetro ajustable, está en [docs/05](docs/05-ejecucion.md).
+
+**¿Quieres entender qué pasa por dentro?** [docs/07 — Cómo funciona el sistema](docs/07-como-funciona.md) explica la arquitectura de nodos, el recorrido completo desde la cámara hasta el robot, y por qué el brazo se comanda por tópico y la pinza por acción.
 
 ---
 

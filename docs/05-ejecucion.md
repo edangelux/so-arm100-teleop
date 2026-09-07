@@ -72,6 +72,8 @@ Se abre una ventana con el video de la cámara, el esqueleto sobre tu brazo y un
 
 ## Cómo funciona el mapeo
 
+> Esta sección es el resumen. La explicación completa —nodos, tópicos, acciones, y el recorrido desde la cámara hasta la física de Gazebo— está en **[07 — Cómo funciona el sistema](07-como-funciona.md)**.
+
 El sistema **no** calcula dónde poner la mano del robot en el espacio. Hace algo más directo y más robusto: **mide los ángulos de tus articulaciones y se los copia al robot**, articulación por articulación.
 
 | Tu cuerpo | Articulación del robot | Cómo se mide |

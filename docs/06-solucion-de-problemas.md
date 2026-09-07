@@ -1,6 +1,6 @@
 # 06 — Solución de problemas
 
-[← Anterior: ejecución](05-ejecucion.md) · [Volver al inicio](../README.md)
+[← Anterior: ejecución](05-ejecucion.md) · [Volver al inicio](../README.md) · [Siguiente: cómo funciona →](07-como-funciona.md)
 
 ---
 
