@@ -4,7 +4,7 @@
 
 Sistema de teleoperación en tiempo real para el manipulador de 5 GDL **SO-ARM100**. Una cámara web captura el movimiento del brazo y la mano del operador, y una cinemática inversa en espacio de tarea traduce esa postura a los ángulos articulares del robot simulado en Gazebo.
 
-> Proyecto de tesis — Ingeniería Mecatrónica, Universidad La Salle (ULSA), Nicaragua.
+> Proyecto de Análisis y Diseño de Sistemas Mecatrónicos — Ingeniería Mecatrónica, Universidad La Salle (ULSA), Nicaragua.
 
 ---
 
