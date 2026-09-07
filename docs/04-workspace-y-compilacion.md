@@ -108,7 +108,7 @@ Si ese comando no devuelve nada, es casi siempre porque **no hiciste `source` de
 También puedes correr el diagnóstico completo:
 
 ```bash
-~/so-arm100-teleop/scripts/verificar.sh
+bash ~/so-arm100-teleop/scripts/verificar.sh
 ```
 
 ---

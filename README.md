@@ -15,7 +15,7 @@ Si ya tienes **Ubuntu 22.04 LTS** funcionando (nativo o en máquina virtual), es
 ```bash
 sudo apt update && sudo apt install -y git
 git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
-cd ~/so-arm100-teleop && ./scripts/install.sh
+cd ~/so-arm100-teleop && bash scripts/install.sh
 ```
 
 El script tarda entre 20 y 40 minutos según tu conexión. Al terminar, **cierra y vuelve a abrir la terminal** y salta a [Ejecución](#ejecución).
@@ -89,10 +89,10 @@ El repositorio **no vive dentro del workspace de ROS**. Se clona en tu carpeta p
 Si prefieres entender cada comando en lugar de correr el instalador, o si el script falló en algún punto, cada fase está documentada y puedes ejecutarla sola:
 
 ```bash
-./scripts/01_ros2_humble.sh      # Fase 1: ROS 2 Humble
-./scripts/02_simulacion.sh       # Fase 2: Gazebo + MoveIt 2 + controladores
-./scripts/03_vision_python.sh    # Fase 3: OpenCV + MediaPipe + cámara
-./scripts/04_workspace.sh        # Fase 4: workspace y compilación
+bash scripts/01_ros2_humble.sh      # Fase 1: ROS 2 Humble
+bash scripts/02_simulacion.sh       # Fase 2: Gazebo + MoveIt 2 + controladores
+bash scripts/03_vision_python.sh    # Fase 3: OpenCV + MediaPipe + cámara
+bash scripts/04_workspace.sh        # Fase 4: workspace y compilación
 ```
 
 Los scripts son **idempotentes**: puedes volver a correrlos sin romper nada. Los bloques de comandos equivalentes, uno por uno, están en [docs/03](docs/03-instalacion-ros2.md) y [docs/04](docs/04-workspace-y-compilacion.md).
@@ -144,7 +144,7 @@ La guía completa, con la explicación de cada parámetro ajustable, está en [d
 ¿No estás seguro de si todo quedó bien instalado? Corre el diagnóstico:
 
 ```bash
-~/so-arm100-teleop/scripts/verificar.sh
+bash ~/so-arm100-teleop/scripts/verificar.sh
 ```
 
 Te dice, línea por línea, qué está presente y qué falta: versión de Ubuntu, ROS 2, Gazebo, MoveIt, paquetes de Python, cámara detectada y estado del workspace.

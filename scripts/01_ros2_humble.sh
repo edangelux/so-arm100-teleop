@@ -100,4 +100,4 @@ source /opt/ros/humble/setup.bash
 
 titulo "Fase 1 completada"
 ok "ROS_DISTRO = ${ROS_DISTRO:-(no definido)}"
-printf '\nSiguiente: %s./scripts/02_simulacion.sh%s\n\n' "${NEGRITA}" "${FIN}"
+printf '\nSiguiente: %sbash scripts/02_simulacion.sh%s\n\n' "${NEGRITA}" "${FIN}"

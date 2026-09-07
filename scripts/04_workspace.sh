@@ -23,7 +23,7 @@ DIR_ROBOT="${WS}/src/SO-100-arm"
 titulo "Fase 4 · Workspace y compilación"
 
 if [ ! -d /opt/ros/humble ]; then
-    morir "No se encontró ROS 2 Humble. Ejecuta primero: ./scripts/01_ros2_humble.sh"
+    morir "No se encontró ROS 2 Humble. Ejecuta primero: bash scripts/01_ros2_humble.sh"
 fi
 
 # shellcheck source=/dev/null
@@ -51,7 +51,7 @@ PLUGIN_IKFAST="${DIR_ROBOT}/so_arm_100_5dof_arm_ikfast_plugin"
 if [ -d "${PLUGIN_IKFAST}" ] && [ "${COMPILAR_IKFAST:-0}" != "1" ]; then
     touch "${PLUGIN_IKFAST}/COLCON_IGNORE"
     aviso "Se omite so_arm_100_5dof_arm_ikfast_plugin (opcional, falla a menudo al compilar)."
-    aviso "Para incluirlo: COMPILAR_IKFAST=1 ./scripts/04_workspace.sh"
+    aviso "Para incluirlo: COMPILAR_IKFAST=1 bash scripts/04_workspace.sh"
 fi
 
 # --- 3. Dependencias -------------------------------------------------------

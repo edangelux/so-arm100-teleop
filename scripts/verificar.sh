@@ -140,6 +140,6 @@ if [ "${FALLOS}" -eq 0 ]; then
 else
     printf '%s%d comprobación(es) fallida(s).%s\n' "${ROJO}${NEGRITA}" "${FALLOS}" "${FIN}"
     printf 'Consulta docs/06-solucion-de-problemas.md, o vuelve a correr la fase que falta:\n\n'
-    printf '  ./scripts/install.sh --desde N\n\n'
+    printf '  bash scripts/install.sh --desde N\n\n'
     exit 1
 fi

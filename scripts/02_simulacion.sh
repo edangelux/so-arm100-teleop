@@ -21,7 +21,7 @@ titulo "Fase 2 · Gazebo, MoveIt 2 y controladores"
 
 if [ ! -d /opt/ros/humble ]; then
     morir "No se encontró ROS 2 Humble en /opt/ros/humble.
-       Ejecuta primero: ./scripts/01_ros2_humble.sh"
+       Ejecuta primero: bash scripts/01_ros2_humble.sh"
 fi
 
 # --- Aviso si hay Gazebo Classic instalado ---------------------------------
@@ -70,4 +70,4 @@ if command -v gz >/dev/null 2>&1; then
 else
     aviso "El comando 'gz' no está en el PATH todavía. Abre una terminal nueva y prueba: gz sim --version"
 fi
-printf '\nSiguiente: %s./scripts/03_vision_python.sh%s\n\n' "${NEGRITA}" "${FIN}"
+printf '\nSiguiente: %sbash scripts/03_vision_python.sh%s\n\n' "${NEGRITA}" "${FIN}"

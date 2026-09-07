@@ -7,8 +7,48 @@
 Antes de nada, corre el diagnóstico. Suele decirte exactamente qué falta:
 
 ```bash
-~/so-arm100-teleop/scripts/verificar.sh
+bash ~/so-arm100-teleop/scripts/verificar.sh
 ```
+
+---
+
+## Al ejecutar los scripts
+
+### `bash: ./scripts/install.sh: Permission denied`
+
+El archivo está ahí, pero sin permiso de ejecución. Pasa cuando el repositorio se subió a GitHub por la web (la interfaz web no conserva ese permiso) o cuando se clonó desde Windows.
+
+**Solución inmediata** — `bash <archivo>` ignora el permiso de ejecución:
+
+```bash
+cd ~/so-arm100-teleop
+bash scripts/install.sh
+```
+
+**Solución permanente**, si es tu propio repositorio:
+
+```bash
+cd ~/so-arm100-teleop
+chmod +x scripts/*.sh teleop_vision/*.py
+git update-index --chmod=+x scripts/*.sh teleop_vision/*.py
+git commit -m "Restaura el permiso de ejecución de los scripts"
+git push
+```
+
+`git update-index --chmod=+x` marca el permiso **dentro del repositorio**, no solo en tu copia local. Funciona incluso desde Windows, donde `chmod` por sí solo no se registra porque Git tiene `core.filemode` en `false`.
+
+---
+
+### `bash: ./scripts/install.sh: /usr/bin/env: bad interpreter: No such file or directory`
+
+Fíjate si al final del mensaje aparece un `^M`. Si es así, el archivo tiene finales de línea de Windows (CRLF) y Linux lee el `\r` como parte del nombre del intérprete.
+
+```bash
+sudo apt install -y dos2unix
+dos2unix scripts/*.sh teleop_vision/*.py
+```
+
+El repositorio incluye un `.gitattributes` que fuerza finales de línea LF precisamente para que esto no pase. Si te ocurrió, es que clonaste una versión anterior a ese archivo.
 
 ---
 

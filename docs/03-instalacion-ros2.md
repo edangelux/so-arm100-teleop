@@ -13,7 +13,7 @@ Desde aquí todo es terminal. Abre una con **Ctrl + Alt + T**.
 ```bash
 sudo apt update && sudo apt install -y git
 git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
-cd ~/so-arm100-teleop && ./scripts/install.sh
+cd ~/so-arm100-teleop && bash scripts/install.sh
 ```
 
 Si prefieres entender qué hace cada paso, o si el script se detuvo en algún punto, sigue leyendo: abajo está exactamente lo mismo, bloque por bloque.

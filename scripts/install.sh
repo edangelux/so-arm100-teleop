@@ -3,9 +3,9 @@
 # Instalador maestro — Teleoperación por visión del SO-ARM100
 #
 # Uso:
-#   ./scripts/install.sh              instala todo
-#   ./scripts/install.sh --desde 3    reanuda desde la fase 3
-#   ./scripts/install.sh --si         no pide confirmación (desatendido)
+#   bash scripts/install.sh              instala todo
+#   bash scripts/install.sh --desde 3    reanuda desde la fase 3
+#   bash scripts/install.sh --si         no pide confirmación (desatendido)
 #
 # Ejecuta en orden:
 #   Fase 1  ROS 2 Humble
@@ -16,6 +16,13 @@
 set -Eeuo pipefail
 DIR_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DIR_REPO="$(cd "${DIR_SCRIPTS}/.." && pwd)"
+
+# Se restaura el bit de ejecución por si se perdió al descargar el repositorio.
+# Pasa, sobre todo, al subir los archivos por la web de GitHub o al clonar
+# desde Windows: los scripts llegan sin permiso de ejecución y el primer
+# intento falla con "Permission denied".
+chmod +x "${DIR_SCRIPTS}"/*.sh "${DIR_REPO}"/teleop_vision/*.py 2>/dev/null || true
+
 # shellcheck source=comun.sh
 source "${DIR_SCRIPTS}/comun.sh"
 

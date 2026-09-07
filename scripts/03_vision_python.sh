@@ -89,4 +89,4 @@ else
 fi
 
 titulo "Fase 3 completada"
-printf '\nSiguiente: %s./scripts/04_workspace.sh%s\n\n' "${NEGRITA}" "${FIN}"
+printf '\nSiguiente: %sbash scripts/04_workspace.sh%s\n\n' "${NEGRITA}" "${FIN}"

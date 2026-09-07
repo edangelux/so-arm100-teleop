@@ -108,5 +108,5 @@ O corre el instalador automático:
 ```bash
 sudo apt update && sudo apt install -y git
 git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
-cd ~/so-arm100-teleop && ./scripts/install.sh
+cd ~/so-arm100-teleop && bash scripts/install.sh
 ```
