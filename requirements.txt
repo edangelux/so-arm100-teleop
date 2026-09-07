@@ -1,0 +1,19 @@
+# Dependencias de Python para el nodo de teleoperación por visión.
+#
+# RECOMENDADO: no instales esto con pip directamente. Usa el script
+#   ./scripts/03_vision_python.sh
+# que instala OpenCV desde APT (python3-opencv) para evitar el conflicto de
+# bibliotecas Qt entre el opencv-python de pip y el que trae ROS 2.
+#
+# Este archivo queda como referencia de versiones, o para un entorno virtual
+# aislado creado con:  python3 -m venv --system-site-packages ~/venv_teleop
+
+# MediaPipe y OpenCV en Ubuntu 22.04 se compilaron contra NumPy 1.x.
+# Con NumPy 2 aparece "A module that was compiled using NumPy 1.x cannot be
+# run in NumPy 2.x" y el nodo no arranca.
+numpy<2
+
+mediapipe>=0.10.9
+
+# Solo si NO instalaste python3-opencv desde APT. Ver docs/06 (conflicto Qt).
+# opencv-python>=4.8,<5
