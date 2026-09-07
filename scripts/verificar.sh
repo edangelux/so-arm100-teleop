@@ -124,15 +124,31 @@ if [ -f "${WS}/install/setup.bash" ]; then
     fi
 fi
 
-# El overlay de la fase 5 tiene que estar aplicado, o el lanzamiento falla
+# El overlay de la fase 5 tiene que estar aplicado, o el lanzamiento falla.
+#
+# Se miran SOLO los archivos que carga la simulación. Un 'grep -r' sobre toda
+# la carpeta daba dos falsos positivos: hardware_controllers.yaml (que solo usa
+# el robot físico) y los respaldos .original, que por definición contienen el
+# texto viejo — así que fallaba siempre justo después de aplicar el overlay.
 CFG_ROBOT="${WS}/src/SO-100-arm/so_arm_100_moveit_config/config"
 if [ -d "${CFG_ROBOT}" ]; then
-    if grep -rq "parallel_gripper_action_controller" "${CFG_ROBOT}" 2>/dev/null; then
-        error "Falta aplicar el overlay: la configuración usa controladores de Jazzy"
+    JAZZY=""
+    for ARCHIVO in ros2_controllers.yaml controllers_5dof.yaml moveit_controllers.yaml kinematics.yaml; do
+        [ -f "${CFG_ROBOT}/${ARCHIVO}" ] || continue
+        if grep -qE "parallel_gripper_action_controller|ParallelGripperCommand" "${CFG_ROBOT}/${ARCHIVO}"; then
+            JAZZY="${JAZZY} ${ARCHIVO}"
+        fi
+    done
+    if [ -n "${JAZZY}" ]; then
+        error "Falta aplicar el overlay — controladores de Jazzy en:${JAZZY}"
         aviso "  Solución:  bash scripts/05_aplicar_overlay.sh"
         FALLOS=$((FALLOS + 1))
     else
-        ok "Overlay aplicado (sin controladores de Jazzy)"
+        ok "Overlay aplicado (simulación sin controladores de Jazzy)"
+    fi
+    if [ -f "${CFG_ROBOT}/hardware_controllers.yaml" ] && \
+       grep -q "parallel_gripper_action_controller" "${CFG_ROBOT}/hardware_controllers.yaml"; then
+        aviso "hardware_controllers.yaml usa el controlador de Jazzy (solo afecta al robot físico)"
     fi
 fi
 comprobar "Launch combinado gz_moveit.launch.py" \

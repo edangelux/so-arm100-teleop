@@ -108,11 +108,30 @@ fi
 titulo "Verificando"
 CFG="${DIR_ROBOT}/so_arm_100_moveit_config/config"
 
-if grep -q "parallel_gripper_action_controller" "${CFG}"/*.yaml 2>/dev/null; then
-    morir "Sigue habiendo 'parallel_gripper_action_controller' en la configuración.
+# Solo se comprueban los archivos que la SIMULACIÓN carga de verdad.
+#
+# La versión anterior hacía grep sobre "${CFG}"/*.yaml, es decir sobre TODOS
+# los yaml de la carpeta, y abortaba la instalación al encontrar la cadena en
+# hardware_controllers.yaml — un archivo que solo usa hardware.launch.py (el
+# robot físico) y que la simulación no carga jamás. Una comprobación que
+# detiene una instalación correcta es peor que no tener comprobación.
+ARCHIVOS_SIM=(ros2_controllers.yaml controllers_5dof.yaml moveit_controllers.yaml kinematics.yaml)
+for ARCHIVO in "${ARCHIVOS_SIM[@]}"; do
+    [ -f "${CFG}/${ARCHIVO}" ] || continue
+    if grep -qE "parallel_gripper_action_controller|ParallelGripperCommand" "${CFG}/${ARCHIVO}"; then
+        morir "Sigue habiendo un controlador de Jazzy en ${ARCHIVO}.
        Ese tipo no existe en Humble y el lanzamiento fallará."
+    fi
+done
+ok "Sin controladores de Jazzy en la configuración de simulación"
+
+# Aviso, NO error: este archivo no interviene en la simulación.
+if [ -f "${CFG}/hardware_controllers.yaml" ] && \
+   grep -q "parallel_gripper_action_controller" "${CFG}/hardware_controllers.yaml"; then
+    aviso "hardware_controllers.yaml todavía declara el controlador de Jazzy."
+    aviso "  No afecta a la simulación: ese archivo solo lo carga hardware.launch.py."
+    aviso "  Cuando conectes el brazo físico habrá que aplicarle el mismo cambio."
 fi
-ok "Sin referencias a controladores de Jazzy"
 
 grep -q "position_controllers/GripperActionController" "${CFG}/ros2_controllers.yaml" \
     && ok "gripper_controller: position_controllers/GripperActionController"

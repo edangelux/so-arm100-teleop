@@ -471,6 +471,42 @@ gripper_controller       position_controllers/GripperActionController    active
 
 ---
 
+### `Sigue habiendo 'parallel_gripper_action_controller' en la configuración` — pero el overlay sí se aplicó
+
+```
+✓ 2 archivo(s) aplicados, 7 ya estaban al día
+= Verificando =
+✗ Sigue habiendo 'parallel_gripper_action_controller' en la configuración.
+```
+
+**Era un fallo de la comprobación, corregido.** Actualiza y vuelve a correr la fase 5:
+
+```bash
+cd ~/so-arm100-teleop
+git pull
+bash scripts/05_aplicar_overlay.sh
+```
+
+<details>
+<summary><b>Qué pasaba, por si te interesa</b></summary>
+
+La comprobación hacía `grep` sobre **todos** los `.yaml` de la carpeta `config/`, y encontraba la cadena en **`hardware_controllers.yaml`** — un archivo que solo carga `hardware.launch.py`, es decir el **robot físico**. La simulación no lo lee nunca.
+
+Resultado: la instalación se abortaba por un archivo que no está en juego, cuando la configuración de simulación estaba perfectamente bien.
+
+El diagnóstico `verificar.sh` tenía además una versión peor del mismo error: hacía `grep -r` sobre la carpeta entera, así que también leía los respaldos `.original` — que por definición contienen el texto viejo. Habría fallado **siempre**, justo después de aplicar el overlay correctamente.
+
+Ahora ambos miran solo los cuatro archivos que la simulación carga de verdad: `ros2_controllers.yaml`, `controllers_5dof.yaml`, `moveit_controllers.yaml` y `kinematics.yaml`.
+
+</details>
+
+> ### Nota para cuando conectes el brazo físico
+> `hardware_controllers.yaml` **sigue declarando** `parallel_gripper_action_controller`, que no existe en Humble. No se toca a propósito: esa ruta no está probada en este proyecto y prefiero no cambiar a ciegas un archivo que nadie ha ejecutado.
+>
+> Cuando llegue el momento de usar `hardware.launch.py` con los servos reales, habrá que aplicarle el mismo cambio (`position_controllers/GripperActionController`) y **probarlo con el robot delante**.
+
+---
+
 ### Gazebo y MoveIt funcionan por separado pero no juntos
 
 Síntoma: `gz.launch.py` abre Gazebo bien, `demo.launch.py` abre MoveIt bien, pero al intentar los dos a la vez el robot no aparece, o aparece pero MoveIt no lo reconoce.
