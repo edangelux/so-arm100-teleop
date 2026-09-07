@@ -104,22 +104,83 @@ ${VERDE}${NEGRITA}╔═══════════════════�
 
 Tiempo total: ${MINUTOS} minutos.
 
-${AMARILLO}IMPORTANTE:${FIN} cierra esta terminal y abre una nueva antes de continuar.
-Si es la primera vez que se agrega tu usuario al grupo 'video', cierra
-sesión y vuelve a entrar para que la cámara funcione sin sudo.
+Faltan 3 pasos. Están explicados clic por clic; si nunca has usado Linux,
+síguelos tal cual y no te saltes el primero.
 
-${NEGRITA}Terminal 1 — simulación (Gazebo + MoveIt + RViz):${FIN}
-  cd ~/ros2_ws
-  ros2 launch so_arm_100_bringup gz_moveit.launch.py
 
-${NEGRITA}Terminal 2 — teleoperación:${FIN}
-  python3 ${DIR_REPO}/teleop_vision/teleop_vision.py
+${AMARILLO}${NEGRITA}PASO 1 · REINICIA LA MÁQUINA VIRTUAL${FIN}
 
-Espera a que Gazebo cargue por completo antes de lanzar la teleoperación.
-Con la ventana de video enfocada y TU MANO VISIBLE, presiona ${NEGRITA}C${FIN} para calibrar.
+  Sí, reiniciar de verdad. No es por si acaso: durante la instalación tu
+  usuario recibió permiso para usar la cámara, y en Linux ese permiso solo
+  se activa al volver a iniciar sesión. Si te lo saltas, el programa de
+  teleoperación no encontrará la cámara y no sabrás por qué.
 
-Diagnóstico:   ${DIR_SCRIPTS}/verificar.sh
-Ejecución:     ${DIR_REPO}/docs/05-ejecucion.md
-Problemas:     ${DIR_REPO}/docs/06-solucion-de-problemas.md
+  Cómo hacerlo:
+    1. Mira la ${NEGRITA}esquina superior derecha${FIN} de la pantalla de Ubuntu
+       (donde están los iconos de volumen, red y batería).
+    2. Haz clic ahí. Se abre un menú.
+    3. Elige ${NEGRITA}"Apagar / Cerrar sesión"${FIN} y luego ${NEGRITA}"Reiniciar"${FIN}.
+    4. Espera a que vuelva a arrancar y escribe tu contraseña.
+
+  Tarda menos de un minuto. Después de esto, la cámara ya funciona.
+
+
+${AMARILLO}${NEGRITA}PASO 2 · ABRE UNA TERMINAL Y LANZA LA SIMULACIÓN${FIN}
+
+  Presiona a la vez las teclas:   ${NEGRITA}Ctrl + Alt + T${FIN}
+  Se abre una ventana negra: eso es la terminal.
+
+  Copia estas dos líneas, pégalas ahí y presiona Enter:
+
+    ${NEGRITA}cd ~/ros2_ws${FIN}
+    ${NEGRITA}ros2 launch so_arm_100_bringup gz_moveit.launch.py${FIN}
+
+  Para pegar en la terminal de Linux se usa ${NEGRITA}Ctrl + Shift + V${FIN}
+  (con Shift, no el Ctrl+V de siempre).
+
+  Se abrirán dos ventanas: ${NEGRITA}Gazebo${FIN} (el simulador con el robot) y
+  ${NEGRITA}RViz${FIN} (la vista técnica). Espera a que carguen del todo — la primera
+  vez tarda un minuto.
+
+  ${NEGRITA}No cierres esta terminal.${FIN} Mientras la simulación corra, esa ventana
+  se queda ocupada escribiendo mensajes. Es normal.
+
+
+${AMARILLO}${NEGRITA}PASO 3 · ABRE OTRA TERMINAL Y LANZA LA TELEOPERACIÓN${FIN}
+
+  Presiona otra vez ${NEGRITA}Ctrl + Alt + T${FIN}. Se abre una terminal NUEVA,
+  aparte de la anterior. Necesitas las dos abiertas al mismo tiempo.
+
+  Pega esto y presiona Enter:
+
+    ${NEGRITA}python3 ${DIR_REPO}/teleop_vision/teleop_vision.py${FIN}
+
+  Se abre una ventana con la imagen de tu cámara.
+
+  Ponte de frente, con el brazo y ${NEGRITA}la mano bien visibles${FIN}, haz clic sobre
+  esa ventana de video para seleccionarla, y presiona la tecla ${NEGRITA}C${FIN}.
+  Eso le dice al robot "esta postura mía es tu punto de partida".
+
+  A partir de ahí, muévete y el robot te copia.
+  Para salir: presiona ${NEGRITA}Q${FIN} sobre la ventana de video.
+
+
+${NEGRITA}¿ALGO NO FUNCIONÓ?${FIN}
+
+  Este comando revisa la instalación y te dice qué falta:
+
+    ${NEGRITA}bash ${DIR_SCRIPTS}/verificar.sh${FIN}
+
+  Y aquí está cada error conocido con su causa y su solución:
+
+    ${DIR_REPO}/docs/06-solucion-de-problemas.md
+
+  Guía de uso completa (todas las teclas, cómo ajustar el robot):
+
+    ${DIR_REPO}/docs/05-ejecucion.md
+
+  Todo lo que pasó durante esta instalación quedó guardado en:
+
+    ${SO_ARM_REGISTRO}
 
 FINAL

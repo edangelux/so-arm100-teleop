@@ -2,14 +2,27 @@
 #
 # Fase 3 — Visión artificial: OpenCV, MediaPipe y permisos de cámara
 #
-# Sobre el conflicto Qt:
-#   El paquete `opencv-python` de pip trae su propia copia de las bibliotecas
-#   Qt, que choca con las que instala ROS 2 (RViz también usa Qt). El síntoma
-#   es `qt.qpa.plugin: Could not load the Qt platform plugin "xcb"` al abrir la
-#   ventana de video.
-#   Por eso este script instala OpenCV desde APT (python3-opencv) y le pide a
-#   pip que NO instale su propia copia. MediaPipe funciona con el cv2 del
-#   sistema sin problema.
+# DOS TRAMPAS QUE YA MORDIERON, y cómo se evitan aquí:
+#
+# 1) NumPy 2 rompe OpenCV y MediaPipe
+#    Ambos están compilados contra NumPy 1.x en Ubuntu 22.04. Con NumPy 2 el
+#    'import cv2' revienta con:
+#        A module that was compiled using NumPy 1.x cannot be run in NumPy 2.x
+#        AttributeError: _ARRAY_API not found
+#    No basta con instalar "numpy<2" al principio: CUALQUIER paquete que se
+#    instale después y que pida numpy>=2 lo vuelve a subir en silencio.
+#    (Una versión anterior de este script instalaba jax y jaxlib — que no son
+#    dependencias de MediaPipe — y hacían exactamente eso.)
+#    SOLUCIÓN: un archivo de restricciones de pip que se pasa a TODAS las
+#    instalaciones. Con él, pip no puede subir NumPy ni aunque un paquete se lo
+#    pida: falla la instalación de ese paquete en vez de romper el entorno.
+#
+# 2) El OpenCV de pip choca con el Qt de ROS 2
+#    El paquete 'opencv-python' de pip trae su propia copia de Qt, que choca con
+#    la que instala ROS 2 (RViz también usa Qt). Síntoma:
+#        qt.qpa.plugin: Could not load the Qt platform plugin "xcb"
+#    SOLUCIÓN: OpenCV se instala desde APT (python3-opencv) y a MediaPipe se le
+#    pide --no-deps para que no arrastre su propia copia.
 
 set -Eeuo pipefail
 DIR_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -26,46 +39,56 @@ paso "Instalando OpenCV del sistema (evita el conflicto de Qt con ROS 2)"
 sudo apt-get update
 apt_instalar python3-opencv python3-numpy v4l-utils
 
-# --- 2. MediaPipe ----------------------------------------------------------
+# --- 2. Restricción de NumPy -----------------------------------------------
+# Este archivo se pasa a todas las instalaciones de pip de aquí en adelante.
+RESTRICCIONES="$(mktemp)"
+echo "numpy<2" > "${RESTRICCIONES}"
+trap 'rm -f "${RESTRICCIONES}"' EXIT
+
 titulo "MediaPipe"
 paso "Actualizando pip"
 python3 -m pip install --upgrade pip
 
-# numpy<2 : MediaPipe y el OpenCV de Ubuntu 22.04 se compilaron contra NumPy 1.x.
-#           Con NumPy 2 aparece "A module that was compiled using NumPy 1.x
-#           cannot be run in NumPy 2.x" y nada arranca.
-paso "Fijando NumPy 1.x (MediaPipe no es compatible con NumPy 2)"
-python3 -m pip install "numpy<2"
+paso "Fijando NumPy 1.x"
+python3 -m pip install -c "${RESTRICCIONES}" "numpy<2"
 
-# --no-deps evita que pip arrastre opencv-contrib-python y vuelva a meter el Qt
-# conflictivo. Las demás dependencias de MediaPipe se instalan a mano abajo.
+# --no-deps: evita que MediaPipe arrastre opencv-contrib-python y vuelva a
+# meter el Qt conflictivo. Las demás dependencias se instalan abajo, a mano.
 paso "Instalando MediaPipe sin su copia propia de OpenCV"
-python3 -m pip install --no-deps mediapipe
+python3 -m pip install -c "${RESTRICCIONES}" --no-deps mediapipe
 
+# Dependencias REALES de MediaPipe, menos opencv-contrib-python (ya está el de
+# APT) y menos numpy (ya fijado arriba). Comprobadas contra los metadatos del
+# paquete, no supuestas.
 paso "Instalando las dependencias restantes de MediaPipe"
-python3 -m pip install \
+python3 -m pip install -c "${RESTRICCIONES}" \
     absl-py \
-    attrs \
+    certifi \
     flatbuffers \
-    jax \
-    jaxlib \
     matplotlib \
-    protobuf \
-    sentencepiece \
     sounddevice
 
 # --- 3. Permisos de cámara -------------------------------------------------
 titulo "Permisos de cámara"
 if groups "$USER" | grep -qw video; then
     ok "El usuario '$USER' ya pertenece al grupo 'video'"
+    CAMARA_NECESITA_REINICIO=0
 else
     sudo usermod -a -G video "$USER"
     ok "Usuario '$USER' agregado al grupo 'video'"
-    aviso "Este cambio NO surte efecto hasta que cierres sesión y vuelvas a entrar (o reinicies)."
+    CAMARA_NECESITA_REINICIO=1
 fi
 
 # --- 4. Verificación -------------------------------------------------------
 titulo "Verificación"
+
+# Que nada haya vuelto a subir NumPy por detrás
+NUMPY_MAYOR="$(python3 -c "import numpy; print(numpy.__version__.split('.')[0])" 2>/dev/null || echo "?")"
+if [ "${NUMPY_MAYOR}" = "2" ]; then
+    aviso "Algo subió NumPy a 2.x. Se vuelve a fijar en 1.x."
+    python3 -m pip install -c "${RESTRICCIONES}" "numpy<2" --force-reinstall
+fi
+
 if python3 -c "import cv2, mediapipe, numpy" 2>/dev/null; then
     python3 - <<'PY'
 import cv2, mediapipe, numpy
@@ -80,13 +103,27 @@ else
     aviso "Ver docs/06-solucion-de-problemas.md"
 fi
 
+# Que MediaPipe traiga el módulo 'solutions', que es el que usa teleop_vision.py
+if python3 -c "import mediapipe as mp; mp.solutions.pose; mp.solutions.hands" 2>/dev/null; then
+    ok "mediapipe.solutions disponible (pose y hands)"
+else
+    error "Esta versión de MediaPipe no trae 'mediapipe.solutions'."
+    aviso "  teleop_vision.py lo necesita. Instala una versión de la serie 0.10:"
+    aviso "    python3 -m pip install 'mediapipe<1' --force-reinstall --no-deps"
+fi
+
 if ls /dev/video* >/dev/null 2>&1; then
     ok "Cámara(s) detectada(s): $(ls /dev/video* | tr '\n' ' ')"
 else
     aviso "No se detectó ninguna cámara en /dev/video*"
     aviso "En VirtualBox: menú Dispositivos → Webcams → selecciona tu cámara."
-    aviso "Ver docs/06-solucion-de-problemas.md#cámara"
+    aviso "Ver docs/06-solucion-de-problemas.md"
 fi
 
 titulo "Fase 3 completada"
+if [ "${CAMARA_NECESITA_REINICIO}" -eq 1 ]; then
+    printf '\n%sTu usuario se acaba de agregar al grupo "video".%s\n' "${AMARILLO}" "${FIN}"
+    printf 'Ese cambio NO se aplica hasta que cierres sesión y vuelvas a entrar.\n'
+    printf 'Sin eso, la cámara no funcionará. Se te recuerda al final de la instalación.\n'
+fi
 printf '\nSiguiente: %sbash scripts/04_workspace.sh%s\n\n' "${NEGRITA}" "${FIN}"

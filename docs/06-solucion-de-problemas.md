@@ -386,6 +386,73 @@ python3 -m pip install "numpy<2" --force-reinstall
 
 ## Gazebo
 
+### `A module that was compiled using NumPy 1.x cannot be run in NumPy 2.x` / `_ARRAY_API not found`
+
+```
+AttributeError: _ARRAY_API not found
+ImportError: numpy.core.multiarray failed to import
+```
+
+**Era un fallo del script, corregido.** Arréglalo así:
+
+```bash
+python3 -m pip uninstall -y jax jaxlib
+python3 -m pip install "numpy<2" --force-reinstall
+python3 -c "import cv2, mediapipe, numpy; print(cv2.__version__, mediapipe.__version__, numpy.__version__)"
+```
+
+Y actualiza el repositorio para que no vuelva a pasar:
+
+```bash
+cd ~/so-arm100-teleop && git pull && bash scripts/install.sh --desde 3
+```
+
+<details>
+<summary><b>Qué pasaba, por si te interesa</b></summary>
+
+OpenCV y MediaPipe están compilados contra **NumPy 1.x** en Ubuntu 22.04. Con NumPy 2 instalado, `import cv2` falla.
+
+El script fijaba `numpy<2`… y dos líneas después instalaba **`jax` y `jaxlib`**, que **no son dependencias de MediaPipe** y que exigen `numpy>=2`. `pip` obedecía a lo último que se le pedía y subía NumPy en silencio, rompiendo lo que la línea anterior acababa de arreglar.
+
+Esa lista de dependencias la escribí yo a mano, adivinando. Las reales son `absl-py`, `certifi`, `flatbuffers`, `matplotlib`, `sounddevice` y `opencv-contrib-python` — nada de jax.
+
+Ahora el script usa un **archivo de restricciones de pip** que se pasa a todas las instalaciones. Con él, `pip` no puede subir NumPy ni aunque un paquete se lo pida: falla la instalación de ese paquete en vez de romper el entorno. Y al final vuelve a comprobar la versión, por si acaso.
+
+</details>
+
+---
+
+### Gazebo abre pero la ventana 3D se ve en blanco
+
+El panel **Entity Tree** de la derecha sí muestra `ground_plane`, `sun` y `so_arm_100`, pero el área 3D está vacía o llena de líneas raras.
+
+**No es un fallo de la simulación: el robot está ahí y se está moviendo.** Lo que falla es el dibujado. Gazebo Fortress usa el motor **OGRE2**, que necesita OpenGL 3.3+, y la tarjeta gráfica virtual de VirtualBox no siempre lo da.
+
+**Solución A — renderizado por software** (más lento, pero funciona siempre):
+
+```bash
+cd ~/ros2_ws
+LIBGL_ALWAYS_SOFTWARE=1 ros2 launch so_arm_100_bringup gz_moveit.launch.py
+```
+
+Si quieres que sea permanente:
+
+```bash
+echo 'export LIBGL_ALWAYS_SOFTWARE=1' >> ~/.bashrc
+```
+
+**Solución B — revisa la aceleración 3D de la máquina virtual:**
+
+1. Apaga la máquina virtual.
+2. **Configuración → Pantalla**: memoria de video **128 MB**, controlador **VMSVGA**, y ✅ **Habilitar aceleración 3D**.
+3. Confirma que las **Guest Additions** están instaladas — sin ellas no hay aceleración real (ver [docs/01](01-instalacion-maquina-virtual.md)).
+
+**Solución C — trabaja solo con RViz.** Para la teleoperación **no necesitas la ventana de Gazebo**: RViz muestra el estado real del robot, y ahí sí se ve todo. Gazebo puede seguir corriendo detrás haciendo la física aunque no lo veas.
+
+> En instalación nativa esto casi nunca pasa: es un problema de la gráfica virtual, no de Gazebo.
+
+---
+
 ### Gazebo se congela, se cierra solo, o va a 2 FPS
 
 **En máquina virtual:** falta la aceleración 3D.
