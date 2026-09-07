@@ -1,177 +1,208 @@
 # 01 — Instalación en Máquina Virtual (VirtualBox)
 
-[← Volver al inicio](../README.md) · [Siguiente: instalación nativa por ISO →](02-instalacion-nativa-iso.md)
+[← Volver al inicio](../README.md) · [Siguiente: instalación local por ISO →](02-instalacion-nativa-iso.md)
 
 ---
 
-Existen **dos opciones probadas** para tener Ubuntu 22.04 LTS y correr este proyecto:
+# Guía paso a paso para el robot SO-ARM100 — Teleoperación
 
-1. **Máquina virtual** ← esta guía. Recomendada si tu computadora tiene buen procesador, gráfica y RAM de sobra.
-2. **[Instalación nativa por ISO](02-instalacion-nativa-iso.md)**. Recomendada si tu computadora tiene características básicas; necesitas una USB y ~50 GB de espacio en un disco (el mismo de Windows u otro externo).
+Existen en este caso **2 opciones probadas** para poder realizar todo mediante Linux Ubuntu 22.04 LTS:
 
-Hay más formas de tener Linux, pero estas dos son las habituales y las únicas que están verificadas aquí.
+**1) Máquina virtual** · **2) Instalación local por ISO**
 
-> **ROS 2 Humble requiere estrictamente Ubuntu 22.04 LTS.** Versiones más nuevas (24.04) o más viejas (20.04) generan incompatibilidades directas con las dependencias binarias de ROS y Gazebo. No lo intentes con otra versión.
+Existen otras formas y maneras de tener Linux, pero estas son las habituales y las que yo he probado que funcionan.
+
+Elige qué opción tomarás:
+
+1. **[Máquina virtual](01-instalacion-maquina-virtual.md)** ← esta guía
+   Está más vista para computadoras que tienen buen procesador, gráfica y RAM de sobra.
+
+2. **[Instalación ISO](02-instalacion-nativa-iso.md)**
+   Está más vista para computadoras que tienen *stats* básicos o generales. Se necesita tener una USB y un disco duro aparte, o un espacio de almacenamiento de 50 GB: en una USB, en el mismo disco duro que tienes para Windows, o en uno externo.
 
 ---
 
-## 1. Descargar Ubuntu 22.04 LTS
+ROS 2 Humble requiere de forma estricta **Ubuntu 22.04 LTS**. Versiones más recientes (como 24.04) o anteriores (20.04) generan incompatibilidades directas con las dependencias binarias de ROS y Gazebo.
 
 Descarga la imagen ISO oficial:
 
-- **[Ubuntu 22.04 LTS Desktop (64-bit)](https://releases.ubuntu.com/22.04/)** — archivo `ubuntu-22.04.x-desktop-amd64.iso`
+- **Archivo ISO:** [Ubuntu 22.04.5 LTS Desktop (64-bit)](https://releases.ubuntu.com/22.04/)
 
-Son unos 4–5 GB. Déjala descargando mientras instalas VirtualBox.
+![Página de descargas de Ubuntu 22.04](img/vm-01-iso-releases-ubuntu.png)
 
----
-
-## 2. Instalar VirtualBox y el Extension Pack
-
-No es obligatorio que sea VirtualBox: sirve cualquier hipervisor (VMware, QEMU/KVM, Xen Project). Aquí se usa VirtualBox por practicidad, aunque **VMware suele dar mejor rendimiento gráfico**.
-
-- **[Descargar VirtualBox](https://www.virtualbox.org/wiki/Downloads)**
-- Descarga también el **VirtualBox Extension Pack de la misma versión**.
-
-> El Extension Pack **no es opcional** en este proyecto: es lo que habilita el controlador USB 3.0, y sin él no puedes pasarle la webcam ni los servomotores del host a la máquina virtual.
-
-Durante la instalación **se te desconectará el internet unos segundos** (VirtualBox instala adaptadores de red virtuales). Es normal. Acepta con **Yes** y luego **Install**.
-
-<!-- CAPTURA: docs/img/01-vbox-instalador.png — advertencia de desconexión de red del instalador de VirtualBox -->
-![Instalador de VirtualBox](img/01-vbox-instalador.png)
-
-<!-- CAPTURA: docs/img/02-vbox-instalado.png — pantalla final del instalador -->
-![VirtualBox instalado](img/02-vbox-instalado.png)
+![Descarga de la ISO](img/vm-02-iso-descarga.png)
 
 ---
 
-## 3. Crear la máquina virtual
+## Opción 1: Instalación en Máquina Virtual (VirtualBox)
+
+Esta opción permite trabajar dentro de Windows sin modificar particiones de disco.
+
+### 1. Requisitos de asignación en VirtualBox
+
+| Recurso | Mínimo requerido | Recomendado |
+| :- | :- | :- |
+| **Memoria RAM** | 4096 MB (4 GB) | 6144 MB – 8192 MB (6–8 GB) |
+| **Procesadores (Cores)** | 2 CPUs | 4 CPUs |
+| **Disco Virtual** | 40 GB (VDI Dinámico) | 60 GB – 80 GB |
+| **Memoria de Video** | 128 MB | 128 MB + Aceleración 3D habilitada |
+
+---
+
+### 2. Instalación de VirtualBox y Extension Pack
+
+Instala **VirtualBox** y el **VirtualBox Extension Pack** correspondiente a la misma versión desde la web oficial de Oracle. El Extension Pack es obligatorio para habilitar el controlador USB 3.0, que es el que permite transferir la webcam del host a la máquina virtual.
+
+Bueno, no es necesario que sea VirtualBox, sino que cualquier máquina virtual sirve: puede ser **VMware**, **QEMU/KVM**, **Xen Project** o **VirtualBox**.
+
+Yo elegí VirtualBox por practicidad, pero es mejor VMware.
+
+Link de descarga de VirtualBox:
+
+<https://www.virtualbox.org/wiki/Downloads>
+
+![Web de descargas de VirtualBox](img/vm-03-vbox-web-descarga.png)
+
+![Instalador de VirtualBox](img/vm-04-vbox-instalador-1.png)
+
+![Instalador de VirtualBox](img/vm-05-vbox-instalador-2.png)
+
+![Instalador de VirtualBox](img/vm-06-vbox-instalador-3.png)
+
+**Se desconectará el internet mientras se instala.**
+
+![Aviso de desconexión de red](img/vm-07-vbox-aviso-internet.png)
+
+No entraré en profundidad en esto, solo dale a **Yes** y ya.
+
+![Aviso de dependencias](img/vm-08-vbox-aviso-yes-1.png)
+
+![Aviso de dependencias](img/vm-09-vbox-aviso-yes-2.png)
+
+Le das a **Install**.
+
+![Botón Install](img/vm-10-vbox-boton-install.png)
+
+Finalizamos con la instalación de VirtualBox, listo.
+
+![Instalación finalizada](img/vm-11-vbox-instalacion-finalizada.png)
+
+---
+
+### 3. Crear la máquina virtual
 
 Abre VirtualBox y haz clic en **Nueva**:
 
-| Campo | Valor |
-|---|---|
-| **Nombre** | `Robotcito` (o el que quieras) |
-| **Tipo** | Linux |
-| **Versión** | Ubuntu (64-bit) |
-| **Imagen ISO** | El archivo `.iso` que descargaste |
-| **Instalación desatendida** | ✅ Marca **Omitir instalación desatendida** |
+- **Nombre:** `Robotcito`
+- **Tipo:** Linux
+- **Versión:** Ubuntu (64-bit)
+- **Imagen ISO:** selecciona el archivo `.iso` descargado
+- Marca la casilla **Omitir instalación desatendida** (*Unattended Installation*) para configurar usuario y contraseñas manualmente
 
-> Marcar *Omitir instalación desatendida* es importante: te deja configurar usuario, contraseña y particiones manualmente en lugar de que VirtualBox lo haga por ti.
+> Marcar **Omitir instalación desatendida** es lo que hace que después el instalador de Ubuntu te pregunte idioma, teclado, usuario y contraseña pantalla por pantalla. Si la dejas sin marcar, VirtualBox te pide esos datos en el asistente y luego instala solo, sin preguntarte nada.
 
-<!-- CAPTURA: docs/img/03-vbox-nueva-maquina.png — diálogo "Nueva" con nombre, tipo, versión e ISO -->
-![Crear máquina virtual](img/03-vbox-nueva-maquina.png)
+![Diálogo Nueva máquina virtual](img/vm-12-vbox-nueva-1.png)
 
----
-
-## 4. Ajustes críticos ANTES de encender
-
-Si la máquina virtual arrancó sola, **apágala**: haz clic en la **X** de la ventana, elige **Apagar** y **Aceptar**. Estos ajustes deben hacerse con la máquina apagada.
-
-Clic derecho sobre la máquina virtual → **Configuración**.
-
-### 4.1 Recursos a asignar
-
-| Recurso | Mínimo requerido | Recomendado |
-|---|---|---|
-| **Memoria RAM** | 4096 MB (4 GB) | 6144 – 8192 MB (6–8 GB) |
-| **Procesadores (núcleos)** | 2 CPUs | 4 CPUs |
-| **Disco virtual** | 40 GB (VDI dinámico) | 60 – 80 GB |
-| **Memoria de video** | 128 MB | 128 MB + aceleración 3D |
-
-> Nunca asignes más de la **mitad** de la RAM ni más de la mitad de los núcleos de tu computadora física, o el sistema anfitrión se vuelve inutilizable.
-
-### 4.2 Sistema
-
-- **Sistema → Placa Base:** asigna mínimo **4096 MB** de RAM.
-- **Sistema → Procesador:** asigna **2 o 4 núcleos**.
-
-<!-- CAPTURA: docs/img/04-vbox-sistema-ram.png — pestaña Sistema con la RAM asignada -->
-![Configuración de RAM](img/04-vbox-sistema-ram.png)
-
-<!-- CAPTURA: docs/img/05-vbox-procesador.png — pestaña Procesador con los núcleos asignados -->
-![Configuración de procesador](img/05-vbox-procesador.png)
-
-### 4.3 Pantalla — el ajuste más importante
-
-- **Memoria de video:** **128 MB** (arrástralo al máximo)
-- **Controlador gráfico:** **VMSVGA**
-- ✅ **Habilitar aceleración 3D**
-
-> **Sin aceleración 3D, Gazebo y RViz no abren o van a 2 FPS.** Es el error número uno de este proyecto.
-
-<!-- CAPTURA: docs/img/06-vbox-pantalla-3d.png — pestaña Pantalla con 128 MB, VMSVGA y aceleración 3D marcada -->
-![Configuración de pantalla y aceleración 3D](img/06-vbox-pantalla-3d.png)
-
-### 4.4 Red
-
-Ve a **Red** y cambia **NAT** por **Adaptador puente**. Así la máquina virtual usa la misma tarjeta de red que tu PC y aparece como un equipo más en tu red local — útil cuando quieras comunicar nodos de ROS 2 entre máquinas.
-
-<!-- CAPTURA: docs/img/07-vbox-red-puente.png — pestaña Red con Adaptador puente seleccionado -->
-![Configuración de red](img/07-vbox-red-puente.png)
-
-### 4.5 USB — para los servomotores
-
-Ve a **USB** y selecciona **Controlador USB 3.0 (xHCI)**.
-
-Esto es para la entrada de los servomotores Feetech. Si todavía no tienes el robot físico, no pasa nada: déjalo configurado de una vez para cuando lo tengas.
-
-<!-- CAPTURA: docs/img/08-vbox-usb-xhci.png — pestaña USB con USB 3.0 (xHCI) seleccionado -->
-![Configuración de USB](img/08-vbox-usb-xhci.png)
+![Casilla Omitir instalación desatendida](img/vm-13-vbox-nueva-2.png)
 
 ---
 
-## 5. Instalar Ubuntu
+### 4. Ajustes críticos de la máquina virtual (antes de iniciar)
 
-Enciende la máquina virtual con **doble clic** sobre ella.
+Haz clic derecho en la máquina virtual → **Configuración**:
 
-1. Selecciona **Try or Install Ubuntu**.
-2. **Idioma:** Español o English → **Instalar Ubuntu**.
-3. **Disposición del teclado:** la que uses (ej. *Español — Latinoamericano*).
-4. **Tipo de instalación:** *Instalación mínima*, y marca **Descargar actualizaciones al instalar** e **Instalar programas de terceros**.
-5. **Tipo de instalación de disco:** *Borrar disco e instalar Ubuntu* — esto **solo afecta al disco virtual** que creaste, no toca tu Windows.
-6. Configura tu **usuario y contraseña**.
+- **Sistema → Placa Base:** asigna mínimo 4096 MB de RAM.
+- **Sistema → Procesador:** asigna 2 o 4 núcleos.
+- **Pantalla → Pantalla:**
+  - Memoria de video: **128 MB**
+  - Controlador gráfico: **VMSVGA**
+  - Marca la casilla **Habilitar aceleración 3D** (indispensable para la interfaz gráfica de Gazebo y RViz)
+- **USB:** selecciona **Controlador USB 3.0 (xHCI)**
 
-> ### ⚠️ RECUERDA LA CONTRASEÑA
-> Anótala. En serio. La vas a escribir decenas de veces con `sudo` durante toda la instalación de ROS, y si la pierdes, la única salida práctica es reinstalar todo desde cero. Esto no es una broma, es una advertencia.
+![Configuración de la máquina virtual](img/vm-14-vbox-config-1.png)
 
-<!-- CAPTURA: docs/img/09-ubuntu-instalacion.png — pantalla del instalador de Ubuntu -->
-![Instalación de Ubuntu](img/09-ubuntu-instalacion.png)
+![Configuración de la máquina virtual](img/vm-15-vbox-config-2.png)
 
-Al terminar, **reinicia**. Cuando arranque, si te ofrece actualizar (*Upgrade*), acepta y reinicia de nuevo.
+![Configuración de la máquina virtual](img/vm-16-vbox-config-3.png)
 
----
+Si en el caso que arranque la máquina virtual, apágala dándole a la **X** en la pantalla minimizada que corre. Le das a **Apagar** y **Aceptar**.
 
-## 6. Guest Additions — pantalla completa y portapapeles
+![Apagar la máquina virtual](img/vm-17-vbox-apagar-maquina.png)
 
-Con la máquina encendida, ve al menú superior de VirtualBox:
+Le darás a **Configuración** para asignar el uso de cámara, y para que más adelante puedas conectar el robot y funcionen los puertos USB con la máquina virtual.
 
-**Dispositivos → Insertar imagen de CD de las «Guest Additions»**
+![Abrir Configuración](img/vm-18-vbox-abrir-configuracion.png)
 
-Abre una terminal dentro de Ubuntu (**Ctrl + Alt + T**) y ejecuta:
+Configuramos la pantalla, la disposición de video y la aceleración 3D.
 
-```bash
-sudo apt update && sudo apt install -y build-essential dkms linux-headers-$(uname -r)
-sudo /media/$USER/VBox_GAs_*/VBoxLinuxAdditions.run
-sudo reboot
-```
+![Pantalla, memoria de video y aceleración 3D](img/vm-19-vbox-pantalla-3d.png)
 
-Después del reinicio tendrás pantalla completa real, redimensionado automático de ventana y podrás habilitar el portapapeles compartido.
+Ve a **Red** y configura el **NAT** a **Adaptador puente**, así usa la misma tarjeta de red tanto tu PC como la máquina virtual.
 
-> **Consejo muy recomendable:** activa **Dispositivos → Portapapeles compartido → Bidireccional**. Todo lo que sigue son comandos que vas a copiar y pegar, y escribirlos a mano es donde la gente se equivoca. Un espacio de más y el comando no funciona.
+![Red en modo Adaptador puente](img/vm-20-vbox-red-puente.png)
 
-<!-- CAPTURA: docs/img/10-ubuntu-terminal.png — terminal de Ubuntu recién abierta -->
-![Terminal de Ubuntu](img/10-ubuntu-terminal.png)
+Ve a **USB**, para la entrada de los servomotores. Si no los tienes, *chill*: esto es por si en el dado caso tienes el robot en físico y quieras accionarlo.
+
+![USB para los servomotores](img/vm-21-vbox-usb-servomotores.png)
 
 ---
 
-## 7. Conectar la webcam a la máquina virtual
+### 5. Instalar Ubuntu
 
-Este paso es obligatorio: sin él, el script de teleoperación no encuentra la cámara.
+Enciende la máquina virtual con **doble clic** encima de ella.
 
-Menú superior de VirtualBox: **Dispositivos → Webcams → [selecciona tu cámara]**
+![Encender la máquina virtual](img/vm-22-vbox-encender-maquina.png)
 
-<!-- CAPTURA: docs/img/11-vbox-webcam.png — menú Dispositivos → Webcams con la cámara seleccionada -->
-![Conectar webcam](img/11-vbox-webcam.png)
+Ahora sí empieza la instalación de Ubuntu. Como marcaste **Omitir instalación desatendida**, el instalador te va a ir preguntando todo pantalla por pantalla. Vas dándole siguiente con las opciones por defecto; espera a que termine.
+
+![Instalador de Ubuntu](img/vm-23-ubuntu-instalador-1.png)
+
+![Instalador de Ubuntu](img/vm-24-ubuntu-instalador-2.png)
+
+![Instalador de Ubuntu](img/vm-25-ubuntu-instalador-3.png)
+
+![Instalador de Ubuntu](img/vm-26-ubuntu-instalador-4.png)
+
+![Instalador de Ubuntu](img/vm-27-ubuntu-instalador-5.png)
+
+Recuerda la contraseña que colocas y el usuario.
+
+> ## ⚠️ PERO EN SERIO RECUERDA BIEN LA CONTRASEÑA
+> **POR LO MÁS SAGRADO DEL MUNDO. NO ES BROMA, ES ADVERTENCIA, COMPLETAMENTE EN SERIO.**
+>
+> La vas a escribir decenas de veces con `sudo` durante toda la instalación de ROS. Si la pierdes, la única salida práctica es reinstalar todo desde cero.
+
+![Usuario y contraseña](img/vm-28-ubuntu-usuario-password-1.png)
+
+![Usuario y contraseña](img/vm-29-ubuntu-usuario-password-2.png)
+
+Denle a **Upgrade**.
+
+![Upgrade](img/vm-30-ubuntu-upgrade-1.png)
+
+![Upgrade](img/vm-31-ubuntu-upgrade-2.png)
+
+Y reiniciar.
+
+![Reiniciar](img/vm-32-ubuntu-reiniciar.png)
+
+---
+
+### 6. Abrir la terminal
+
+Abres terminal como en la imagen, o por comando **Ctrl + Alt + T**.
+
+![Abrir la terminal](img/vm-33-ubuntu-terminal-1.png)
+
+![Terminal abierta](img/vm-34-ubuntu-terminal-2.png)
+
+---
+
+### 7. Conectar la webcam
+
+Antes que sigamos, porque vamos a ocupar la webcam, haz esta configuración: ve a **Dispositivos → Webcams** y selecciónala.
+
+![Dispositivos → Webcams](img/vm-35-vbox-webcam.png)
 
 Comprueba que Ubuntu la ve:
 
@@ -183,13 +214,31 @@ Debe aparecer al menos `/dev/video0`. Si no aparece nada, revisa que el **Extens
 
 ---
 
+### 8. Antes de los comandos
+
+Ahora sí vamos con comandos. **Ten cuidado con cómo colocas los comandos**: si le colocas un espacio o algo de más, no van a funcionar o puedes dañar algo.
+
+Si es posible, configura tu VirtualBox para que sea **copiar y pegar bidireccional** (no voy a enseñar eso porque no es totalmente necesario).
+
+> Está en **Dispositivos → Portapapeles compartido → Bidireccional**, con la máquina encendida.
+
+Y si quieres pantalla completa de verdad y que la ventana se redimensione sola, instala las **Guest Additions**: menú superior de VirtualBox → **Dispositivos → Insertar imagen de CD de las «Guest Additions»**, y luego en la terminal:
+
+```bash
+sudo apt update && sudo apt install -y build-essential dkms linux-headers-$(uname -r)
+sudo /media/$USER/VBox_GAs_*/VBoxLinuxAdditions.run
+sudo reboot
+```
+
+---
+
 ## Listo
 
 Ya tienes Ubuntu 22.04 funcionando. Continúa con:
 
 **[→ 03 — Instalación de ROS 2 Humble](03-instalacion-ros2.md)**
 
-O corre el instalador automático directamente:
+O, si prefieres que un script haga todos los comandos de terminal por ti:
 
 ```bash
 sudo apt update && sudo apt install -y git

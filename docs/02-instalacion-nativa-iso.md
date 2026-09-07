@@ -37,8 +37,8 @@ Conecta la USB de 8 GB o más y, en **Rufus**, configura:
 
 Clic en **Empezar** y, cuando pregunte, selecciona **Escribir en modo Imagen ISO**.
 
-<!-- CAPTURA: docs/img/12-rufus.png — ventana de Rufus con GPT y UEFI configurados -->
-![Rufus configurado](img/12-rufus.png)
+<!-- CAPTURA: docs/img/iso-01-rufus.png — ventana de Rufus con GPT y UEFI configurados -->
+![Rufus configurado](img/iso-01-rufus.png)
 
 > Si tu computadora es de antes de ~2012 y no soporta UEFI, usa **MBR** + **BIOS o UEFI-CSM**. En cualquier equipo moderno, GPT + UEFI es lo correcto.
 
@@ -76,8 +76,8 @@ Dentro:
 > ### ⚠️ RECUERDA LA CONTRASEÑA
 > La vas a escribir decenas de veces con `sudo` durante la instalación de ROS. Anótala.
 
-<!-- CAPTURA: docs/img/13-ubuntu-particionado.png — pantalla de tipo de instalación / particionado -->
-![Particionado](img/13-ubuntu-particionado.png)
+<!-- CAPTURA: docs/img/iso-02-particionado.png — pantalla de tipo de instalación / particionado -->
+![Particionado](img/iso-02-particionado.png)
 
 6. Deja que termine, **reinicia** y **retira la USB** cuando lo pida.
 
