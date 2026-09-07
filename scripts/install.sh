@@ -12,6 +12,7 @@
 #   Fase 2  Gazebo, MoveIt 2, ros2_control
 #   Fase 3  OpenCV, MediaPipe, permisos de cámara
 #   Fase 4  Workspace, paquetes del robot, compilación
+#   Fase 5  Parche del controlador de la pinza para Humble
 
 set -Eeuo pipefail
 DIR_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,6 +55,7 @@ Se instalará:
   Fase 2 · Gazebo (gz sim), MoveIt 2 y ros2_control
   Fase 3 · OpenCV, MediaPipe y permisos de cámara
   Fase 4 · Workspace ~/ros2_ws, paquetes del robot y compilación
+  Fase 5 · Parche del controlador de la pinza para Humble
 
 Duración estimada: 20–40 minutos según tu conexión.
 Se te pedirá la contraseña de sudo varias veces.
@@ -89,6 +91,7 @@ ejecutar_fase 1 01_ros2_humble.sh
 ejecutar_fase 2 02_simulacion.sh
 ejecutar_fase 3 03_vision_python.sh
 ejecutar_fase 4 04_workspace.sh
+ejecutar_fase 5 05_parche_gripper.sh
 
 FIN_T=$(date +%s)
 MINUTOS=$(( (FIN_T - INICIO) / 60 ))

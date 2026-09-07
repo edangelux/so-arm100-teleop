@@ -75,6 +75,7 @@ so-arm100-teleop/
 │   ├── 02_simulacion.sh           ← Gazebo, MoveIt 2, ros2_control
 │   ├── 03_vision_python.sh        ← OpenCV, MediaPipe, permisos de cámara
 │   ├── 04_workspace.sh            ← ~/ros2_ws + paquetes del robot + compilación
+│   ├── 05_parche_gripper.sh       ← adapta el controlador de la pinza a Humble
 │   └── verificar.sh               ← diagnóstico: qué está bien y qué falta
 └── teleop_vision/
     └── teleop_vision.py           ← nodo de teleoperación por visión
@@ -93,6 +94,7 @@ bash scripts/01_ros2_humble.sh      # Fase 1: ROS 2 Humble
 bash scripts/02_simulacion.sh       # Fase 2: Gazebo + MoveIt 2 + controladores
 bash scripts/03_vision_python.sh    # Fase 3: OpenCV + MediaPipe + cámara
 bash scripts/04_workspace.sh        # Fase 4: workspace y compilación
+bash scripts/05_parche_gripper.sh   # Fase 5: controlador de la pinza para Humble
 ```
 
 Los scripts son **idempotentes**: puedes volver a correrlos sin romper nada. Los bloques de comandos equivalentes, uno por uno, están en [docs/03](docs/03-instalacion-ros2.md) y [docs/04](docs/04-workspace-y-compilacion.md).
@@ -162,7 +164,8 @@ Casi todos los errores que aparecen en la práctica están documentados con su c
 - `rosdep: command not found` o `ERROR: cannot download default sources list`
 - `Package 'so_arm_100_bringup' not found`
 - El robot no se mueve aunque la ventana de video sí detecta el cuerpo
-- La pinza no responde al pellizco
+- La pinza no responde al pellizco, o `gripper_controller` no carga
+- «Se abre Gazebo pero no se abre ROS»
 - El brazo tiembla o se mueve a saltos
 
 ---

@@ -430,6 +430,75 @@ Este proyecto usa el **Gazebo nuevo** (`gz sim`), que viene con `ros-humble-ros-
 
 ---
 
+### `Error loading controller` / `process has died ... load_controller --set-state active gripper_controller`
+
+```
+[ros2-7] Error loading controller, check controller_manager logs
+[ERROR] [ros2-7]: process has died [pid 24426, exit code 1,
+        cmd 'ros2 control load_controller --set-state active gripper_controller'].
+```
+
+**Causa:** los paquetes de `brukg/SO-100-arm` están escritos para **ROS 2 Jazzy** en la parte de la pinza. Declaran:
+
+```yaml
+gripper_controller:
+  type: parallel_gripper_action_controller/GripperActionController   # solo Jazzy+
+```
+
+Ese controlador se incorporó a `ros2_controllers` en Jazzy; **en Humble no existe**. `controller_manager` no encuentra el plugin y el spawner muere. Lo mismo ocurre en `moveit_controllers.yaml`, que lo declara como `ParallelGripperCommand`, otro tipo de Jazzy en adelante.
+
+**Solución:**
+
+```bash
+cd ~/so-arm100-teleop
+git pull
+bash scripts/05_parche_gripper.sh
+```
+
+El script cambia la pinza a `joint_trajectory_controller/JointTrajectoryController`, que sí existe en Humble, ajusta MoveIt a `FollowJointTrajectory`, recompila y **guarda una copia `.original` de cada archivo** antes de tocarlo.
+
+Además del arreglo, esto trae una ventaja: aparece el tópico `/gripper_controller/joint_trajectory`, que es justo al que publica `teleop_vision.py`. Con el controlador original, de tipo acción, ese tópico no existía y los mensajes de la pinza se perdían **sin dar ningún error**.
+
+Comprueba que quedó bien:
+
+```bash
+ros2 control list_controllers
+```
+
+Los tres deben decir `active`:
+
+```
+joint_state_broadcaster  joint_state_broadcaster/JointStateBroadcaster  active
+arm_controller           joint_trajectory_controller/JointTrajectoryController  active
+gripper_controller       joint_trajectory_controller/JointTrajectoryController  active
+```
+
+Para revertir, los archivos `.original` están en `~/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/`.
+
+---
+
+### «Se abre Gazebo pero no se abre ROS»
+
+No falta nada: **ROS 2 no es un programa con ventana.** Es un conjunto de procesos que se comunican entre sí, sin interfaz gráfica propia. Cuando lanzas `gz.launch.py`, ROS 2 **ya está corriendo** — lo que ves es Gazebo, que es la ventana del simulador.
+
+Compruébalo con la simulación abierta, en otra terminal:
+
+```bash
+ros2 node list      # los nodos de ROS 2 en marcha
+ros2 topic list     # los tópicos por los que se hablan
+```
+
+La otra ventana que quizá esperabas es **RViz**, que visualiza el estado del robot y la planificación de MoveIt. `gz.launch.py` no la abre, a propósito: en una máquina virtual, Gazebo y RViz a la vez se comen la RAM y la gráfica. Si la quieres:
+
+```bash
+ros2 launch so_arm_100_bringup rviz.launch.py     # solo RViz
+ros2 launch so_arm_100_moveit_config demo.launch.py   # MoveIt + RViz, sin Gazebo
+```
+
+Para este proyecto **no necesitas RViz**: la teleoperación publica directamente a los controladores y el resultado se ve en Gazebo.
+
+---
+
 ### Los controladores no se activan / `arm_controller` queda en `inactive`
 
 Espera un poco más: el spawner de controladores a veces tarda 10–20 segundos en una máquina virtual lenta. Si pasado ese tiempo sigue inactivo:
