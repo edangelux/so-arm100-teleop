@@ -124,6 +124,20 @@ if [ -f "${WS}/install/setup.bash" ]; then
     fi
 fi
 
+# El overlay de la fase 5 tiene que estar aplicado, o el lanzamiento falla
+CFG_ROBOT="${WS}/src/SO-100-arm/so_arm_100_moveit_config/config"
+if [ -d "${CFG_ROBOT}" ]; then
+    if grep -rq "parallel_gripper_action_controller" "${CFG_ROBOT}" 2>/dev/null; then
+        error "Falta aplicar el overlay: la configuración usa controladores de Jazzy"
+        aviso "  Solución:  bash scripts/05_aplicar_overlay.sh"
+        FALLOS=$((FALLOS + 1))
+    else
+        ok "Overlay aplicado (sin controladores de Jazzy)"
+    fi
+fi
+comprobar "Launch combinado gz_moveit.launch.py" \
+    test -f "${WS}/src/SO-100-arm/so_arm_100_bringup/launch/gz_moveit.launch.py"
+
 if [ -d "${WS}/src/SO-ARM100" ]; then
     aviso "Se detectó 'SO-ARM100' en src/ — ese repositorio solo tiene STL/CAD,"
     aviso "  no paquetes de ROS 2. El correcto es brukg/SO-100-arm (ver docs/04)."
@@ -140,7 +154,7 @@ if [ "${FALLOS}" -eq 0 ]; then
     printf '%s╔════════════════════════════════════════════╗%s\n' "${VERDE}${NEGRITA}" "${FIN}"
     printf '%s║   Todo en orden. Listo para ejecutar.      ║%s\n' "${VERDE}${NEGRITA}" "${FIN}"
     printf '%s╚════════════════════════════════════════════╝%s\n\n' "${VERDE}${NEGRITA}" "${FIN}"
-    printf '  Terminal 1:  ros2 launch so_arm_100_bringup gz.launch.py\n'
+    printf '  Terminal 1:  ros2 launch so_arm_100_bringup gz_moveit.launch.py\n'
     printf '  Terminal 2:  python3 %s\n\n' "${NODO}"
 else
     printf '%s%d comprobación(es) fallida(s).%s\n' "${ROJO}${NEGRITA}" "${FALLOS}" "${FIN}"

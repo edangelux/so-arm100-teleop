@@ -75,8 +75,11 @@ so-arm100-teleop/
 │   ├── 02_simulacion.sh           ← Gazebo, MoveIt 2, ros2_control
 │   ├── 03_vision_python.sh        ← OpenCV, MediaPipe, permisos de cámara
 │   ├── 04_workspace.sh            ← ~/ros2_ws + paquetes del robot + compilación
-│   ├── 05_parche_gripper.sh       ← adapta el controlador de la pinza a Humble
+│   ├── 05_aplicar_overlay.sh      ← aplica la configuración verificada para Humble
 │   └── verificar.sh               ← diagnóstico: qué está bien y qué falta
+├── overlay/                       ← archivos de configuración ya corregidos
+│   ├── so_arm_100_bringup/
+│   └── so_arm_100_moveit_config/
 └── teleop_vision/
     └── teleop_vision.py           ← nodo de teleoperación por visión
 ```
@@ -94,7 +97,7 @@ bash scripts/01_ros2_humble.sh      # Fase 1: ROS 2 Humble
 bash scripts/02_simulacion.sh       # Fase 2: Gazebo + MoveIt 2 + controladores
 bash scripts/03_vision_python.sh    # Fase 3: OpenCV + MediaPipe + cámara
 bash scripts/04_workspace.sh        # Fase 4: workspace y compilación
-bash scripts/05_parche_gripper.sh   # Fase 5: controlador de la pinza para Humble
+bash scripts/05_aplicar_overlay.sh  # Fase 5: overlay de configuración verificada
 ```
 
 Los scripts son **idempotentes**: puedes volver a correrlos sin romper nada. Los bloques de comandos equivalentes, uno por uno, están en [docs/03](docs/03-instalacion-ros2.md) y [docs/04](docs/04-workspace-y-compilacion.md).
@@ -111,10 +114,10 @@ Se necesitan **dos terminales**.
 cd ~/ros2_ws
 source /opt/ros/humble/setup.bash
 source install/setup.bash
-ros2 launch so_arm_100_bringup gz.launch.py
+ros2 launch so_arm_100_bringup gz_moveit.launch.py
 ```
 
-Espera a que la ventana 3D de Gazebo cargue por completo y a que en la consola aparezcan `joint_state_broadcaster`, `arm_controller` y `gripper_controller` como **activos**.
+Abre Gazebo, `move_group` y RViz a la vez. Espera a que Gazebo cargue por completo y a que en la consola aparezcan `joint_state_broadcaster`, `arm_controller` y `gripper_controller` como **activos**.
 
 ### Terminal 2 — Teleoperación por visión
 
@@ -129,13 +132,14 @@ python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py
 
 | Acción | Gesto / tecla |
 |---|---|
-| **Calibrar el cero** | Ponte frente a la cámara con el brazo derecho visible y en reposo, presiona **`C`** o **`ESPACIO`** |
-| Mover el efector a los lados | Mueve la mano lateralmente → rota la base |
-| Subir / bajar el efector | Sube o baja la mano → hombro y codo ajustan la altura |
-| Acercar / alejar el efector | Acerca o aleja la mano de la cámara → los eslabones se extienden o recogen |
+| **Calibrar** | Postura neutra, **con la mano visible**, y presiona **`C`** o **`ESPACIO`** |
+| Mover el brazo | El robot **copia los ángulos de tus articulaciones**: hombro, codo y muñeca |
 | **Cerrar la pinza** | Junta el pulgar con el índice (pellizco) |
 | **Abrir la pinza** | Separa el pulgar del índice |
-| Salir | **`Q`** o **`ESC`** con la ventana de video enfocada |
+| **Invertir un sentido** | Teclas **`1`**–**`5`** — si te mueves y el robot va al revés |
+| Ajustar sensibilidad | **`TAB`** para seleccionar, **`+`** / **`-`** para la ganancia |
+| **Guardar el ajuste** | **`S`** — queda en `~/teleop_config.json` |
+| Cambiar de brazo | **`B`** (requiere recalibrar) · Pausa: **`P`** · Salir: **`Q`** |
 
 La guía completa, con la explicación de cada parámetro ajustable, está en [docs/05](docs/05-ejecucion.md).
 
@@ -164,7 +168,10 @@ Casi todos los errores que aparecen en la práctica están documentados con su c
 - `rosdep: command not found` o `ERROR: cannot download default sources list`
 - `Package 'so_arm_100_bringup' not found`
 - El robot no se mueve aunque la ventana de video sí detecta el cuerpo
-- La pinza no responde al pellizco, o `gripper_controller` no carga
+- `Error loading controller` al cargar `gripper_controller`
+- Gazebo y MoveIt funcionan por separado pero no juntos
+- La pinza no responde al pellizco
+- El brazo se mueve al revés de como me muevo yo
 - «Se abre Gazebo pero no se abre ROS»
 - El brazo tiembla o se mueve a saltos
 

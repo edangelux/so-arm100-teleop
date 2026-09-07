@@ -18,6 +18,10 @@ comprobar_ubuntu_2204
 
 WS="${ROS2_WS:-$HOME/ros2_ws}"
 REPO_ROBOT="https://github.com/brukg/SO-100-arm.git"
+# El overlay de la fase 5 está verificado contra este commit exacto. Si upstream
+# cambia, los archivos del overlay podrían no encajar, así que se fija la
+# versión. Para usar la última:  COMMIT_ROBOT=main bash scripts/04_workspace.sh
+COMMIT_ROBOT="${COMMIT_ROBOT:-789b6b2c32819d792105b068a4c70c32767d4e46}"
 DIR_ROBOT="${WS}/src/SO-100-arm"
 
 titulo "Fase 4 · Workspace y compilación"
@@ -46,6 +50,10 @@ else
     paso "Clonando ${REPO_ROBOT}"
     git clone "${REPO_ROBOT}" "${DIR_ROBOT}"
 fi
+
+paso "Fijando el repositorio en ${COMMIT_ROBOT:0:12}"
+git -C "${DIR_ROBOT}" checkout -q "${COMMIT_ROBOT}" 2>/dev/null || \
+    aviso "No se pudo fijar el commit; se sigue con la rama actual."
 ok "Paquetes del robot en ${DIR_ROBOT}"
 
 # El plugin IKFast es opcional y es el que más falla al compilar.

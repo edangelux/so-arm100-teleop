@@ -79,7 +79,53 @@ La primera compilación tarda entre 3 y 15 minutos.
 
 ---
 
-## 5. Cargar el workspace automáticamente
+## 5. Overlay de configuración verificada
+
+**Este paso no es opcional.** Los paquetes de `brukg/SO-100-arm`, tal como vienen, **no arrancan en Humble**.
+
+```bash
+bash ~/so-arm100-teleop/scripts/05_aplicar_overlay.sh
+```
+
+El script copia sobre el clon los archivos ya corregidos que están en `overlay/`, guarda una copia `.original` de cada uno y recompila. Es idempotente.
+
+### Qué corrige, y por qué
+
+| Archivo | Problema | Corrección |
+|---|---|---|
+| `config/ros2_controllers.yaml`<br>`config/controllers_5dof.yaml` | `gripper_controller` declarado como `parallel_gripper_action_controller/GripperActionController`, que **solo existe en Jazzy** | Pasa a `position_controllers/GripperActionController` |
+| `config/moveit_controllers.yaml` | `ParallelGripperCommand`, también de Jazzy | Pasa a `GripperCommand` |
+| `config/kinematics.yaml` | Usa el plugin **IKFast**, que no compila de forma fiable en Humble | Pasa a **KDL**, que resuelve este brazo sin problema |
+| `config/so_arm_100.urdf.xacro`<br>`config/so_arm_100.srdf` | El xacro de MoveIt **no coincide** con el del paquete de descripción | Se reescribe con la misma estructura, y el robot pasa a llamarse `so_arm_100_5dof` |
+| `launch/move_group.launch.py`<br>`launch/moveit_rviz.launch.py` | Los generadores de `moveit_configs_utils` no permiten pasar `use_sim_time` | Se construye el nodo a mano con `use_sim_time: true` |
+| `launch/gz_moveit.launch.py` | No existía | **Archivo nuevo**: lanza Gazebo + `move_group` + RViz de una vez |
+
+> ### El arreglo importante es el del URDF
+> Sin el overlay, el error visible es el del `gripper_controller` — es el que aborta el lanzamiento y el que vas a ver primero. Pero debajo hay uno más profundo: **Gazebo y MoveIt cargaban dos URDF distintos** y no se entendían entre sí. Por eso `gz.launch.py` y `demo.launch.py` funcionaban por separado pero no juntos. Reescribir `so_arm_100.urdf.xacro` para que use la misma estructura que `so_arm_100_description` es lo que hace posible `gz_moveit.launch.py`.
+>
+> Y sin `use_sim_time: true`, MoveIt usa el reloj de pared mientras Gazebo usa el de simulación: las trayectorias quedan desfasadas aunque todo lo demás esté bien.
+
+### Sobre la versión fijada
+
+La fase 4 fija el clon en el commit `789b6b2c`, que es contra el que está verificado este overlay. Si `brukg/SO-100-arm` cambia esos archivos, el overlay podría no encajar.
+
+Para usar la última versión del upstream y asumir el riesgo:
+
+```bash
+COMMIT_ROBOT=main bash ~/so-arm100-teleop/scripts/04_workspace.sh
+```
+
+### Volver a la configuración original
+
+```bash
+cd ~/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config
+for f in *.original; do cp "$f" "${f%.original}"; done
+cd ~/ros2_ws && colcon build --symlink-install --packages-select so_arm_100_moveit_config
+```
+
+---
+
+## 6. Cargar el workspace automáticamente
 
 ```bash
 grep -qxF "source ~/ros2_ws/install/setup.bash" ~/.bashrc || echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
@@ -88,7 +134,7 @@ source ~/ros2_ws/install/setup.bash
 
 ---
 
-## 6. Verificar que todo quedó bien
+## 7. Verificar que todo quedó bien
 
 ```bash
 ros2 pkg list | grep so_arm

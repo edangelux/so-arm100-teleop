@@ -324,10 +324,10 @@ y luego **cierra sesión y vuelve a entrar** (o reinicia). El cambio de grupo no
 
 ### La cámara existe pero el video sale negro o congelado
 
-Prueba otro índice de cámara:
+Prueba otro índice de cámara. En `teleop_vision.py`, busca esta línea y cambia el `0`:
 
-```bash
-python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py --ros-args -p camera_index:=1
+```python
+cap = cv2.VideoCapture(0)      # prueba 1, 2, ...
 ```
 
 Para ver qué cámaras hay realmente:
@@ -438,42 +438,76 @@ Este proyecto usa el **Gazebo nuevo** (`gz sim`), que viene con `ros-humble-ros-
         cmd 'ros2 control load_controller --set-state active gripper_controller'].
 ```
 
-**Causa:** los paquetes de `brukg/SO-100-arm` están escritos para **ROS 2 Jazzy** en la parte de la pinza. Declaran:
+**Causa:** los paquetes de `brukg/SO-100-arm` están escritos contra **ROS 2 Jazzy** en la parte de la pinza. Declaran:
 
 ```yaml
 gripper_controller:
   type: parallel_gripper_action_controller/GripperActionController   # solo Jazzy+
 ```
 
-Ese controlador se incorporó a `ros2_controllers` en Jazzy; **en Humble no existe**. `controller_manager` no encuentra el plugin y el spawner muere. Lo mismo ocurre en `moveit_controllers.yaml`, que lo declara como `ParallelGripperCommand`, otro tipo de Jazzy en adelante.
+Ese controlador se incorporó a `ros2_controllers` en Jazzy; **en Humble no existe**. `controller_manager` no encuentra el plugin y el spawner muere.
 
-**Solución:**
+**Solución** — aplica el overlay:
 
 ```bash
 cd ~/so-arm100-teleop
 git pull
-bash scripts/05_parche_gripper.sh
+bash scripts/05_aplicar_overlay.sh
 ```
 
-El script cambia la pinza a `joint_trajectory_controller/JointTrajectoryController`, que sí existe en Humble, ajusta MoveIt a `FollowJointTrajectory`, recompila y **guarda una copia `.original` de cada archivo** antes de tocarlo.
+El overlay cambia la pinza a `position_controllers/GripperActionController`, que sí existe en Humble, y ajusta MoveIt a `GripperCommand`. Corrige además otros cinco archivos — ver [docs/04 §5](04-workspace-y-compilacion.md#5-overlay-de-configuración-verificada).
 
-Además del arreglo, esto trae una ventaja: aparece el tópico `/gripper_controller/joint_trajectory`, que es justo al que publica `teleop_vision.py`. Con el controlador original, de tipo acción, ese tópico no existía y los mensajes de la pinza se perdían **sin dar ningún error**.
-
-Comprueba que quedó bien:
+Comprueba:
 
 ```bash
 ros2 control list_controllers
 ```
 
-Los tres deben decir `active`:
-
 ```
-joint_state_broadcaster  joint_state_broadcaster/JointStateBroadcaster  active
+joint_state_broadcaster  joint_state_broadcaster/JointStateBroadcaster   active
 arm_controller           joint_trajectory_controller/JointTrajectoryController  active
-gripper_controller       joint_trajectory_controller/JointTrajectoryController  active
+gripper_controller       position_controllers/GripperActionController    active
 ```
 
-Para revertir, los archivos `.original` están en `~/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/`.
+---
+
+### Gazebo y MoveIt funcionan por separado pero no juntos
+
+Síntoma: `gz.launch.py` abre Gazebo bien, `demo.launch.py` abre MoveIt bien, pero al intentar los dos a la vez el robot no aparece, o aparece pero MoveIt no lo reconoce.
+
+**Causa:** `so_arm_100_moveit_config/config/so_arm_100.urdf.xacro` **no coincide** con el xacro del paquete de descripción — nombres de robot distintos y estructura de `ros2_control` distinta. Cada uno cargaba su propio URDF y no se entendían.
+
+A eso se suma que `move_group` y RViz arrancaban **sin `use_sim_time`**, así que usaban el reloj de pared mientras Gazebo usaba el de simulación: aunque el URDF coincidiera, las trayectorias quedaban desfasadas.
+
+**Solución:** el overlay reescribe el xacro, renombra el robot a `so_arm_100_5dof`, y reconstruye `move_group.launch.py` y `moveit_rviz.launch.py` con `use_sim_time: true`. Además instala `gz_moveit.launch.py`, que lanza los tres a la vez:
+
+```bash
+bash ~/so-arm100-teleop/scripts/05_aplicar_overlay.sh
+cd ~/ros2_ws
+ros2 launch so_arm_100_bringup gz_moveit.launch.py
+```
+
+---
+
+### La pinza no responde al pellizco
+
+El brazo se mueve, pero la pinza no. Recorre esto en orden:
+
+1. **¿Está activo el controlador?**
+   ```bash
+   ros2 control list_controllers | grep gripper
+   ```
+
+2. **¿Existe la acción?** La pinza **no** se comanda por tópico, sino por una **acción**:
+   ```bash
+   ros2 action list | grep gripper     # /gripper_controller/gripper_cmd
+   ```
+
+3. **Mira el HUD del script.** Si al lado de `Gripper` dice `[accion NO disp.]`, el script no encontró el servidor de acción — el problema está del lado del controlador, no del script.
+
+4. **¿Aplicaste el overlay?** Sin él, `gripper_controller` ni siquiera carga.
+
+> **Por qué acción y no tópico:** `position_controllers/GripperActionController` solo acepta acciones. Una versión anterior de este script publicaba a `/gripper_controller/joint_trajectory`, un tópico que con este controlador **no existe** — los mensajes se perdían sin dar ningún error. Si alguna vez ves el brazo moverse y la pinza quieta sin mensajes de error, esta es la sospecha número uno.
 
 ---
 
@@ -544,70 +578,86 @@ Recorre esta lista en orden:
 
 ---
 
-### La pinza no responde al pellizco
+### El brazo se mueve al revés de como me muevo yo
 
-En la configuración original del repositorio, `gripper_controller` es de tipo `parallel_gripper_action_controller/GripperActionController`, que **se comanda por una acción de ROS, no por el tópico `joint_trajectory`**. Los mensajes que envía el script se pierden en silencio.
+No es un fallo: **el sentido correcto depende de tu cámara, de si la imagen está en espejo y de tu lateralidad.** No hay un valor universal.
 
-```bash
-ros2 control list_controllers
-ros2 topic list | grep gripper
-```
+Con la ventana de video enfocada, presiona el **número de la articulación** (`1`–`5`) y su signo se invierte al instante. Verás cambiar `s=+1` a `s=-1` en el panel.
 
-- Si existe `/gripper_effort_controller/joint_trajectory`, apunta ahí:
-  ```bash
-  python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py \
-      --ros-args -p gripper_topic:=/gripper_effort_controller/joint_trajectory
-  ```
-- Si el joint de tu pinza tiene otro nombre:
-  ```bash
-  python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py \
-      --ros-args -p gripper_joint:=Moving_Jaw
-  ```
-- Si prefieres cambiar el controlador: en `so_arm_100_moveit_config/config/ros2_controllers.yaml`, define `gripper_controller` como `joint_trajectory_controller/JointTrajectoryController` sobre el joint `Gripper`, y recompila.
+| Tecla | Articulación |
+|---|---|
+| `1` | `Shoulder_Rotation` |
+| `2` | `Shoulder_Pitch` |
+| `3` | `Elbow` |
+| `4` | `Wrist_Pitch` |
+| `5` | `Wrist_Roll` |
+
+Cuando quede a tu gusto, presiona **`S`** para guardarlo en `~/teleop_config.json`. La próxima vez se carga solo.
+
+> **No borres `~/teleop_config.json` sin respaldarlo.** Ese archivo guarda un ajuste que solo se consigue probando en vivo; borrarlo devuelve todo a los valores por defecto del código, que pueden no ser los correctos para tu montaje. Si necesitas resetearlo: `cp ~/teleop_config.json ~/teleop_config.json.bak` primero.
 
 ---
 
 ### El brazo tiembla o se mueve a saltos
 
-Sube el suavizado (**valores más bajos suavizan más**) y baja el paso máximo por fotograma:
+Primero descarta lo más común: **si el temblor viene de que MediaPipe pierde y recupera el tracking, el problema es de iluminación, no del filtro.** Mejora la luz frontal y despeja el fondo.
 
-```bash
-python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py \
-    --ros-args -p smoothing:=0.20 -p max_joint_step:=0.05
+Si el tracking es estable y aun así tiembla, ajusta el filtro One Euro en `teleop_vision.py`:
+
+```python
+ONE_EURO = {
+    'Shoulder_Rotation': dict(min_cutoff=1.2, beta=0.05),
+    ...
+}
 ```
 
-Si el temblor viene de que MediaPipe pierde y recupera el tracking, el problema es de iluminación, no del filtro: mejora la luz frontal y despeja el fondo.
+- **`min_cutoff` más bajo** → más suave en reposo, elimina el temblor
+- **`beta` más alto** → responde más rápido al movimiento, menos retraso
+
+También puedes subir la zona muerta, que es el movimiento mínimo antes de que la articulación reaccione:
+
+```python
+DEADZONE = {'Shoulder_Rotation': 0.012, ...}   # en radianes
+```
 
 ---
 
 ### El robot se mueve muy poco / tengo que exagerar el movimiento
 
-Sube la escala:
+Sube la **ganancia** de la articulación, en vivo:
 
-```bash
-python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py --ros-args -p scale:=0.60
+1. **`TAB`** hasta seleccionar la articulación (queda marcada con `>`)
+2. **`+`** para subirla (hasta 3.0)
+3. **`S`** para guardar
+
+---
+
+### Las muñecas se quedan congeladas
+
+Mira el mensaje del panel — hay **dos causas distintas** y el script las distingue:
+
+| Mensaje | Causa | Qué hacer |
+|---|---|---|
+| `MANO NO DETECTADA` (rojo) | MediaPipe no ve tu mano | Métela en cuadro; mejora la luz |
+| `MUÑECA EN ESCORZO` (naranja) | La mano se ve, pero el antebrazo apunta hacia la cámara | Gira el cuerpo para que el antebrazo quede **perpendicular** a la cámara |
+
+El escorzo no es un bug: cuando el antebrazo apunta hacia la cámara, su proyección 2D se acorta casi a cero, y cualquier ruido de detección se amplifica en un ángulo enorme e inestable. El script prefiere **congelar** el último valor válido antes que comandar un ángulo calculado sobre un vector casi nulo.
+
+Si te pasa demasiado, baja los umbrales en `teleop_vision.py`:
+
+```python
+MIN_FORE_LEN = 0.04      # bájalo para tolerar más escorzo
+MIN_HAND_LEN = 0.03
+MIN_KNUCKLE_LEN = 0.02
 ```
 
 ---
 
-### Aviso constante de singularidad
+### El índice `w=` se acerca a cero
 
-El punto objetivo está en el límite del alcance del brazo: demasiado lejos o demasiado pegado a la base. El algoritmo ya recorta el objetivo a una posición válida, así que no es un fallo — pero significa que estás trabajando en el borde del espacio alcanzable.
+`w` es el **índice de manipulabilidad**: cuánto margen de movimiento le queda al brazo en esa postura. Cerca de cero significa que estás en una **singularidad** — el brazo casi extendido del todo o casi plegado sobre sí mismo, donde pequeños cambios de postura exigen movimientos articulares enormes.
 
-1. **Recalibra** (**`C`**) con el brazo en una postura más centrada y relajada.
-2. Si el aviso sale prácticamente siempre, revisa los límites del espacio de trabajo. El SO-ARM100 alcanza **0.251 m** (`L1 + L2 = 0.116 + 0.135`); si `x_max` u otro límite supera ese valor, buena parte de la caja de trabajo es inalcanzable por construcción y la IK vive saturada.
-
-   Los valores por defecto ya están ajustados a ese alcance. Compruébalos:
-
-   ```bash
-   ros2 param get /teleop_vision_node x_max
-   ```
-
-   Debe devolver `0.20`, no un valor mayor. Si necesitas más recorrido, **sube `scale`** en lugar de ampliar la caja:
-
-   ```bash
-   python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py --ros-args -p scale:=0.60
-   ```
+No es un error, es información. Recalibra (**`C`**) con el brazo en una postura más media, ni muy extendida ni muy recogida.
 
 ---
 

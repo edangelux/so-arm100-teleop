@@ -12,7 +12,7 @@
 #   Fase 2  Gazebo, MoveIt 2, ros2_control
 #   Fase 3  OpenCV, MediaPipe, permisos de cámara
 #   Fase 4  Workspace, paquetes del robot, compilación
-#   Fase 5  Parche del controlador de la pinza para Humble
+#   Fase 5  Overlay de configuración verificada (Humble + Gazebo/MoveIt)
 
 set -Eeuo pipefail
 DIR_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -55,7 +55,7 @@ Se instalará:
   Fase 2 · Gazebo (gz sim), MoveIt 2 y ros2_control
   Fase 3 · OpenCV, MediaPipe y permisos de cámara
   Fase 4 · Workspace ~/ros2_ws, paquetes del robot y compilación
-  Fase 5 · Parche del controlador de la pinza para Humble
+  Fase 5 · Overlay de configuración verificada
 
 Duración estimada: 20–40 minutos según tu conexión.
 Se te pedirá la contraseña de sudo varias veces.
@@ -91,7 +91,7 @@ ejecutar_fase 1 01_ros2_humble.sh
 ejecutar_fase 2 02_simulacion.sh
 ejecutar_fase 3 03_vision_python.sh
 ejecutar_fase 4 04_workspace.sh
-ejecutar_fase 5 05_parche_gripper.sh
+ejecutar_fase 5 05_aplicar_overlay.sh
 
 FIN_T=$(date +%s)
 MINUTOS=$(( (FIN_T - INICIO) / 60 ))
@@ -108,15 +108,15 @@ ${AMARILLO}IMPORTANTE:${FIN} cierra esta terminal y abre una nueva antes de cont
 Si es la primera vez que se agrega tu usuario al grupo 'video', cierra
 sesión y vuelve a entrar para que la cámara funcione sin sudo.
 
-${NEGRITA}Terminal 1 — simulación:${FIN}
+${NEGRITA}Terminal 1 — simulación (Gazebo + MoveIt + RViz):${FIN}
   cd ~/ros2_ws
-  ros2 launch so_arm_100_bringup gz.launch.py
+  ros2 launch so_arm_100_bringup gz_moveit.launch.py
 
 ${NEGRITA}Terminal 2 — teleoperación:${FIN}
   python3 ${DIR_REPO}/teleop_vision/teleop_vision.py
 
 Espera a que Gazebo cargue por completo antes de lanzar la teleoperación.
-Con la ventana de video enfocada, presiona ${NEGRITA}C${FIN} para calibrar el cero.
+Con la ventana de video enfocada y TU MANO VISIBLE, presiona ${NEGRITA}C${FIN} para calibrar.
 
 Diagnóstico:   ${DIR_SCRIPTS}/verificar.sh
 Ejecución:     ${DIR_REPO}/docs/05-ejecucion.md
