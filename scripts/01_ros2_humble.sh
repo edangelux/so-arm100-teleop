@@ -95,8 +95,14 @@ ok "Base de datos de rosdep actualizada"
 titulo "Configurando el entorno"
 anadir_a_bashrc "source /opt/ros/humble/setup.bash"
 
+# Los archivos setup.bash de ROS NO son compatibles con 'set -u': referencian
+# variables como AMENT_TRACE_SETUP_FILES sin darles valor por defecto, y el
+# script muere con "AMENT_TRACE_SETUP_FILES: unbound variable".
+# Se desactiva -u solo mientras se carga el entorno, y se vuelve a activar.
+set +u
 # shellcheck source=/dev/null
 source /opt/ros/humble/setup.bash
+set -u
 
 titulo "Fase 1 completada"
 ok "ROS_DISTRO = ${ROS_DISTRO:-(no definido)}"

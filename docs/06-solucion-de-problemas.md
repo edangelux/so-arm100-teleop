@@ -12,6 +12,71 @@ bash ~/so-arm100-teleop/scripts/verificar.sh
 
 ---
 
+## Cómo leer un error
+
+Cuando el instalador se detiene, muestra un recuadro como este:
+
+```
+╔═══════════════════════════════════════════════════════════════╗
+║  La instalación se detuvo por un error                        ║
+╚═══════════════════════════════════════════════════════════════╝
+
+  Archivo:            01_ros2_humble.sh
+  Línea:              104
+  Comando que falló:  source /opt/ros/humble/setup.bash
+  Código de salida:   1
+  Registro completo:  /home/tu_usuario/so-arm100-instalacion.log
+```
+
+**El mensaje de error de verdad está unas líneas MÁS ARRIBA de ese recuadro.** El recuadro te dice dónde se detuvo; la causa la imprimió el comando que falló, justo antes. Es el error más común al pedir ayuda: pegar solo la última línea, que casi nunca es la útil.
+
+Todo queda guardado en `~/so-arm100-instalacion.log`, así que no importa si el texto se te fue de la ventana:
+
+```bash
+tail -n 40 ~/so-arm100-instalacion.log     # el error y su contexto
+less ~/so-arm100-instalacion.log           # todo, con flechas para navegar
+grep -n -i "error\|fail\|E:" ~/so-arm100-instalacion.log
+```
+
+Cuando arregles la causa, reanuda sin repetir lo ya instalado:
+
+```bash
+bash scripts/install.sh --desde 2     # 2 = número de la fase donde se cortó
+```
+
+---
+
+### `AMENT_TRACE_SETUP_FILES: unbound variable`
+
+**Era un fallo del script, corregido.** Actualiza el repositorio y vuelve a lanzarlo:
+
+```bash
+cd ~/so-arm100-teleop
+git pull
+bash scripts/install.sh
+```
+
+<details>
+<summary><b>Qué pasaba, por si te interesa</b></summary>
+
+Los scripts corren con `set -u`, que detiene la ejecución ante cualquier variable sin definir. Es una buena práctica: evita que un error tipográfico en un nombre de variable pase desapercibido y borre algo que no debía.
+
+El problema es que **los archivos `setup.bash` de ROS no son compatibles con `set -u`**: referencian variables como `AMENT_TRACE_SETUP_FILES` sin darles valor por defecto. Al cargarlos, `bash` se detiene.
+
+La solución es desactivar `-u` únicamente durante el `source` y volver a activarlo enseguida:
+
+```bash
+set +u
+source /opt/ros/humble/setup.bash
+set -u
+```
+
+Esto **no te afecta al usar ROS normalmente**: tu terminal interactiva no tiene `set -u` activado. Solo pasaba dentro de los scripts.
+
+</details>
+
+---
+
 ## Al ejecutar los scripts
 
 ### `bash: ./scripts/install.sh: Permission denied`

@@ -40,8 +40,11 @@ informar "Espacio libre en \$HOME" "$(df -h "$HOME" | awk 'NR==2 {print $4}')"
 titulo "ROS 2"
 comprobar "ROS 2 Humble instalado en /opt/ros/humble" test -d /opt/ros/humble
 if [ -d /opt/ros/humble ]; then
+    # Los setup.bash de ROS no son compatibles con 'set -u'
+    set +u
     # shellcheck source=/dev/null
     source /opt/ros/humble/setup.bash 2>/dev/null
+    set -u
     informar "ROS_DISTRO" "${ROS_DISTRO:-(no definido)}"
     comprobar "Comando 'ros2' disponible" command -v ros2
     comprobar "colcon disponible" command -v colcon
@@ -107,8 +110,10 @@ comprobar "'source ${WS}/install/setup.bash' en ~/.bashrc" \
     grep -qxF "source ${WS}/install/setup.bash" "$HOME/.bashrc"
 
 if [ -f "${WS}/install/setup.bash" ]; then
+    set +u
     # shellcheck source=/dev/null
     source "${WS}/install/setup.bash" 2>/dev/null
+    set -u
     PAQUETES="$(ros2 pkg list 2>/dev/null | grep '^so_arm' || true)"
     if [ -n "${PAQUETES}" ]; then
         ok "Paquetes del robot detectados:"

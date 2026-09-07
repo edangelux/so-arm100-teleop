@@ -26,8 +26,11 @@ if [ ! -d /opt/ros/humble ]; then
     morir "No se encontró ROS 2 Humble. Ejecuta primero: bash scripts/01_ros2_humble.sh"
 fi
 
+# Los setup.bash de ROS no son compatibles con 'set -u' (ver nota en la fase 1).
+set +u
 # shellcheck source=/dev/null
 source /opt/ros/humble/setup.bash
+set -u
 
 # --- 1. Workspace ----------------------------------------------------------
 paso "Preparando el workspace en ${WS}"
@@ -80,8 +83,10 @@ colcon build "${ARGS_BUILD[@]}"
 titulo "Configurando el entorno"
 anadir_a_bashrc "source ${WS}/install/setup.bash"
 
+set +u
 # shellcheck source=/dev/null
 source "${WS}/install/setup.bash"
+set -u
 
 # --- 6. Verificación -------------------------------------------------------
 titulo "Verificación"

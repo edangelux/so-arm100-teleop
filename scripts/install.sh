@@ -69,6 +69,11 @@ if [ "${CONFIRMAR}" -eq 1 ]; then
     esac
 fi
 
+# El registro arranca DESPUÉS de la pregunta: redirigir la salida antes haría
+# que el prompt no se viera bien.
+iniciar_registro
+paso "Registro de esta instalación: ${SO_ARM_REGISTRO}"
+
 INICIO=$(date +%s)
 
 ejecutar_fase() {

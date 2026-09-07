@@ -20,8 +20,49 @@ error()   { printf '%s✗%s %s\n' "${ROJO}" "${FIN}" "$*" >&2; }
 
 morir() { error "$*"; exit 1; }
 
-# Mensaje útil cuando algo revienta a mitad del script.
-trap 'error "Falló el comando en la línea $LINENO. Revisa docs/06-solucion-de-problemas.md"' ERR
+# --- Registro -------------------------------------------------------------
+# Todo lo que sale por pantalla se guarda además en un archivo. Sin esto, el
+# usuario solo conserva lo que quepa en la ventana de la terminal, y el error
+# de verdad casi siempre quedó más arriba del punto donde se detuvo.
+iniciar_registro() {
+    [ -n "${SO_ARM_REGISTRO:-}" ] && return 0   # ya hay un registro activo
+    SO_ARM_REGISTRO="${1:-$HOME/so-arm100-instalacion.log}"
+    export SO_ARM_REGISTRO
+    exec > >(tee -a "${SO_ARM_REGISTRO}") 2>&1
+    printf '\n══ Instalación iniciada: %s ══\n' "$(date '+%Y-%m-%d %H:%M:%S')"
+}
+
+# --- Informe de error ------------------------------------------------------
+# Cuando algo falla, lo mínimo que hay que decirle a la persona es QUÉ comando
+# falló, EN QUÉ archivo, y DÓNDE está el registro completo. Un "falló en la
+# línea 80" no le sirve a nadie.
+informe_de_error() {
+    local codigo="$1" linea="$2" comando="$3" archivo="$4"
+    printf '\n'
+    printf '%s╔═══════════════════════════════════════════════════════════════╗%s\n' "${ROJO}${NEGRITA}" "${FIN}"
+    printf '%s║  La instalación se detuvo por un error                        ║%s\n' "${ROJO}${NEGRITA}" "${FIN}"
+    printf '%s╚═══════════════════════════════════════════════════════════════╝%s\n\n' "${ROJO}${NEGRITA}" "${FIN}"
+    # Las etiquetas se alinean a mano: printf pad por BYTES, y las tildes
+    # ocupan dos, así que '%-20s' descuadra las que llevan acento.
+    printf '  Archivo:            %s\n' "${archivo##*/}"
+    printf '  Línea:              %s\n' "${linea}"
+    printf '  Comando que falló:  %s\n' "${comando}"
+    printf '  Código de salida:   %s\n' "${codigo}"
+    [ -n "${SO_ARM_REGISTRO:-}" ] && \
+        printf '  Registro completo:  %s\n' "${SO_ARM_REGISTRO}"
+    printf '\n%sQué hacer:%s\n\n' "${NEGRITA}" "${FIN}"
+    printf '  1. El mensaje de error de verdad está UNAS LÍNEAS MÁS ARRIBA de este\n'
+    printf '     recuadro. La causa casi nunca está en la última línea.\n\n'
+    printf '  2. Busca ese mensaje en:  docs/06-solucion-de-problemas.md\n\n'
+    printf '  3. Cuando lo arregles, reanuda sin repetir lo ya instalado:\n'
+    printf '       %sbash scripts/install.sh --desde N%s   (N = número de fase)\n\n' "${NEGRITA}" "${FIN}"
+    if [ -n "${SO_ARM_REGISTRO:-}" ]; then
+        printf '  4. Si pides ayuda, adjunta esto — lleva el error y su contexto:\n'
+        printf '       %stail -n 40 %s%s\n\n' "${NEGRITA}" "${SO_ARM_REGISTRO}" "${FIN}"
+    fi
+}
+
+trap 'informe_de_error "$?" "${LINENO}" "${BASH_COMMAND}" "${BASH_SOURCE[0]}"' ERR
 
 # --- Comprobaciones previas ------------------------------------------------
 
