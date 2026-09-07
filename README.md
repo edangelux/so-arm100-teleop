@@ -14,7 +14,7 @@ Si ya tienes **Ubuntu 22.04 LTS** funcionando (nativo o en máquina virtual), es
 
 ```bash
 sudo apt update && sudo apt install -y git
-git clone https://github.com/TU_USUARIO/so-arm100-teleop.git ~/so-arm100-teleop
+git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
 cd ~/so-arm100-teleop && ./scripts/install.sh
 ```
 
