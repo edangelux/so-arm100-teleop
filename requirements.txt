@@ -12,8 +12,9 @@
 # extremo a extremo: Gazebo + MoveIt + RViz + teleoperación.
 #
 #     OpenCV      4.5.4     ← desde APT (python3-opencv), NO desde pip
-#     MediaPipe   1.0.1     ← pip, con --no-deps
+#     MediaPipe   0.10.21   ← pip, con --no-deps. LA VERSIÓN IMPORTA (ver abajo)
 #     NumPy       1.26.4    ← pip
+#     protobuf    4.25.x    ← pip. También importa la versión (ver abajo)
 #
 # ── POR QUÉ NumPy 1.x ────────────────────────────────────────────────────
 # OpenCV y MediaPipe están compilados contra NumPy 1.x en Ubuntu 22.04.
@@ -28,21 +29,45 @@ numpy<2
 # ROS 2 (RViz también usa Qt) y hace que la ventana de video no abra:
 #     qt.qpa.plugin: Could not load the Qt platform plugin "xcb"
 # Por eso se instala con --no-deps y se usa el OpenCV de APT.
-mediapipe
+# ── POR QUÉ 0.10.21 EXACTAMENTE ──────────────────────────────────────────
+# MediaPipe ELIMINÓ el módulo 'solutions' a partir de la 0.10.26.
+# teleop_vision.py usa mp.solutions.pose y mp.solutions.hands, así que con
+# cualquier versión posterior falla al arrancar con:
+#     AttributeError: module 'mediapipe' has no attribute 'solutions'
+# Probado versión por versión en un entorno limpio:
+#     0.10.21  ✔ tiene solutions      1.0.1   ✘ no tiene
+#     0.10.26  ✘ ya no lo tiene       0.10.35 ✘ no tiene
+# 0.10.21 es la última que sirve para este proyecto.
+mediapipe==0.10.21
 
-# Dependencias reales de MediaPipe, comprobadas contra los metadatos del
-# paquete. Sin opencv-contrib-python (ya está el de APT) y sin numpy (arriba).
+# Dependencias reales de MediaPipe 0.10.21, sacadas de sus metadatos y
+# comprobadas una por una. Sin opencv-contrib-python (ya está el de APT), sin
+# numpy (arriba) y sin jax/jaxlib (ver más abajo).
 absl-py
-certifi
-flatbuffers
+attrs>=19.1.0
+flatbuffers>=2.0
 matplotlib
-sounddevice
+sentencepiece
+sounddevice>=0.4.4
+
+# No es obvio que haga falta, pero sin él 'import mediapipe' falla en
+# mediapipe/tasks/python/core/base_options.py con ModuleNotFoundError.
+certifi
+
+# Tampoco es opcional: con protobuf 5 o superior, importar mediapipe lanza
+#     AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+protobuf<5,>=4.25.3
 
 # ── NO INSTALAR ──────────────────────────────────────────────────────────
 # jax, jaxlib, ml-dtypes
-#   No son dependencias de MediaPipe. Exigen numpy>=2 y, si se instalan,
-#   suben NumPy en silencio y rompen 'import cv2'. Una versión anterior de
-#   scripts/03_vision_python.sh los instalaba por error.
+#   MediaPipe 0.10.21 SÍ los declara como dependencia, pero NO hacen falta
+#   para 'solutions' — comprobado importando y usando pose y hands sin ellos.
+#   Y exigen numpy>=2, así que si se instalan suben NumPy en silencio y rompen
+#   'import cv2'. Por eso MediaPipe se instala con --no-deps y sus
+#   dependencias se ponen a mano.
+#
+# mediapipe (sin fijar versión)
+#   pip instalaría la última, que no tiene el módulo 'solutions'.
 #
 # opencv-python, opencv-contrib-python
 #   Conflicto de Qt con ROS 2 (ver arriba). Usa python3-opencv de APT.

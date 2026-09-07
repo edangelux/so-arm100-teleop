@@ -64,21 +64,38 @@ python3 -m pip install --upgrade pip
 paso "Fijando NumPy 1.x"
 python3 -m pip install -c "${RESTRICCIONES}" "numpy<2"
 
-# --no-deps: evita que MediaPipe arrastre opencv-contrib-python y vuelva a
-# meter el Qt conflictivo. Las demás dependencias se instalan abajo, a mano.
-paso "Instalando MediaPipe sin su copia propia de OpenCV"
-python3 -m pip install -c "${RESTRICCIONES}" --no-deps mediapipe
+# VERSIÓN FIJA, y no es capricho: MediaPipe ELIMINÓ el módulo 'solutions' a
+# partir de la 0.10.26. teleop_vision.py usa mp.solutions.pose y
+# mp.solutions.hands, así que con cualquier versión más nueva falla con:
+#     AttributeError: module 'mediapipe' has no attribute 'solutions'
+# Probado versión por versión: 0.10.21 lo tiene, 0.10.26 ya no.
+# 0.10.21 es la última que sirve para este proyecto.
+MEDIAPIPE_VERSION="${MEDIAPIPE_VERSION:-0.10.21}"
 
-# Dependencias REALES de MediaPipe, menos opencv-contrib-python (ya está el de
-# APT) y menos numpy (ya fijado arriba). Comprobadas contra los metadatos del
-# paquete, no supuestas.
-paso "Instalando las dependencias restantes de MediaPipe"
+# --no-deps: evita que MediaPipe arrastre opencv-contrib-python y vuelva a
+# meter el Qt conflictivo, y evita que instale jax/jaxlib, que exigen numpy>=2.
+paso "Instalando MediaPipe ${MEDIAPIPE_VERSION} sin sus dependencias"
+python3 -m pip install -c "${RESTRICCIONES}" --no-deps "mediapipe==${MEDIAPIPE_VERSION}"
+
+# Dependencias REALES de MediaPipe 0.10.21, sacadas de sus propios metadatos y
+# comprobadas una por una en un entorno limpio. Se omiten:
+#   - opencv-contrib-python : ya está el de APT (conflicto de Qt)
+#   - numpy                 : ya fijado arriba
+#   - jax, jaxlib           : NO hacen falta para 'solutions' y fuerzan numpy>=2
+# 'certifi' no es obvio pero SÍ hace falta: sin él, 'import mediapipe' falla en
+# mediapipe/tasks/python/core/base_options.py.
+# 'protobuf<5' tampoco es opcional: con protobuf 5 o superior aparece
+#     AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+paso "Instalando las dependencias reales de MediaPipe"
 python3 -m pip install -c "${RESTRICCIONES}" \
     absl-py \
+    "attrs>=19.1.0" \
     certifi \
-    flatbuffers \
+    "flatbuffers>=2.0" \
     matplotlib \
-    sounddevice
+    "protobuf<5,>=4.25.3" \
+    sentencepiece \
+    "sounddevice>=0.4.4"
 
 # --- 3. Permisos de cámara -------------------------------------------------
 titulo "Permisos de cámara"
@@ -120,8 +137,9 @@ if python3 -c "import mediapipe as mp; mp.solutions.pose; mp.solutions.hands" 2>
     ok "mediapipe.solutions disponible (pose y hands)"
 else
     error "Esta versión de MediaPipe no trae 'mediapipe.solutions'."
-    aviso "  teleop_vision.py lo necesita. Instala una versión de la serie 0.10:"
-    aviso "    python3 -m pip install 'mediapipe<1' --force-reinstall --no-deps"
+    aviso "  MediaPipe eliminó ese módulo a partir de la 0.10.26, y"
+    aviso "  teleop_vision.py lo necesita. Vuelve a la 0.10.21:"
+    aviso "    python3 -m pip install --no-deps 'mediapipe==0.10.21' --force-reinstall"
 fi
 
 if ls /dev/video* >/dev/null 2>&1; then

@@ -18,11 +18,19 @@ set -Eeuo pipefail
 DIR_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DIR_REPO="$(cd "${DIR_SCRIPTS}/.." && pwd)"
 
-# Se restaura el bit de ejecución por si se perdió al descargar el repositorio.
-# Pasa, sobre todo, al subir los archivos por la web de GitHub o al clonar
-# desde Windows: los scripts llegan sin permiso de ejecución y el primer
-# intento falla con "Permission denied".
-chmod +x "${DIR_SCRIPTS}"/*.sh "${DIR_REPO}"/teleop_vision/*.py 2>/dev/null || true
+# NO se hace 'chmod +x' aquí, aunque parezca útil.
+#
+# Se intentó, para curar el "Permission denied" de quien clona un repositorio
+# donde se perdió el bit de ejecución. Pero los archivos están registrados en
+# git con modo 644, así que el chmod los deja como MODIFICADOS a ojos de git y
+# el siguiente 'git pull' se niega a seguir:
+#
+#     error: Your local changes to the following files would be overwritten
+#            by merge: scripts/03_vision_python.sh, scripts/install.sh
+#
+# Cambiar permisos de archivos versionados, sin que nadie lo pida, es una mala
+# idea. Y además no hace falta: todo se invoca con 'bash scripts/...', que
+# ignora el bit de ejecución por completo.
 
 # shellcheck source=comun.sh
 source "${DIR_SCRIPTS}/comun.sh"
