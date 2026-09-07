@@ -96,6 +96,19 @@ ejecutar_fase 5 05_aplicar_overlay.sh
 FIN_T=$(date +%s)
 MINUTOS=$(( (FIN_T - INICIO) / 60 ))
 
+# En una máquina virtual, Gazebo suele abrir con la ventana 3D EN BLANCO: usa el
+# motor OGRE2, que necesita OpenGL 3.3+, y la gráfica virtual no siempre lo da.
+# El robot está ahí y la física corre, pero no se ve nada. Se detecta y se avisa
+# con el comando exacto, en vez de dejar que descubra el problema solo.
+VIRTUALIZADO=""
+if command -v systemd-detect-virt >/dev/null 2>&1; then
+    VIRTUALIZADO="$(systemd-detect-virt 2>/dev/null || true)"
+fi
+case "${VIRTUALIZADO}" in
+    none|"") LANZAR_SIM="ros2 launch so_arm_100_bringup gz_moveit.launch.py" ;;
+    *)       LANZAR_SIM="LIBGL_ALWAYS_SOFTWARE=1 ros2 launch so_arm_100_bringup gz_moveit.launch.py" ;;
+esac
+
 cat <<FINAL
 
 ${VERDE}${NEGRITA}╔══════════════════════════════════════════════════════════════╗
@@ -133,7 +146,7 @@ ${AMARILLO}${NEGRITA}PASO 2 · ABRE UNA TERMINAL Y LANZA LA SIMULACIÓN${FIN}
   Copia estas dos líneas, pégalas ahí y presiona Enter:
 
     ${NEGRITA}cd ~/ros2_ws${FIN}
-    ${NEGRITA}ros2 launch so_arm_100_bringup gz_moveit.launch.py${FIN}
+    ${NEGRITA}${LANZAR_SIM}${FIN}
 
   Para pegar en la terminal de Linux se usa ${NEGRITA}Ctrl + Shift + V${FIN}
   (con Shift, no el Ctrl+V de siempre).
@@ -141,6 +154,10 @@ ${AMARILLO}${NEGRITA}PASO 2 · ABRE UNA TERMINAL Y LANZA LA SIMULACIÓN${FIN}
   Se abrirán dos ventanas: ${NEGRITA}Gazebo${FIN} (el simulador con el robot) y
   ${NEGRITA}RViz${FIN} (la vista técnica). Espera a que carguen del todo — la primera
   vez tarda un minuto.
+
+  El ${NEGRITA}LIBGL_ALWAYS_SOFTWARE=1${FIN} del principio es porque estás en una máquina
+  virtual: sin eso, la ventana 3D de Gazebo se ve en blanco. Va más lento,
+  pero se ve. En una instalación nativa no hace falta.
 
   ${NEGRITA}No cierres esta terminal.${FIN} Mientras la simulación corra, esa ventana
   se queda ocupada escribiendo mensajes. Es normal.

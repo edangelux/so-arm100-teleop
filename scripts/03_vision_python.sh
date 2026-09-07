@@ -45,6 +45,18 @@ RESTRICCIONES="$(mktemp)"
 echo "numpy<2" > "${RESTRICCIONES}"
 trap 'rm -f "${RESTRICCIONES}"' EXIT
 
+# Restos de instalaciones anteriores que EXIGEN numpy>=2. Si quedan, cualquier
+# 'pip install' posterior intenta subir NumPy otra vez. jax/jaxlib los instalaba
+# por error una version anterior de este script; ml-dtypes viene con ellos.
+titulo "Limpiando paquetes que fuerzan NumPy 2"
+for PAQUETE in jax jaxlib ml-dtypes; do
+    if python3 -m pip show "${PAQUETE}" >/dev/null 2>&1; then
+        paso "Desinstalando ${PAQUETE} (exige numpy>=2 y no hace falta aqui)"
+        python3 -m pip uninstall -y "${PAQUETE}" >/dev/null
+    fi
+done
+ok "Sin paquetes que fuercen NumPy 2"
+
 titulo "MediaPipe"
 paso "Actualizando pip"
 python3 -m pip install --upgrade pip

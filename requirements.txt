@@ -1,19 +1,48 @@
 # Dependencias de Python para el nodo de teleoperación por visión.
 #
-# RECOMENDADO: no instales esto con pip directamente. Usa el script
-#   ./scripts/03_vision_python.sh
-# que instala OpenCV desde APT (python3-opencv) para evitar el conflicto de
-# bibliotecas Qt entre el opencv-python de pip y el que trae ROS 2.
+# NO INSTALES ESTO CON pip DIRECTAMENTE. Usa:
+#     bash scripts/03_vision_python.sh
 #
-# Este archivo queda como referencia de versiones, o para un entorno virtual
-# aislado creado con:  python3 -m venv --system-site-packages ~/venv_teleop
-
-# MediaPipe y OpenCV en Ubuntu 22.04 se compilaron contra NumPy 1.x.
-# Con NumPy 2 aparece "A module that was compiled using NumPy 1.x cannot be
-# run in NumPy 2.x" y el nodo no arranca.
+# Ese script instala OpenCV desde APT (no desde pip) y aplica una restricción
+# que impide que NumPy suba a 2.x. Hacerlo a mano con este archivo se salta las
+# dos protecciones y rompe el entorno — ya pasó.
+#
+# ── COMBINACIÓN VERIFICADA ───────────────────────────────────────────────
+# Probada en Ubuntu 22.04 LTS (Python 3.10) con el sistema funcionando de
+# extremo a extremo: Gazebo + MoveIt + RViz + teleoperación.
+#
+#     OpenCV      4.5.4     ← desde APT (python3-opencv), NO desde pip
+#     MediaPipe   1.0.1     ← pip, con --no-deps
+#     NumPy       1.26.4    ← pip
+#
+# ── POR QUÉ NumPy 1.x ────────────────────────────────────────────────────
+# OpenCV y MediaPipe están compilados contra NumPy 1.x en Ubuntu 22.04.
+# Con NumPy 2 instalado, 'import cv2' falla con:
+#     A module that was compiled using NumPy 1.x cannot be run in NumPy 2.x
+#     AttributeError: _ARRAY_API not found
 numpy<2
 
-mediapipe>=0.10.9
+# ── POR QUÉ --no-deps PARA MEDIAPIPE ─────────────────────────────────────
+# MediaPipe declara 'opencv-contrib-python' como dependencia. Ese paquete de
+# pip trae su propia copia de las bibliotecas Qt, que choca con la que instala
+# ROS 2 (RViz también usa Qt) y hace que la ventana de video no abra:
+#     qt.qpa.plugin: Could not load the Qt platform plugin "xcb"
+# Por eso se instala con --no-deps y se usa el OpenCV de APT.
+mediapipe
 
-# Solo si NO instalaste python3-opencv desde APT. Ver docs/06 (conflicto Qt).
-# opencv-python>=4.8,<5
+# Dependencias reales de MediaPipe, comprobadas contra los metadatos del
+# paquete. Sin opencv-contrib-python (ya está el de APT) y sin numpy (arriba).
+absl-py
+certifi
+flatbuffers
+matplotlib
+sounddevice
+
+# ── NO INSTALAR ──────────────────────────────────────────────────────────
+# jax, jaxlib, ml-dtypes
+#   No son dependencias de MediaPipe. Exigen numpy>=2 y, si se instalan,
+#   suben NumPy en silencio y rompen 'import cv2'. Una versión anterior de
+#   scripts/03_vision_python.sh los instalaba por error.
+#
+# opencv-python, opencv-contrib-python
+#   Conflicto de Qt con ROS 2 (ver arriba). Usa python3-opencv de APT.
