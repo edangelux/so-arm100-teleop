@@ -333,7 +333,7 @@ sudo apt install -y ros-humble-rqt-graph
 rqt_graph
 ```
 
-Muestra todos los nodos y las flechas entre ellos. Es la imagen que responde "¿se mueve por nodos?" sin decir una palabra — y sirve como figura para el documento de tesis.
+Muestra todos los nodos y las flechas entre ellos. Es la imagen que responde "¿se mueve por nodos?" sin decir una palabra — y sirve como figura para el documento de proyecto.
 
 ---
 
