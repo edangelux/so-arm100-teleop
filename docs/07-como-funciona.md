@@ -1,6 +1,6 @@
 # 07 — Cómo funciona el sistema
 
-[← Anterior: solución de problemas](06-solucion-de-problemas.md) · [Volver al inicio](../README.md)
+[← Anterior: solución de problemas](06-solucion-de-problemas.md) · [Volver al inicio](../README.md) · [Siguiente: análisis cinemático →](08-analisis-cinematico.md)
 
 Este documento explica la arquitectura: qué son los nodos, cómo se comunican, y qué recorrido hace un movimiento tuyo desde la cámara hasta el robot.
 
@@ -266,6 +266,8 @@ No hay cinemática inversa en el lazo de control. Es una decisión de diseño co
 
 *(El índice de manipulabilidad `w=` que muestra la pantalla sí usa el jacobiano, pero solo para **informar** de qué tan cerca estás de una singularidad. No interviene en el control.)*
 
+> **La justificación completa, con mediciones, está en [08 — Análisis cinemático](08-analisis-cinematico.md):** por qué 5 GDL no bastan para una pose completa, por qué la cinemática inversa es entre 4 y 22 veces más sensible al ruido de medición, y qué cambiaría si se agregara.
+
 ### La calibración es relativa, no absoluta
 
 ```python
@@ -333,14 +335,14 @@ sudo apt install -y ros-humble-rqt-graph
 rqt_graph
 ```
 
-Muestra todos los nodos y las flechas entre ellos. Es la imagen que responde "¿se mueve por nodos?" sin decir una palabra — y sirve como figura para el documento de proyecto.
+Muestra todos los nodos y las flechas entre ellos. Es la imagen que responde "¿se mueve por nodos?" sin decir una palabra — y sirve como figura para el documento de tesis.
 
 ---
 
 ## Preguntas probables, y por dónde responderlas
 
 **«¿Usa cinemática inversa?»**
-En el lazo de control no. Se copian ángulos articulares directamente. Hay un cálculo de jacobiano, pero solo para mostrar el índice de manipulabilidad y avisar de singularidades. La cinemática inversa está disponible por MoveIt (solucionador KDL) si se planifica hacia una pose cartesiana, que es una modalidad distinta.
+En el lazo de control no. Se copian ángulos articulares directamente. Hay un cálculo de jacobiano, pero solo para mostrar el índice de manipulabilidad y avisar de singularidades. La cinemática inversa está disponible por MoveIt (solucionador KDL) si se planifica hacia una pose cartesiana, que es una modalidad distinta. El análisis que respalda esta decisión, con números reproducibles, está en [08 — Análisis cinemático](08-analisis-cinematico.md).
 
 **«¿Cómo sabe el robot dónde está?»**
 `joint_state_broadcaster` lee el estado real de las articulaciones desde la física de Gazebo y lo publica en `/joint_states`. `robot_state_publisher` lo combina con el URDF para producir el árbol de transformadas `/tf`.
@@ -370,3 +372,5 @@ Alrededor de 40 ms de extremo a extremo. El cuello de botella es la inferencia d
 - [05 — Ejecución y control](05-ejecucion.md) — todas las teclas y cómo ajustar el robot
 - [04 — Workspace y compilación](04-workspace-y-compilacion.md) — qué corrige el overlay y por qué
 - [06 — Solución de problemas](06-solucion-de-problemas.md) — cada error conocido con su causa
+- [08 — Análisis cinemático](08-analisis-cinematico.md) — por qué mapeo articular directo y no cinemática inversa
+- [09 — Estado del robot físico](09-robot-fisico.md) — qué falta para pasar de la simulación al brazo real

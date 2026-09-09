@@ -8,6 +8,19 @@ Sistema de teleoperación en tiempo real para el manipulador de 5 GDL **SO-ARM10
 
 ---
 
+## Estado del proyecto
+
+| Qué | Estado |
+|---|---|
+| Ubuntu 22.04 en VirtualBox → ROS 2 Humble → Gazebo → MoveIt 2 → teleoperación por visión | **Verificado en una instalación real desde cero** |
+| *Plan & Execute* de MoveIt sobre el robot simulado | **Verificado** |
+| [Instalación nativa por ISO / USB](docs/02-instalacion-nativa-iso.md) | Escrita, **no verificada** |
+| **Brazo físico (SO-ARM100 real por USB)** | **No funciona todavía** — los bloqueos concretos están en [docs/09](docs/09-robot-fisico.md) |
+
+Todo lo que este repositorio instala y ejecuta hoy es **simulación**. Es completa y reproducible, pero es simulación. Si tu objetivo es mover el brazo físico, lee [docs/09 — Estado del robot físico](docs/09-robot-fisico.md) **antes** de conectar nada.
+
+---
+
 ## Instalación en 3 comandos
 
 Si ya tienes **Ubuntu 22.04 LTS** funcionando (nativo o en máquina virtual), esto instala absolutamente todo:
@@ -37,6 +50,8 @@ El script tarda entre 20 y 40 minutos según tu conexión. Al terminar, **cierra
 | 05 | [Ejecución y control](docs/05-ejecucion.md) | Lanzar Gazebo, lanzar la teleoperación, calibrar, gestos |
 | 06 | [Solución de problemas](docs/06-solucion-de-problemas.md) | Todos los errores reales que aparecen y cómo se arreglan |
 | 07 | [**Cómo funciona el sistema**](docs/07-como-funciona.md) | Arquitectura: nodos, tópicos y acciones; el recorrido de la cámara al robot; qué hace cada parte del código |
+| 08 | [**Análisis cinemático**](docs/08-analisis-cinematico.md) | Por qué mapeo articular directo y no cinemática inversa; qué cinemática usa el proyecto; qué cambiaría si se agregara CI |
+| 09 | [**Estado del robot físico**](docs/09-robot-fisico.md) | Qué falta para pasar de la simulación al brazo real, bloqueo por bloqueo |
 
 ---
 
@@ -69,6 +84,9 @@ so-arm100-teleop/
 │   ├── 04-workspace-y-compilacion.md
 │   ├── 05-ejecucion.md
 │   ├── 06-solucion-de-problemas.md
+│   ├── 07-como-funciona.md        ← arquitectura: nodos, tópicos y acciones
+│   ├── 08-analisis-cinematico.md  ← por qué no hay cinemática inversa en el lazo
+│   ├── 09-robot-fisico.md         ← qué falta para el brazo real
 │   └── img/                       ← capturas de pantalla
 ├── scripts/
 │   ├── install.sh                 ← instalador maestro
@@ -77,7 +95,10 @@ so-arm100-teleop/
 │   ├── 03_vision_python.sh        ← OpenCV, MediaPipe, permisos de cámara
 │   ├── 04_workspace.sh            ← ~/ros2_ws + paquetes del robot + compilación
 │   ├── 05_aplicar_overlay.sh      ← aplica la configuración verificada para Humble
+│   ├── comun.sh                   ← funciones compartidas y registro de errores
 │   └── verificar.sh               ← diagnóstico: qué está bien y qué falta
+├── analisis/
+│   └── analisis_cinematico.py     ← reproduce los números de docs/08
 ├── overlay/                       ← archivos de configuración ya corregidos
 │   ├── so_arm_100_bringup/
 │   └── so_arm_100_moveit_config/
@@ -113,10 +134,16 @@ Se necesitan **dos terminales**.
 
 ```bash
 cd ~/ros2_ws
-source /opt/ros/humble/setup.bash
-source install/setup.bash
 ros2 launch so_arm_100_bringup gz_moveit.launch.py
 ```
+
+> ### Si estás en una máquina virtual, lanza así
+> ```bash
+> LIBGL_ALWAYS_SOFTWARE=1 ros2 launch so_arm_100_bringup gz_moveit.launch.py
+> ```
+> Sin esa variable, la ventana 3D de Gazebo **se ve en blanco** dentro de VirtualBox: el simulador usa el motor OGRE2, que necesita OpenGL 3.3+, y la gráfica virtual no siempre lo da. El robot está ahí y la física corre, pero no lo ves. En instalación nativa no hace falta.
+>
+> El instalador detecta la máquina virtual y te entrega el comando ya con la variable puesta.
 
 Abre Gazebo, `move_group` y RViz a la vez. Espera a que Gazebo cargue por completo y a que en la consola aparezcan `joint_state_broadcaster`, `arm_controller` y `gripper_controller` como **activos**.
 

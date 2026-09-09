@@ -18,6 +18,8 @@ cd ~/so-arm100-teleop && bash scripts/install.sh
 
 Si prefieres entender qué hace cada paso, o si el script se detuvo en algún punto, sigue leyendo: abajo está exactamente lo mismo, bloque por bloque.
 
+> **Si vas por la ruta manual, no termines aquí.** Este documento cubre ROS 2, Gazebo y Python. Falta el workspace y, sobre todo, el **overlay de configuración** — sin él los paquetes del robot **no arrancan en Humble**. Todo eso está en [04 — Workspace y compilación](04-workspace-y-compilacion.md), y es obligatorio.
+
 ---
 
 ## Fase 1 — Localización UTF-8
@@ -115,16 +117,22 @@ printenv ROS_DISTRO   # debe imprimir: humble
 ```bash
 sudo apt install -y \
     ros-humble-ros-gz \
+    ros-humble-ros-gz-sim \
+    ros-humble-ros-gz-bridge \
     ros-humble-gz-ros2-control \
     ros-humble-ros2-control \
     ros-humble-ros2-controllers \
+    ros-humble-controller-manager \
     ros-humble-joint-trajectory-controller \
+    ros-humble-joint-state-broadcaster \
     ros-humble-position-controllers \
     ros-humble-effort-controllers \
     ros-humble-moveit \
     ros-humble-moveit-ros-planning-interface \
+    ros-humble-moveit-kinematics \
     ros-humble-joint-state-publisher \
     ros-humble-joint-state-publisher-gui \
+    ros-humble-robot-state-publisher \
     ros-humble-xacro \
     ros-humble-tf-transformations
 ```
@@ -158,27 +166,77 @@ sudo usermod -a -G video $USER
 
 ## Fase 6 — Python: OpenCV, MediaPipe y NumPy
 
+> ### Aquí hay tres trampas. Ninguna es evidente, y las tres rompen el sistema.
+> Esta fase es la que más problemas dio en la práctica. Si prefieres saltártela, corre `bash scripts/03_vision_python.sh`, que ya trae todo esto resuelto.
+
+**1. OpenCV desde APT, nunca desde pip:**
+
 ```bash
-python3 -m pip install --upgrade pip
-python3 -m pip install "numpy<2" mediapipe opencv-python
+sudo apt install -y python3-opencv python3-numpy v4l-utils
 ```
 
-> ### Por qué `numpy<2`
-> MediaPipe y las versiones de OpenCV compatibles con Ubuntu 22.04 se compilaron contra NumPy 1.x. Si `pip` instala NumPy 2.x, obtienes el error `A module that was compiled using NumPy 1.x cannot be run in NumPy 2.x` y nada arranca. Fijar `numpy<2` evita ese problema por completo.
+El paquete `opencv-python` de pip trae su **propia copia de las bibliotecas Qt**, que choca con la que instala ROS 2 (RViz también usa Qt). El síntoma es que la ventana de video no abre:
 
-> ### Si la ventana de video no abre (error de Qt)
-> `pip` instala su propia copia de las bibliotecas Qt dentro del paquete de OpenCV, y esa copia choca con la que ya trae ROS 2. El síntoma es:
+```
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb"
+```
+
+**2. NumPy fijado en 1.x, y protegido:**
+
+```bash
+echo "numpy<2" > /tmp/restricciones.txt
+python3 -m pip install --upgrade pip
+python3 -m pip install -c /tmp/restricciones.txt "numpy<2"
+```
+
+OpenCV y MediaPipe están compilados contra NumPy 1.x en Ubuntu 22.04. Con NumPy 2, `import cv2` falla con `_ARRAY_API not found`.
+
+**No basta con instalarlo al principio:** cualquier paquete posterior que pida `numpy>=2` lo vuelve a subir en silencio. Por eso se usa un **archivo de restricciones** que se pasa a todas las instalaciones siguientes: con él, pip no puede subir NumPy ni aunque un paquete se lo exija.
+
+**3. MediaPipe en la versión 0.10.21, y con `--no-deps`:**
+
+```bash
+python3 -m pip install -c /tmp/restricciones.txt --no-deps "mediapipe==0.10.21"
+python3 -m pip install -c /tmp/restricciones.txt \
+    absl-py \
+    "attrs>=19.1.0" \
+    certifi \
+    "flatbuffers>=2.0" \
+    matplotlib \
+    "protobuf<5,>=4.25.3" \
+    sentencepiece \
+    "sounddevice>=0.4.4"
+```
+
+> **La versión importa.** MediaPipe **eliminó el módulo `solutions`** a partir de la **0.10.26**. El nodo de teleoperación usa `mp.solutions.pose` y `mp.solutions.hands`, así que con cualquier versión posterior falla al arrancar:
 >
 > ```
-> qt.qpa.plugin: Could not load the Qt platform plugin "xcb"
+> AttributeError: module 'mediapipe' has no attribute 'solutions'
 > ```
 >
-> La solución está en [docs/06 — Solución de problemas](06-solucion-de-problemas.md#la-ventana-de-video-no-abre-qtqpaplugin-could-not-load-the-qt-platform-plugin-xcb). No lo arregles a ciegas; ahí está explicado el porqué.
+> Probado versión por versión: `0.10.21` lo tiene, `0.10.26` ya no. **0.10.21 es la última que sirve.**
 
-Verifica que las tres bibliotecas importan:
+> **Por qué `--no-deps`.** MediaPipe declara `opencv-contrib-python` (el del conflicto de Qt) y `jax` + `jaxlib`, que **exigen `numpy>=2`** y romperían el pin de NumPy. Ninguno hace falta para `solutions` — comprobado importando y usando `pose` y `hands` sin ellos. Por eso se instalan sus dependencias a mano.
+
+> **Dos que no son obvias.** `certifi` es necesario o `import mediapipe` falla; y `protobuf` tiene que ser **menor que 5**, o aparece `AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'`.
+
+**Verifica que todo quedó bien:**
 
 ```bash
 python3 -c "import cv2, mediapipe, numpy; print(cv2.__version__, mediapipe.__version__, numpy.__version__)"
+python3 -c "import mediapipe as mp; print(mp.solutions.pose.Pose)"
+```
+
+La combinación verificada en una instalación real es:
+
+```
+opencv 4.5.4 | mediapipe 0.10.21 | numpy 1.26.4
+```
+
+Si el segundo comando falla con `has no attribute 'solutions'`, tienes una versión demasiado nueva:
+
+```bash
+python3 -m pip install --no-deps "mediapipe==0.10.21" --force-reinstall
 ```
 
 ---

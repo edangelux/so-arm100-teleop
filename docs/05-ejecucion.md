@@ -72,7 +72,7 @@ Se abre una ventana con el video de la cámara, el esqueleto sobre tu brazo y un
 
 ## Cómo funciona el mapeo
 
-> Esta sección es el resumen. La explicación completa —nodos, tópicos, acciones, y el recorrido desde la cámara hasta la física de Gazebo— está en **[07 — Cómo funciona el sistema](07-como-funciona.md)**.
+> Esta sección es el resumen. La explicación completa —nodos, tópicos, acciones, y el recorrido desde la cámara hasta la física de Gazebo— está en **[07 — Cómo funciona el sistema](07-como-funciona.md)**, y la justificación de por qué se copian ángulos en vez de resolver cinemática inversa, con mediciones, en **[08 — Análisis cinemático](08-analisis-cinematico.md)**.
 
 El sistema **no** calcula dónde poner la mano del robot en el espacio. Hace algo más directo y más robusto: **mide los ángulos de tus articulaciones y se los copia al robot**, articulación por articulación.
 
@@ -155,7 +155,7 @@ COPIANDO POSTURA
 | `g=1.0` | Ganancia — se ajusta con `+` / `-` |
 | La barra a la derecha | Posición dentro del rango del joint; la línea blanca es el cero |
 | `Gripper ... [OK]` | La acción de la pinza está disponible. Si dice `[accion NO disp.]`, el `gripper_controller` no está activo |
-| `w=0.00042` | Índice de manipulabilidad: cuánto margen de movimiento tiene el brazo en esa postura. Cerca de cero = cerca de una singularidad |
+| `w=0.00042` | Índice de manipulabilidad `√det(J·Jᵀ)`: cuánto margen de movimiento tiene el brazo en esa postura. Cerca de cero = cerca de una singularidad. Solo informativo — ver [08](08-analisis-cinematico.md) |
 | `COPIANDO POSTURA` | Estado. Si dice `PULSA [C]`, aún no has calibrado |
 
 ### Los tres estados de la muñeca

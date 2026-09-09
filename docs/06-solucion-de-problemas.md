@@ -2,6 +2,8 @@
 
 [← Anterior: ejecución](05-ejecucion.md) · [Volver al inicio](../README.md) · [Siguiente: cómo funciona →](07-como-funciona.md)
 
+> ¿El problema es con el **brazo físico**? Ve directo a [09 — Estado del robot físico](09-robot-fisico.md).
+
 ---
 
 Antes de nada, corre el diagnóstico. Suele decirte exactamente qué falta:
@@ -772,6 +774,18 @@ No es un error, es información. Recalibra (**`C`**) con el brazo en una postura
 - **Sube la RAM y los núcleos** de la máquina virtual (nunca más de la mitad de los de tu equipo físico).
 - Considera la [instalación nativa](02-instalacion-nativa-iso.md): la diferencia en FPS es grande.
 - Baja la resolución de captura editando `CAP_PROP_FRAME_WIDTH` / `HEIGHT` en `teleop_vision.py`.
+
+---
+
+## Conecté el brazo físico y no arranca
+
+**No es un error tuyo: el repositorio todavía no soporta el brazo físico.**
+
+Los síntomas esperados son `Error loading controller 'gripper_controller'`, o bien `open:: No such file or directory` seguido de `Failed to initialize motors`. Hay seis bloqueos identificados —el driver no se instala y no tiene versión para Humble, el controlador de la pinza es el de Jazzy, el overlay se come los parámetros del puerto serie, falta la calibración de *ticks* a radianes, falta el grupo `dialout`, y el nodo de teleoperación no es seguro para hardware real— y cada uno está explicado con su archivo y su arreglo en:
+
+**[→ 09 — Estado del robot físico](09-robot-fisico.md)**
+
+No intentes forzarlo antes de leerlo: el bloqueo 6 hace que el brazo salte a la postura cero a máxima velocidad en cuanto reciba el primer comando.
 
 ---
 

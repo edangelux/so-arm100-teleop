@@ -204,6 +204,18 @@ ${NEGRITA}¿ALGO NO FUNCIONÓ?${FIN}
 
     ${DIR_REPO}/docs/05-ejecucion.md
 
+  Cómo funciona por dentro (nodos, tópicos, el recorrido de la cámara al robot):
+
+    ${DIR_REPO}/docs/07-como-funciona.md
+
+  Por qué se copian ángulos y no se resuelve cinemática inversa (con mediciones):
+
+    ${DIR_REPO}/docs/08-analisis-cinematico.md
+
+  ${AMARILLO}Si tu objetivo es el brazo FISICO, lee esto ANTES de conectarlo:${FIN}
+
+    ${DIR_REPO}/docs/09-robot-fisico.md
+
   Todo lo que pasó durante esta instalación quedó guardado en:
 
     ${SO_ARM_REGISTRO}
