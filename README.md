@@ -1,8 +1,8 @@
 # Teleoperación por Visión del Manipulador SO-ARM100
 
-**ROS 2 Humble · Gazebo · MoveIt 2 · MediaPipe · Cinemática Inversa 3D**
+**ROS 2 Humble · Gazebo · MoveIt 2 · MediaPipe · Mapeo Articular Directo**
 
-Sistema de teleoperación en tiempo real para el manipulador de 5 GDL **SO-ARM100**. Una cámara web captura el movimiento del brazo y la mano del operador, y una cinemática inversa en espacio de tarea traduce esa postura a los ángulos articulares del robot simulado en Gazebo.
+Sistema de teleoperación en tiempo real para el manipulador de 5 GDL **SO-ARM100**. Una cámara web mide los ángulos de las articulaciones del brazo y la mano del operador y los **copia articulación por articulación** al robot simulado en Gazebo. **No hay cinemática inversa en el lazo de control**: no se calcula dónde poner el efector en el espacio, se replican ángulos. El jacobiano se usa únicamente para mostrar el índice de manipulabilidad en pantalla, sin intervenir en el control. MoveIt 2 queda disponible para planificación cartesiana fuera del lazo de teleoperación. Ver [docs/07 — Cómo funciona el sistema](docs/07-como-funciona.md).
 
 > Proyecto de Análisis y Diseño de Sistemas Mecatrónicos — Ingeniería Mecatrónica, Universidad La Salle (ULSA), Nicaragua.
 
