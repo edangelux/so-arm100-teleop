@@ -214,6 +214,26 @@ Solo necesita `numpy` (ya instalado por el script de la fase 3). No necesita ROS
 
 ---
 
+## 10-bis. El modelo cinemático completo
+
+El presente documento justifica la **decisión de control**. El desarrollo matemático completo del
+manipulador —matriz de transformación homogénea, tabla de Denavit-Hartenberg, cinemática directa,
+cinemática inversa en forma cerrada, jacobiano geométrico de seis por cinco, singularidades e índice
+de manipulabilidad— se elaboró aparte y se encuentra en:
+
+**[`analisis/cinematica/`](../analisis/cinematica/ANALISIS_CINEMATICO.md)**
+
+Ese material incluye el desarrollo articulación por articulación, las implementaciones en Python y en
+MATLAB, las figuras generadas a partir de las mallas del modelo descriptivo y un programa de
+verificación cruzada que contrasta cada resultado contra tres implementaciones ajenas al proyecto.
+La tabla de Denavit-Hartenberg se derivó del archivo `so_arm_100_5dof_arm.urdf.xacro`, que es el
+mismo que cargan el simulador y el planificador de movimiento, de modo que el modelo analítico y el
+modelo simulado describen la misma geometría. La verificación se ejecutó sobre veinte mil
+configuraciones aleatorias, además de la configuración de origen y de los dos extremos del recorrido
+articular, con un error máximo del orden del redondeo de punto flotante.
+
+---
+
 ## 11. Preguntas de defensa
 
 **«¿Usaron cinemática inversa?»**

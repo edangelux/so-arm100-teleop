@@ -52,6 +52,7 @@ El script tarda entre 20 y 40 minutos según tu conexión. Al terminar, **cierra
 | 07 | [**Cómo funciona el sistema**](docs/07-como-funciona.md) | Arquitectura: nodos, tópicos y acciones; el recorrido de la cámara al robot; qué hace cada parte del código |
 | 08 | [**Análisis cinemático**](docs/08-analisis-cinematico.md) | Por qué mapeo articular directo y no cinemática inversa; qué cinemática usa el proyecto; qué cambiaría si se agregara CI |
 | 09 | [**Estado del robot físico**](docs/09-robot-fisico.md) | Qué falta para pasar de la simulación al brazo real, bloqueo por bloqueo |
+| — | [**Modelo cinemático completo**](analisis/cinematica/ANALISIS_CINEMATICO.md) | Transformación homogénea, tabla D-H, cinemática directa e inversa, jacobiano, singularidades y manipulabilidad, con verificación cruzada |
 
 ---
 
@@ -88,6 +89,13 @@ so-arm100-teleop/
 │   ├── 08-analisis-cinematico.md  ← por qué no hay cinemática inversa en el lazo
 │   ├── 09-robot-fisico.md         ← qué falta para el brazo real
 │   └── img/                       ← capturas de pantalla
+├── analisis/
+│   ├── analisis_cinematico.py     ← números que respaldan la decisión de control
+│   └── cinematica/                ← modelo cinemático completo y su verificación
+│       ├── ANALISIS_CINEMATICO.md ← punto de entrada
+│       ├── codigo/                ← implementación en Python
+│       ├── matlab/                ← implementación en MATLAB
+│       └── figuras/               ← figuras del capítulo
 ├── scripts/
 │   ├── install.sh                 ← instalador maestro
 │   ├── 01_ros2_humble.sh          ← ROS 2 Humble + herramientas

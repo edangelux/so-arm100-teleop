@@ -155,7 +155,7 @@ COPIANDO POSTURA
 | `g=1.0` | Ganancia — se ajusta con `+` / `-` |
 | La barra a la derecha | Posición dentro del rango del joint; la línea blanca es el cero |
 | `Gripper ... [OK]` | La acción de la pinza está disponible. Si dice `[accion NO disp.]`, el `gripper_controller` no está activo |
-| `w=0.00042` | Índice de manipulabilidad `√det(J·Jᵀ)`: cuánto margen de movimiento tiene el brazo en esa postura. Cerca de cero = cerca de una singularidad. Solo informativo — ver [08](08-analisis-cinematico.md) |
+| `w=0.00042` | Índice de manipulabilidad `√det(J·Jᵀ)` del jacobiano de posición de 3×3 de las tres primeras articulaciones: cuánto margen de movimiento tiene el brazo en esa postura. Cerca de cero = cerca de una singularidad. Solo informativo — ver [08](08-analisis-cinematico.md) |
 | `COPIANDO POSTURA` | Estado. Si dice `PULSA [C]`, aún no has calibrado |
 
 ### Los tres estados de la muñeca
