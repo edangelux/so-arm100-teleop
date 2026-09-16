@@ -1,0 +1,77 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bfb9155..3896217 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,7 +29,7 @@ target_include_directories(
+ 
+ target_link_libraries(${PROJECT_NAME}
+   SCServo
+-  yaml-cpp::yaml-cpp
++  yaml-cpp
+ )
+ 
+ ament_target_dependencies(${PROJECT_NAME}
+diff --git a/include/so_arm_100_hardware/so_arm_100_interface.hpp b/include/so_arm_100_hardware/so_arm_100_interface.hpp
+index 3050bf7..52f534a 100644
+--- a/include/so_arm_100_hardware/so_arm_100_interface.hpp
++++ b/include/so_arm_100_hardware/so_arm_100_interface.hpp
+@@ -36,7 +36,7 @@ public:
+   virtual ~SOARM100Interface();
+ 
+   // LifecycleNodeInterface
+-  CallbackReturn on_init(const hardware_interface::HardwareComponentInterfaceParams & params) override;
++  CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
+   CallbackReturn on_activate(const rclcpp_lifecycle::State &previous_state) override;
+   CallbackReturn on_deactivate(const rclcpp_lifecycle::State &previous_state) override;
+ 
+diff --git a/src/so_arm_100_interface.cpp b/src/so_arm_100_interface.cpp
+index 5862aa1..7dd9607 100644
+--- a/src/so_arm_100_interface.cpp
++++ b/src/so_arm_100_interface.cpp
+@@ -30,32 +30,32 @@ SOARM100Interface::~SOARM100Interface()
+     }
+ }
+ 
+-CallbackReturn SOARM100Interface::on_init(const hardware_interface::HardwareComponentInterfaceParams & params)
++CallbackReturn SOARM100Interface::on_init(const hardware_interface::HardwareInfo & info)
+ {
+-    CallbackReturn result = hardware_interface::SystemInterface::on_init(params);
++    CallbackReturn result = hardware_interface::SystemInterface::on_init(info);
+     if (result != CallbackReturn::SUCCESS)
+     {
+         return result;
+     }
+ 
+-    use_serial_ = params.hardware_info.hardware_parameters.count("use_serial") ?
+-        (params.hardware_info.hardware_parameters.at("use_serial") == "true") : false;
++    use_serial_ = info.hardware_parameters.count("use_serial") ?
++        (info.hardware_parameters.at("use_serial") == "true") : false;
+     
+-    serial_port_ = params.hardware_info.hardware_parameters.count("serial_port") ?
+-        params.hardware_info.hardware_parameters.at("serial_port") : "/dev/ttyUSB0";
++    serial_port_ = info.hardware_parameters.count("serial_port") ?
++        info.hardware_parameters.at("serial_port") : "/dev/ttyUSB0";
+     
+-    serial_baudrate_ = params.hardware_info.hardware_parameters.count("serial_baudrate") ?
+-        std::stoi(params.hardware_info.hardware_parameters.at("serial_baudrate")) : 1000000;
++    serial_baudrate_ = info.hardware_parameters.count("serial_baudrate") ?
++        std::stoi(info.hardware_parameters.at("serial_baudrate")) : 1000000;
+ 
+-    servo_speed_ = params.hardware_info.hardware_parameters.count("servo_speed") ?
+-        std::stoi(params.hardware_info.hardware_parameters.at("servo_speed")) : 2400;
++    servo_speed_ = info.hardware_parameters.count("servo_speed") ?
++        std::stoi(info.hardware_parameters.at("servo_speed")) : 2400;
+ 
+-    servo_acceleration_ = params.hardware_info.hardware_parameters.count("servo_acceleration") ?
+-        std::stoi(params.hardware_info.hardware_parameters.at("servo_acceleration")) : 50;
++    servo_acceleration_ = info.hardware_parameters.count("servo_acceleration") ?
++        std::stoi(info.hardware_parameters.at("servo_acceleration")) : 50;
+ 
+     // Default control mode: 0=position, 1=velocity, 2=effort/PWM
+-    default_control_mode_ = params.hardware_info.hardware_parameters.count("control_mode") ?
+-        std::stoi(params.hardware_info.hardware_parameters.at("control_mode")) : 0;
++    default_control_mode_ = info.hardware_parameters.count("control_mode") ?
++        std::stoi(info.hardware_parameters.at("control_mode")) : 0;
+ 
+     size_t num_joints = info_.joints.size();
+     position_commands_.resize(num_joints, 0.0);

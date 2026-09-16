@@ -1,0 +1,311 @@
+diff --git a/so_arm_100_bringup/launch/hardware.launch.py b/so_arm_100_bringup/launch/hardware.launch.py
+index 85d58c0..0338324 100644
+--- a/so_arm_100_bringup/launch/hardware.launch.py
++++ b/so_arm_100_bringup/launch/hardware.launch.py
+@@ -12,8 +12,9 @@ from launch_ros.actions import Node
+ from launch_ros.parameter_descriptions import ParameterValue
+ from launch.conditions import IfCondition
+ 
++NS = 'real'
++
+ def generate_launch_description():
+-    # Launch arguments
+     so_arm_100_description_path = os.path.join(
+         get_package_share_directory('so_arm_100_description')
+     )
+@@ -61,8 +62,6 @@ def generate_launch_description():
+     ])
+ 
+     def launch_setup(context, *args, **kwargs):
+-        # This loads so_arm_100_5dof_hardware.urdf which is different to the
+-        # other launch file which load so_arm_100_5dof_arm.urdf.xacro
+         xacro_file = os.path.join(
+             so_arm_100_moveit_config_path,
+             'config',
+@@ -90,8 +89,13 @@ def generate_launch_description():
+         robot_state_publisher = Node(
+             package='robot_state_publisher',
+             executable='robot_state_publisher',
++            namespace=NS,
+             output='screen',
+-            parameters=[robot_description]
++            parameters=[robot_description],
++            remappings=[
++                ('/tf', 'tf'),
++                ('/tf_static', 'tf_static'),
++            ],
+         )
+ 
+         ros2_control_file = os.path.join(
+@@ -103,7 +107,7 @@ def generate_launch_description():
+         controller_manager = Node(
+             package="controller_manager",
+             executable="ros2_control_node",
+-            # arguments=["--ros-args", "--log-level", "DEBUG"],
++            namespace=NS,
+             parameters=[
+                 robot_description,
+                 ros2_control_file,
+@@ -114,41 +118,47 @@ def generate_launch_description():
+         joint_state_broadcaster_spawner = Node(
+             package="controller_manager",
+             executable="spawner",
+-            arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
++            namespace=NS,
++            arguments=["joint_state_broadcaster", "--controller-manager", f"/{NS}/controller_manager"],
+         )
+ 
+         arm_controller_spawner = Node(
+             package="controller_manager",
+             executable="spawner",
+-            arguments=["arm_controller", "-c", "/controller_manager"],
++            namespace=NS,
++            arguments=["arm_controller", "-c", f"/{NS}/controller_manager"],
+             output="screen",
+         )
+ 
+         gripper_controller_spawner = Node(
+             package="controller_manager",
+             executable="spawner",
+-            arguments=["gripper_controller", "-c", "/controller_manager"],
++            namespace=NS,
++            arguments=["gripper_controller", "-c", f"/{NS}/controller_manager"],
+             output="screen",
+         )
+ 
+         arm_effort_controller_spawner = Node(
+             package="controller_manager",
+             executable="spawner",
+-            arguments=["arm_effort_controller", "-c", "/controller_manager", "--inactive"],
++            namespace=NS,
++            arguments=["arm_effort_controller", "-c", f"/{NS}/controller_manager", "--inactive"],
+             output="screen",
+         )
+ 
+         gripper_effort_controller_spawner = Node(
+             package="controller_manager",
+             executable="spawner",
+-            arguments=["gripper_effort_controller", "-c", "/controller_manager", "--inactive"],
++            namespace=NS,
++            arguments=["gripper_effort_controller", "-c", f"/{NS}/controller_manager", "--inactive"],
+             output="screen",
+         )
+ 
+         effort_controller_spawner = Node(
+             package="controller_manager",
+             executable="spawner",
+-            arguments=["effort_controller", "-c", "/controller_manager", "--inactive"],
++            namespace=NS,
++            arguments=["effort_controller", "-c", f"/{NS}/controller_manager", "--inactive"],
+             output="screen",
+         )
+ 
+@@ -198,15 +208,16 @@ def generate_launch_description():
+             package='rviz2',
+             executable='rviz2',
+             name='rviz2',
++            namespace=NS,
+             arguments=['-d', rviz_config_file]
+         )
+ 
+-        # Add zero pose test node
+         zero_pose_node = Node(
+             condition=IfCondition(LaunchConfiguration('zero_pose')),
+             package='so_arm_100_hardware',
+             executable='zero_pose.py',
+             name='zero_pose_test',
++            namespace=NS,
+         )
+ 
+         nodes = [
+@@ -226,4 +237,4 @@ def generate_launch_description():
+     return LaunchDescription([
+         arguments,
+         OpaqueFunction(function=launch_setup),
+-    ]) 
++    ])
+diff --git a/so_arm_100_description/gazebo/so_arm_100_5dof.gazebo.xacro b/so_arm_100_description/gazebo/so_arm_100_5dof.gazebo.xacro
+index 3062cf7..001fd49 100644
+--- a/so_arm_100_description/gazebo/so_arm_100_5dof.gazebo.xacro
++++ b/so_arm_100_description/gazebo/so_arm_100_5dof.gazebo.xacro
+@@ -50,6 +50,7 @@
+         <parameters>${ros2_controllers_file}</parameters>
+         <robot_param>robot_description</robot_param>
+         <robot_param_node>robot_state_publisher</robot_param_node>
++        <position_proportional_gain>10.0</position_proportional_gain>
+       </plugin>
+     </xacro:unless>
+ 
+diff --git a/so_arm_100_description/ros2_control/so_arm_100_5dof_position.ros2_control.xacro b/so_arm_100_description/ros2_control/so_arm_100_5dof_position.ros2_control.xacro
+index f566e72..06e934b 100644
+--- a/so_arm_100_description/ros2_control/so_arm_100_5dof_position.ros2_control.xacro
++++ b/so_arm_100_description/ros2_control/so_arm_100_5dof_position.ros2_control.xacro
+@@ -39,6 +39,7 @@
+           </xacro:if>
+           <xacro:unless value="${use_topic_hardware_interface}">
+             <plugin>gz_ros2_control/GazeboSimSystem</plugin>
++            <param name="position_proportional_gain">30.0</param>
+           </xacro:unless>
+         </xacro:if>
+         <xacro:unless value="${use_sim}">
+diff --git a/so_arm_100_moveit_config/config/controllers_5dof.yaml b/so_arm_100_moveit_config/config/controllers_5dof.yaml
+index 6e9a7f7..f7a7310 100644
+--- a/so_arm_100_moveit_config/config/controllers_5dof.yaml
++++ b/so_arm_100_moveit_config/config/controllers_5dof.yaml
+@@ -1,6 +1,7 @@
+ controller_manager:
+   ros__parameters:
+     update_rate: 100  # Hz
++    position_proportional_gain: 10.0
+     
+     joint_state_broadcaster:
+       type: joint_state_broadcaster/JointStateBroadcaster
+@@ -9,7 +10,7 @@ controller_manager:
+       type: joint_trajectory_controller/JointTrajectoryController
+     
+     gripper_controller:
+-      type: parallel_gripper_action_controller/GripperActionController
++      type: position_controllers/GripperActionController
+ 
+ arm_controller:
+   ros__parameters:
+diff --git a/so_arm_100_moveit_config/config/hardware_controllers.yaml b/so_arm_100_moveit_config/config/hardware_controllers.yaml
+index 5f4951b..65475e8 100644
+--- a/so_arm_100_moveit_config/config/hardware_controllers.yaml
++++ b/so_arm_100_moveit_config/config/hardware_controllers.yaml
+@@ -1,4 +1,4 @@
+-controller_manager:
++/**:
+   ros__parameters:
+     update_rate: 200  # Hz
+ 
+@@ -6,7 +6,7 @@ controller_manager:
+       type: joint_trajectory_controller/JointTrajectoryController
+ 
+     gripper_controller:
+-      type: parallel_gripper_action_controller/GripperActionController
++      type: position_controllers/GripperActionController
+ 
+     arm_effort_controller:
+       type: joint_trajectory_controller/JointTrajectoryController
+@@ -20,7 +20,7 @@ controller_manager:
+     joint_state_broadcaster:
+       type: joint_state_broadcaster/JointStateBroadcaster
+ 
+-arm_controller:
++/**/arm_controller:
+   ros__parameters:
+     joints:
+       - Shoulder_Rotation
+@@ -46,7 +46,7 @@ arm_controller:
+           trajectory: 0.05
+           goal: 0.03
+ 
+-gripper_controller:
++/**/gripper_controller:
+   ros__parameters:
+     joint: Gripper
+     interface_name: position
+@@ -56,7 +56,7 @@ gripper_controller:
+       - position
+       - velocity
+ 
+-arm_effort_controller:
++/**/arm_effort_controller:
+   ros__parameters:
+     joints:
+       - Shoulder_Rotation
+@@ -83,7 +83,7 @@ arm_effort_controller:
+       Wrist_Pitch: {p: 75.0, i: 0.0, d: 1.0, u_clamp_max: 100.0, u_clamp_min: -100.0}
+       Wrist_Roll: {p: 75.0, i: 0.0, d: 1.0, u_clamp_max: 100.0, u_clamp_min: -100.0}
+ 
+-gripper_effort_controller:
++/**/gripper_effort_controller:
+   ros__parameters:
+     joints:
+       - Gripper
+@@ -95,7 +95,7 @@ gripper_effort_controller:
+     gains:
+       Gripper: {p: 75.0, i: 0.0, d: 1.0, u_clamp_max: 100.0, u_clamp_min: -100.0}
+ 
+-effort_controller:
++/**/effort_controller:
+   ros__parameters:
+     joints:
+       - Shoulder_Rotation
+diff --git a/so_arm_100_moveit_config/config/joint_limits.yaml b/so_arm_100_moveit_config/config/joint_limits.yaml
+index 7f74078..98c633b 100644
+--- a/so_arm_100_moveit_config/config/joint_limits.yaml
++++ b/so_arm_100_moveit_config/config/joint_limits.yaml
+@@ -2,8 +2,8 @@
+ 
+ # For beginners, we downscale velocity and acceleration limits.
+ # You can always specify higher scaling factors (<= 1.0) in your motion requests.  # Increase the values below to 1.0 to always move at maximum speed.
+-default_velocity_scaling_factor: 0.1
+-default_acceleration_scaling_factor: 0.1
++default_velocity_scaling_factor: 1.0
++default_acceleration_scaling_factor: 1.0
+ 
+ # Specific joint properties can be changed with the keys [max_position, min_position, max_velocity, max_acceleration]
+ # Joint limits can be turned off with [has_velocity_limits, has_acceleration_limits]
+diff --git a/so_arm_100_moveit_config/config/moveit_controllers.yaml b/so_arm_100_moveit_config/config/moveit_controllers.yaml
+index e5b8e4b..63af064 100644
+--- a/so_arm_100_moveit_config/config/moveit_controllers.yaml
++++ b/so_arm_100_moveit_config/config/moveit_controllers.yaml
+@@ -4,12 +4,12 @@ moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControll
+ 
+ moveit_simple_controller_manager:
+   controller_names:
+-    - arm_controller
++    - mirror_controller
+     - arm_effort_controller
+-    - gripper_controller
++    - mirror_gripper_controller
+     - gripper_effort_controller
+ 
+-  arm_controller:
++  mirror_controller:
+     type: FollowJointTrajectory
+     joints:
+       - Shoulder_Rotation
+@@ -20,8 +20,8 @@ moveit_simple_controller_manager:
+     action_ns: follow_joint_trajectory
+     default: true
+ 
+-  gripper_controller:
+-    type: ParallelGripperCommand
++  mirror_gripper_controller:
++    type: GripperCommand
+     joints:
+       - Gripper
+     action_ns: gripper_cmd
+diff --git a/so_arm_100_moveit_config/config/ros2_controllers.yaml b/so_arm_100_moveit_config/config/ros2_controllers.yaml
+index e803b13..573841e 100644
+--- a/so_arm_100_moveit_config/config/ros2_controllers.yaml
++++ b/so_arm_100_moveit_config/config/ros2_controllers.yaml
+@@ -7,7 +7,7 @@ controller_manager:
+       type: joint_trajectory_controller/JointTrajectoryController
+ 
+     gripper_controller:
+-      type: parallel_gripper_action_controller/GripperActionController
++      type: position_controllers/GripperActionController
+ 
+     arm_effort_controller:
+       type: joint_trajectory_controller/JointTrajectoryController
+diff --git a/so_arm_100_moveit_config/config/so_arm_100.srdf b/so_arm_100_moveit_config/config/so_arm_100.srdf
+index dea21c3..b459170 100644
+--- a/so_arm_100_moveit_config/config/so_arm_100.srdf
++++ b/so_arm_100_moveit_config/config/so_arm_100.srdf
+@@ -32,9 +32,9 @@
+     </group_state>
+     <group_state name="home" group="arm">
+         <joint name="Shoulder_Rotation" value="0"/>
+-        <joint name="Shoulder_Pitch" value="-1.745"/>
+-        <joint name="Elbow" value="1.5"/>
+-        <joint name="Wrist_Pitch" value="1.25"/>
++        <joint name="Shoulder_Pitch" value="-1.4"/>
++        <joint name="Elbow" value="1.4"/>
++        <joint name="Wrist_Pitch" value="1.0"/>
+         <joint name="Wrist_Roll" value="1.5708"/>
+     </group_state>
+     <group_state name="close" group="gripper">

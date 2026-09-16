@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>trajectory_mirror</name>
+  <version>0.0.1</version>
+  <description>Reenvia trayectorias y comandos de pinza al robot simulado en Gazebo y al brazo fisico en simultaneo</description>
+  <maintainer email="eddytorrez34@gmail.com">Eddy Torrez</maintainer>
+  <license>Apache-2.0</license>
+  <depend>rclpy</depend>
+  <depend>control_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
