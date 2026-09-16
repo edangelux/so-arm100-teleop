@@ -15,9 +15,14 @@ Sistema de teleoperación en tiempo real para el manipulador de 5 GDL **SO-ARM10
 | Ubuntu 22.04 en VirtualBox → ROS 2 Humble → Gazebo → MoveIt 2 → teleoperación por visión | **Verificado en una instalación real desde cero** |
 | *Plan & Execute* de MoveIt sobre el robot simulado | **Verificado** |
 | [Instalación nativa por ISO / USB](docs/02-instalacion-nativa-iso.md) | Escrita, **no verificada** |
-| **Brazo físico (SO-ARM100 real por USB)** | **No funciona todavía** — los bloqueos concretos están en [docs/09](docs/09-robot-fisico.md) |
+| [Instalación en WSL2](docs/11-instalacion-wsl2.md) | **El sistema corre bajo WSL2** — el procedimiento paso a paso está escrito, no verificado desde cero |
+| **Brazo físico (SO-ARM100 real por USB)** | **Compilado y verificado sobre Humble** — quedan dos bloqueos abiertos, en [docs/09](docs/09-robot-fisico.md) |
 
-Todo lo que este repositorio instala y ejecuta hoy es **simulación**. Es completa y reproducible, pero es simulación. Si tu objetivo es mover el brazo físico, lee [docs/09 — Estado del robot físico](docs/09-robot-fisico.md) **antes** de conectar nada.
+La ruta de **simulación** está verificada desde cero y es completa y reproducible.
+
+La ruta del **brazo físico** ya no está bloqueada. El driver de los servos que publica el repositorio original solo tiene versión para ROS 2 Jazzy y no compila en Humble; este repositorio incluye el retro-porte, verificado sobre el binario resultante. Lo instala `scripts/06_brazo_fisico.sh`.
+
+**Pero quedan dos cosas sin resolver, y las dos importan antes de conectar nada:** la calibración del brazo y los límites de seguridad del nodo de teleoperación. Cada componente lleva su estado de verificación, con quién lo verificó y cuándo, en [docs/09 — Estado del robot físico](docs/09-robot-fisico.md). Léelo **antes** de conectar el brazo.
 
 ---
 
@@ -51,7 +56,9 @@ El script tarda entre 20 y 40 minutos según tu conexión. Al terminar, **cierra
 | 06 | [Solución de problemas](docs/06-solucion-de-problemas.md) | Todos los errores reales que aparecen y cómo se arreglan |
 | 07 | [**Cómo funciona el sistema**](docs/07-como-funciona.md) | Arquitectura: nodos, tópicos y acciones; el recorrido de la cámara al robot; qué hace cada parte del código |
 | 08 | [**Análisis cinemático**](docs/08-analisis-cinematico.md) | Por qué mapeo articular directo y no cinemática inversa; qué cinemática usa el proyecto; qué cambiaría si se agregara CI |
-| 09 | [**Estado del robot físico**](docs/09-robot-fisico.md) | Qué falta para pasar de la simulación al brazo real, bloqueo por bloqueo |
+| 09 | [**Estado del robot físico**](docs/09-robot-fisico.md) | Estado verificado componente por componente; los seis bloqueos y qué pasó con cada uno |
+| 10 | [**Espejo simulación ↔ robot real**](docs/10-espejo-simulacion-y-robot-real.md) | Cómo se comandan las dos plantas a la vez: espacio de nombres `/real`, los dos nodos espejo, orden de arranque |
+| 11 | [Instalación en WSL2](docs/11-instalacion-wsl2.md) | Paso de la cámara y de la placa de servos por `usbipd`, y el arreglo de cámara obligatorio |
 | — | [**Modelo cinemático completo**](analisis/cinematica/ANALISIS_CINEMATICO.md) | Transformación homogénea, tabla D-H, cinemática directa e inversa, jacobiano, singularidades y manipulabilidad, con verificación cruzada |
 
 ---
@@ -87,7 +94,9 @@ so-arm100-teleop/
 │   ├── 06-solucion-de-problemas.md
 │   ├── 07-como-funciona.md        ← arquitectura: nodos, tópicos y acciones
 │   ├── 08-analisis-cinematico.md  ← por qué no hay cinemática inversa en el lazo
-│   ├── 09-robot-fisico.md         ← qué falta para el brazo real
+│   ├── 09-robot-fisico.md         ← estado verificado del brazo real
+│   ├── 10-espejo-simulacion-y-robot-real.md
+│   ├── 11-instalacion-wsl2.md
 │   └── img/                       ← capturas de pantalla
 ├── analisis/
 │   ├── analisis_cinematico.py     ← números que respaldan la decisión de control
@@ -103,13 +112,20 @@ so-arm100-teleop/
 │   ├── 03_vision_python.sh        ← OpenCV, MediaPipe, permisos de cámara
 │   ├── 04_workspace.sh            ← ~/ros2_ws + paquetes del robot + compilación
 │   ├── 05_aplicar_overlay.sh      ← aplica la configuración verificada para Humble
+│   ├── 06_brazo_fisico.sh         ← OPCIONAL: brazo real por USB (no lo corre install.sh)
 │   ├── comun.sh                   ← funciones compartidas y registro de errores
 │   └── verificar.sh               ← diagnóstico: qué está bien y qué falta
 ├── analisis/
 │   └── analisis_cinematico.py     ← reproduce los números de docs/08
-├── overlay/                       ← archivos de configuración ya corregidos
+├── overlay/                       ← archivos de configuración ya corregidos (simulación)
 │   ├── so_arm_100_bringup/
 │   └── so_arm_100_moveit_config/
+├── brazo-fisico/                  ← todo lo del SO-ARM100 real por USB
+│   ├── parches/                   ← adaptación del driver a Humble + namespace /real
+│   ├── extras/                    ← archivos nuevos de MoveIt Servo
+│   ├── trajectory_mirror/         ← paquete ROS 2: espejo Gazebo ↔ brazo real
+│   └── launch/                    ← launch conjunto de las dos plantas
+├── pruebas/                       ← registro de operación del brazo (todavía vacío)
 └── teleop_vision/
     └── teleop_vision.py           ← nodo de teleoperación por visión
 ```
@@ -128,6 +144,12 @@ bash scripts/02_simulacion.sh       # Fase 2: Gazebo + MoveIt 2 + controladores
 bash scripts/03_vision_python.sh    # Fase 3: OpenCV + MediaPipe + cámara
 bash scripts/04_workspace.sh        # Fase 4: workspace y compilación
 bash scripts/05_aplicar_overlay.sh  # Fase 5: overlay de configuración verificada
+```
+
+La **fase 6 es opcional y no la corre `install.sh`**: agrega lo necesario para mover el brazo físico por USB. Córrela solo si tienes el SO-ARM100 delante, y lee [docs/09](docs/09-robot-fisico.md) antes:
+
+```bash
+bash scripts/06_brazo_fisico.sh     # Fase 6: brazo físico (OPCIONAL)
 ```
 
 Los scripts son **idempotentes**: puedes volver a correrlos sin romper nada. Los bloques de comandos equivalentes, uno por uno, están en [docs/03](docs/03-instalacion-ros2.md) y [docs/04](docs/04-workspace-y-compilacion.md).
@@ -180,6 +202,23 @@ python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py
 La guía completa, con la explicación de cada parámetro ajustable, está en [docs/05](docs/05-ejecucion.md).
 
 **¿Quieres entender qué pasa por dentro?** [docs/07 — Cómo funciona el sistema](docs/07-como-funciona.md) explica la arquitectura de nodos, el recorrido completo desde la cámara hasta el robot, y por qué el brazo se comanda por tópico y la pinza por acción.
+
+### Con el brazo físico
+
+Si corriste la fase 6, un solo lanzamiento levanta **la simulación y el brazo real a la vez**, y ambos siguen la misma consigna:
+
+```bash
+ros2 launch so_arm_100_bringup gz_moveit_real.launch.py serial_port:=/dev/ttyUSB0
+```
+
+```bash
+# en la terminal de teleoperación, además de lo anterior:
+export SOARM_GRIPPER_ACTION=/mirror_gripper_controller/gripper_cmd
+```
+
+Cómo funciona el espejo, el orden de arranque y el diagnóstico están en [docs/10](docs/10-espejo-simulacion-y-robot-real.md).
+
+> **La primera vez, con el brazo sostenido a mano y sin carga en la pinza.** El nodo de teleoperación arranca asumiendo que el brazo está en todo-ceros: en Gazebo es inofensivo, en el brazo físico no. Es el bloqueo 6 de [docs/09](docs/09-robot-fisico.md), y sigue abierto.
 
 ---
 
