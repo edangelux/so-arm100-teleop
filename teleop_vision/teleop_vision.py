@@ -173,7 +173,16 @@ import numpy as np
 
 ARM_JOINTS = ['Shoulder_Rotation', 'Shoulder_Pitch', 'Elbow', 'Wrist_Pitch', 'Wrist_Roll']
 ARM_TOPIC = '/arm_controller/joint_trajectory'
-GRIPPER_ACTION = '/gripper_controller/gripper_cmd'
+# [E9] Accion de la pinza. Se lee del entorno para poder apuntarla al nodo
+#      espejo cuando se comanda el brazo fisico y el simulado a la vez:
+#
+#        export SOARM_GRIPPER_ACTION=/mirror_gripper_controller/gripper_cmd
+#
+#      Sin la variable, el comportamiento es el de siempre (solo simulacion).
+#      El brazo se espeja por topico y la pinza no, porque la pinza va por
+#      accion: ver docs/10-espejo-simulacion-y-robot-real.md
+GRIPPER_ACTION = os.environ.get('SOARM_GRIPPER_ACTION',
+                                '/gripper_controller/gripper_cmd')
 CONFIG_FILE = os.path.expanduser('~/teleop_config.json')
 
 SIGN = {'Shoulder_Rotation': 1, 'Shoulder_Pitch': -1, 'Elbow': -1,     # [E8] revierte [E7]
@@ -404,7 +413,21 @@ def main(args=None):
     rclpy.init(args=args)
     node = TeleopNode()
 
-    cap = cv2.VideoCapture(0)
+    # [E10] Apertura de la camara.
+    #   Bajo WSL2 con la camara pasada por usbipd, cv2.VideoCapture(0) a secas
+    #   hace timeout en select() sobre el bus USB/IP: intenta negociar un
+    #   formato crudo (YUYV) que no funciona bien ahi. Forzar el backend V4L2
+    #   con fourcc MJPG y resolucion reducida lo resuelve.
+    #   Se activa con  export SOARM_CAMERA_MJPG=1  para no alterar el
+    #   comportamiento en maquina virtual ni en instalacion nativa, donde la
+    #   apertura simple ya funciona. Ver docs/11-instalacion-wsl2.md
+    if os.environ.get('SOARM_CAMERA_MJPG') == '1':
+        cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    else:
+        cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Error: no se pudo abrir la camara.")
         return
