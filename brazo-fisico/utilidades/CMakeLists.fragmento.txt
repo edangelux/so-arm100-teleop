@@ -1,0 +1,43 @@
+# ---------------------------------------------------------------------------
+# UTILIDADES DE PUESTA EN MARCHA Y MEDICION  (proyecto so-arm100-teleop)
+#
+# Pegar este bloque en  so_arm_100_hardware/CMakeLists.txt  inmediatamente
+# DESPUES del bloque existente de  ping_test  y ANTES de la seccion install().
+# ---------------------------------------------------------------------------
+
+foreach(util
+    change_id
+    list_servos
+    center_one
+    angular_error_test
+    bench_serial)
+
+  add_executable(${util} test/${util}.cpp)
+
+  target_include_directories(${util} PRIVATE
+    include/SCServo_Linux
+  )
+
+  target_link_libraries(${util}
+    SCServo
+  )
+
+endforeach()
+
+# ---------------------------------------------------------------------------
+# Ademas, agregar los cinco nombres a la lista de install(TARGETS ...) que ya
+# existe mas abajo, de modo que quede asi:
+#
+#   install(
+#     TARGETS
+#       ${PROJECT_NAME}
+#       test_servo
+#       ping_test
+#       change_id
+#       list_servos
+#       center_one
+#       angular_error_test
+#       bench_serial
+#     DESTINATION lib/${PROJECT_NAME}
+#   )
+# ---------------------------------------------------------------------------

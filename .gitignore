@@ -27,3 +27,10 @@ Thumbs.db
 *.avi
 *.bag
 rosbag2_*/
+
+# Archivos de bloqueo de SolidWorks
+~$*
+*.err
+
+# Excepcion: el video del ensamble del modelo parametrico si se publica
+!cad/ensamblajes/*.mp4
