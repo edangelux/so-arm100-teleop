@@ -30,6 +30,14 @@ fprintf('====================================================================\n'
 fprintf(' SO-ARM100 -- CONTRASTE CONTRA BIBLIOTECAS INDEPENDIENTES\n');
 fprintf('====================================================================\n\n');
 
+% Directorio de salida de las figuras.  Se escribe ademas de mostrarse en
+% pantalla, para que la figura reproducida en el documento sea exactamente la
+% que produce el codigo.  Cada figura se guarda solo si su toolbox esta
+% instalado, de modo que el guion no falla en una maquina que carezca de uno.
+DIRSAL = fullfile(fileparts(mfilename('fullpath')), 'figuras');
+if ~exist(DIRSAL,'dir'); mkdir(DIRSAL); end
+guardar = @(nombre) exportgraphics(gcf, fullfile(DIRSAL,nombre), 'Resolution', 220);
+
 %% ================= opcion A: Robotics Toolbox de Peter Corke =================
 if exist('SerialLink','class') || exist('SerialLink','file')
     fprintf('A) ROBOTICS TOOLBOX DE PETER CORKE (SerialLink)\n\n');
@@ -82,6 +90,7 @@ if exist('SerialLink','class') || exist('SerialLink','file')
     title({'SO-ARM100 construido con la tabla D-H', ...
            sprintf('q = (%s) grados', num2str(round(rad2deg(q_demo)',0)))}, ...
           'FontWeight','normal')
+    guardar('mlab_fig5_corke_cadena_dh.png');
 else
     fprintf('A) Robotics Toolbox de Peter Corke no encontrado; se omite esa parte.\n');
     fprintf('   Instalacion: descargar de petercorke.com y ejecutar startup_rvc.m\n\n');
@@ -185,6 +194,7 @@ if exist('rigidBodyTree','class')
     title({'SO-ARM100 como arbol de cuerpos rigidos', ...
            'los cuerpos "giro" son las articulaciones; los "eslabon", los tramos fijos'}, ...
           'FontWeight','normal')
+    guardar('mlab_fig6_rst_arbol_cuerpos.png');
 else
     fprintf('\nB) Robotics System Toolbox no encontrado; se omite esa parte.\n');
     fprintf('   Instalacion: Add-Ons de MATLAB -> "Robotics System Toolbox".\n');

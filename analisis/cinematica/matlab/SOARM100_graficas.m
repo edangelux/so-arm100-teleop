@@ -18,6 +18,14 @@
 clc; clear; close all
 P = SOARM100_parametros();
 
+% Directorio de salida de las figuras.  Se crea si no existe, de modo que el
+% guion pueda ejecutarse desde cualquier copia del repositorio sin preparacion
+% previa.  Cada figura se escribe ademas de mostrarse en pantalla, para que la
+% figura que aparece en el documento sea exactamente la que produce el codigo.
+DIRSAL = fullfile(fileparts(mfilename('fullpath')), 'figuras');
+if ~exist(DIRSAL,'dir'); mkdir(DIRSAL); end
+guardar = @(nombre) exportgraphics(gcf, fullfile(DIRSAL,nombre), 'Resolution', 220);
+
 COL_Z = [0.12 0.61 0.82];
 COL_X = [0.82 0.12 0.12];
 COL_L = [0.55 0.11 0.14];
@@ -49,6 +57,7 @@ xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)')
 title({'Sistemas de referencia de Denavit-Hartenberg', ...
        'configuracion q = 0'},'FontWeight','normal','FontSize',12)
 set(gca,'FontSize',10)
+guardar('mlab_fig1_marcos_dh.png');
 
 %% ---------------------------------------------------------------- Figura 2
 nom = {'Rotacion de hombro','Cabeceo de hombro','Codo','Cabeceo de muneca','Giro de muneca'};
@@ -71,6 +80,7 @@ for j = 1:5
           'FontWeight','normal','FontSize',10)
     set(gca,'FontSize',8)
 end
+guardar('mlab_fig2_grados_de_libertad.png');
 
 %% ---------------------------------------------------------------- Figura 3
 N = 60000; rng(3);
@@ -99,6 +109,7 @@ subplot(1,2,2)
   title({'Planta', sprintf('recorrido de la base: %+.1f a %+.1f grados', ...
         rad2deg(P.lim(1,1)), rad2deg(P.lim(1,2)))},'FontWeight','normal','FontSize',11)
   set(gca,'FontSize',10)
+guardar('mlab_fig3_espacio_de_trabajo.png');
 
 %% ---------------------------------------------------------------- Figura 4
 n = 121;
@@ -121,8 +132,9 @@ title({'Indice de manipulabilidad  w = sqrt(det(J^T J))', ...
        'la franja oscura es la singularidad de codo extendido'}, ...
       'FontWeight','normal','FontSize',12)
 set(gca,'FontSize',10)
+guardar('mlab_fig4_manipulabilidad.png');
 
-fprintf('Cuatro figuras generadas.\n');
+fprintf('Cuatro figuras generadas y escritas en %s\n', DIRSAL);
 
 
 %% ---------------------------------------------------------------- auxiliar
