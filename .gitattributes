@@ -1,17 +1,11 @@
-# Los scripts DEBEN llevar finales de línea LF.
-# Si Git en Windows los convierte a CRLF, Linux falla al ejecutarlos con
-# "bad interpreter: /usr/bin/env bash^M: No such file or directory".
-* text=auto eol=lf
-*.sh   text eol=lf
-*.py   text eol=lf
-*.md   text eol=lf
-*.yaml text eol=lf
-*.yml  text eol=lf
-*.txt  text eol=lf
+# Git LFS — modelos de diseno asistido por computadora
+# Los archivos nativos y de intercambio del modelo paramétrico son binarios
+# grandes; se almacenan mediante Git LFS para no cargar el historial del
+# repositorio. Las mallas STL, que son pequenas y son las que se envian a
+# fabricacion, se versionan de forma ordinaria.
 
-# Binarios: que Git no los toque
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.gif binary
-*.zip binary
+*.SLDPRT  filter=lfs diff=lfs merge=lfs -text
+*.SLDASM  filter=lfs diff=lfs merge=lfs -text
+*.step    filter=lfs diff=lfs merge=lfs -text
+*.STEP    filter=lfs diff=lfs merge=lfs -text
+*.mp4     filter=lfs diff=lfs merge=lfs -text
