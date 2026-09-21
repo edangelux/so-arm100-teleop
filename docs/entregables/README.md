@@ -4,7 +4,7 @@ Los cuatro documentos con que se presentó el proyecto, archivados tal como se e
 
 | Archivo | Qué es | Páginas |
 |---|---|---:|
-| [documento_tecnico_final.pdf](documento_tecnico_final.pdf) | Informe técnico del proyecto, asignatura Análisis y Diseño de Sistemas Mecatrónicos | 235 |
+| [documento_tecnico_final.pdf](documento_tecnico_final.pdf) | Informe técnico del proyecto, asignatura Análisis y Diseño de Sistemas Mecatrónicos | 240 |
 | [presentacion_tecnica.pdf](presentacion_tecnica.pdf) | Presentación de la defensa técnica | 18 |
 | [formulacion_y_evaluacion.pdf](formulacion_y_evaluacion.pdf) | Documento de la asignatura Formulación y Evaluación de Proyectos, con el estudio económico | 73 |
 | [presentacion_metodologica.pdf](presentacion_metodologica.pdf) | Presentación de la defensa metodológica | 21 |
