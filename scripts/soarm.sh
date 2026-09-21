@@ -102,10 +102,17 @@ plan
 [[ "$(uname -s)" == Linux ]] || die 'Este lanzador requiere Linux o WSL2; Git Bash no ejecuta ROS 2.'
 [[ "$EUID" -ne 0 ]] || die 'Ejecute el lanzador como usuario normal con sudo, no como root.'
 check_camera_url() {
-    # Un flujo MJPEG no termina nunca: se lee durante 3 s y basta con que lleguen datos.
-    local bytes
-    bytes="$(curl -s --max-time 3 -o /dev/null -w '%{size_download}' "$CAMERA" 2>/dev/null || true)"
-    [[ "${bytes:-0}" =~ ^[0-9]+$ && "${bytes:-0}" -gt 0 ]]
+    # Un flujo MJPEG no termina nunca: se leen 3 s y se comprueba que sea video.
+    # No basta con que lleguen datos: DroidCam responde con una página de texto
+    # cuando ya atiende a otro cliente (el cliente de Windows o un navegador).
+    local tipo
+    tipo="$(curl -s --max-time 3 -o /dev/null -w '%{content_type}' "$CAMERA" 2>/dev/null || true)"
+    if [[ "${tipo,,}" == multipart/* || "${tipo,,}" == image/* || "${tipo,,}" == video/* ]]; then
+        sleep 2   # DroidCam tarda en liberar la conexión de la comprobación.
+        return 0
+    fi
+    printf 'La dirección respondió con tipo «%s», no con video.\n' "${tipo:-ninguno}" >&2
+    return 1
 }
 load_ros() {
     [[ -f /opt/ros/humble/setup.bash ]] || die 'No se encontró ROS 2 Humble.'
@@ -156,7 +163,7 @@ fi
 if [[ "$CAMERA" =~ ^[0-9]+$ ]]; then
     [[ -r "/dev/video$CAMERA" && -w "/dev/video$CAMERA" ]] || die "Cámara inaccesible: /dev/video$CAMERA. Revise la conexión USB (o USB/IP en WSL2) y el grupo video."
 else
-    check_camera_url || die "Cámara por red inaccesible: $CAMERA. Compruebe que la aplicación del teléfono está abierta, que ambos equipos están en la misma red y que ningún navegador tiene el video abierto."
+    check_camera_url || die "Cámara por red inaccesible: $CAMERA. Compruebe que la aplicación del teléfono está abierta, que ambos equipos están en la misma red y que ni el cliente de DroidCam para Windows ni un navegador tienen el video abierto: DroidCam atiende a un solo cliente."
 fi
 if [[ "$ACTION" != sim ]]; then
     [[ -c "$PORT" && -r "$PORT" && -w "$PORT" ]] || die "Puerto inaccesible: $PORT. Revise la conexión USB (o USB/IP en WSL2) y el grupo dialout."
