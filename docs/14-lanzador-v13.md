@@ -19,6 +19,77 @@ Instala ROS 2 Humble y Gazebo si faltan, crea el entorno de Python con las versi
 
 Por omisión usa `~/ros2_ws_entrega` y `~/teleop_venv_entrega`, distintos de los de la instalación por fases, para que una no pise a la otra. Si el workspace ya existe y tiene archivos distintos de las fuentes, **no los sobrescribe**: se detiene y pide otra ruta con `--ws`.
 
+## Atajos de una palabra
+
+Para no escribir rutas ni opciones, la instalación agrega a `~/.bashrc` unas órdenes cortas y dos iconos en el menú de aplicaciones: **SO-ARM100 Teleoperación** y **SO-ARM100 Diagnóstico**. También se instalan solas con `bash scripts/instalar_atajos.sh`. Las preferencias se guardan en `~/.soarm.conf` y se cambian con `soarm-config`.
+
+| Orden | Qué hace |
+|---|---|
+| `teleop` | Arranca todo; véase el recorrido de abajo |
+| `teleop sim` · `teleop real` · `teleop ambos` | Lo mismo, con el modo fijado. Acepta cualquier opción de `soarm.sh`, más `--v13`, `--v14`, `--v15` y `--sin-moveit` |
+| `soarm-camara` | Elige y prueba la cámara sin arrancar nada |
+| `soarm-diagnostico` | Revisa la instalación completa y guarda un informe (véase [Validación por entorno](#validación-por-entorno)) |
+| `centrar` · `servos` | `center_servos` y `list_servos`, compilados la primera vez. No corren si el lanzador tiene el puerto |
+| `soarm-ensayo …` | Ensayos de rendimiento; véase [docs/17](17-ensayos-de-rendimiento.md) |
+| `soarm-registros` · `soarm-actualizar` · `soarm-config` · `soarm-ayuda` | Registros de la última sesión, `git pull`, preferencias y lista de órdenes |
+
+### Qué hace `teleop`
+
+1. **Detecta el entorno:** Ubuntu nativo, máquina virtual o WSL2. En los dos últimos agrega `--software-gl`, porque Gazebo no abre su ventana con la aceleración gráfica de esos entornos.
+2. **Busca el brazo.** Si el puerto configurado no existe, prueba `/dev/ttyACM*` y `/dev/ttyUSB*`. En WSL2 pasa la placa desde Windows con `usbipd`. Si no lo encuentra, una ventana explica qué hacer en ese entorno: conectar el cable, pasarlo a la máquina virtual desde su menú **Dispositivos → USB**, o compartirlo una vez con `usbipd bind`. En modo automático, sin brazo arranca la simulación.
+3. **Pregunta la cámara**, con la elección anterior preseleccionada:
+
+   | Tipo | Qué hace |
+   |---|---|
+   | Integrada o USB | Lista las cámaras que ve el sistema (sin los nodos de metadatos) y prueba que la elegida entregue una imagen. Si está ocupada por otra aplicación o falta el permiso del grupo `video`, lo dice |
+   | Virtual | Igual, con las cámaras de OBS, del cliente de DroidCam para Linux o de v4l2loopback |
+   | Teléfono por Wi-Fi | **Pide la IP cada vez**, porque cambia con la red y con el tiempo (IP dinámica), y propone la última usada. Acepta `192.168.1.38`, `192.168.1.38:8080` o una URL completa. Si se deja vacía, **busca el teléfono en la red** (DroidCam en el puerto 4747 e IP Webcam en el 8080) y lista los que encuentra, indicando si están libres u ocupados |
+
+   Si la cámara no responde, está ocupada por otro cliente o no entrega video, la ventana explica la causa y ofrece reintentar, cambiar la IP, buscar o elegir otro tipo, en vez de terminar con un error.
+4. **Imprime la orden completa** que ejecuta (`→ bash scripts/soarm.sh …`), para que siempre se sepa qué corrió y se pueda repetir a mano.
+
+Las preguntas salen en ventanas cuando hay escritorio y está instalado `zenity`, que instala el propio lanzador. Sin escritorio salen en la terminal. `SOARM_UI=terminal` obliga a usar la terminal.
+
+| ¿Qué cámara? | IP del teléfono | Teléfono ocupado | Búsqueda en la red |
+|:---:|:---:|:---:|:---:|
+| ![Tipo de cámara](img/camara_1_tipo.png) | ![IP](img/camara_2_ip.png) | ![Ocupado](img/camara_3_ocupado.png) | ![Búsqueda](img/camara_4_busqueda.png) |
+
+![Brazo no encontrado en una máquina virtual](img/brazo_no_encontrado.png)
+
+## Validación por entorno
+
+`soarm-diagnostico` revisa, en el equipo donde se ejecuta, todo lo que el sistema necesita. Revisa el sistema, los grupos, el repositorio, ROS 2, Gazebo, el workspace, MoveIt, el entorno Python, la pantalla, OpenGL, las cámaras, el puerto del brazo y los atajos. Cada línea sale como OK, AVISO o FALLA, con la corrección al lado. El informe queda en `~/soarm_diagnostico_AAAA-MM-DD_HHMM.txt`; en WSL2 se copia además a la carpeta Descargas de Windows. No mueve el brazo ni instala nada.
+
+Estado de cada entorno al 21 de septiembre de 2026:
+
+| Etapa | WSL2 | Ubuntu nativo | Máquina virtual |
+|---|---|---|---|
+| Instalación (`soarm.sh instalar`) | Ejecutada | Pendiente | Pendiente |
+| Simulación (`sim`) | Ejecutada, con `--software-gl` | Pendiente | Pendiente |
+| Brazo físico (`real`, `init` y `home`) | Ejecutado | Pendiente | Pendiente |
+| Atajos, `teleop` y elección de cámara | Pendiente en el equipo | Pendiente | Pendiente |
+
+Qué se comprobó sin esos equipos, en un Ubuntu 22.04 de pruebas y con un servidor de video simulado:
+
+- La elección de cámara en sus nueve recorridos por terminal: IP correcta; teléfono ocupado y cambio de IP; sin respuesta y cambio de tipo; búsqueda automática; IP recordada; IP Webcam por URL; cámara integrada; cámara virtual ocupada; y ninguna cámara local.
+- Las ventanas reales de zenity, en una pantalla virtual: tipo de cámara, IP, teléfono ocupado, búsqueda y brazo no encontrado. Las imágenes de arriba son esas capturas.
+- `teleop` con el lanzador sustituido por uno falso: con y sin brazo, con el modo fijado y con la cámara pasada a mano.
+- `soarm-diagnostico` en un equipo sin ROS, donde marca FALLA en lo que falta.
+
+Para completar la tabla, en cada entorno:
+
+```bash
+cd ~/so-arm100-teleop && git pull
+bash scripts/soarm.sh instalar          # en un equipo nuevo; en uno ya instalado basta instalar_atajos
+bash scripts/instalar_atajos.sh
+source ~/.bashrc
+soarm-diagnostico                       # debe terminar sin FALLA
+teleop sim                              # cámara, Gazebo, Q, menú
+teleop                                  # con el brazo: ambos, init al cerrar, home al apagar
+```
+
+y se guarda el informe del diagnóstico de cada entorno en `pruebas/`.
+
 ## Los tres modos
 
 ```bash

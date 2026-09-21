@@ -125,7 +125,7 @@ check_camera_url() {
     # No basta con que lleguen datos: DroidCam responde con una página de texto
     # cuando ya atiende a otro cliente (el cliente de Windows o un navegador).
     local tipo
-    tipo="$(curl -s --max-time 3 -o /dev/null -w '%{content_type}' "$CAMERA" 2>/dev/null || true)"
+    tipo="$(curl -s --noproxy '*' --max-time 3 -o /dev/null -w '%{content_type}' "$CAMERA" 2>/dev/null || true)"
     if [[ "${tipo,,}" == multipart/* || "${tipo,,}" == image/* || "${tipo,,}" == video/* ]]; then
         sleep 2   # DroidCam tarda en liberar la conexión de la comprobación.
         return 0
@@ -147,7 +147,7 @@ if [[ "$ACTION" == instalar ]]; then
     python3 "$REPO/scripts/preparar_workspace.py" "$REPO/entrega/src" "$WS"
     if [[ ! -f /opt/ros/humble/setup.bash ]]; then bash "$REPO/scripts/01_ros2_humble.sh"; fi
     bash "$REPO/scripts/02_simulacion.sh"
-    sudo apt-get install -y python3-venv python3-pip python3-colcon-common-extensions python3-rosdep libyaml-cpp-dev libportaudio2 v4l-utils build-essential curl
+    sudo apt-get install -y python3-venv python3-pip python3-colcon-common-extensions python3-rosdep libyaml-cpp-dev libportaudio2 v4l-utils build-essential curl zenity mesa-utils
     if [[ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]]; then sudo rosdep init; fi
     rosdep update
     [[ ! -e "$VENV" || -f "$VENV/pyvenv.cfg" ]] || die 'La ruta del entorno existe y no es un entorno virtual.'
@@ -160,6 +160,7 @@ if [[ "$ACTION" == instalar ]]; then
     cd "$WS"
     rosdep install --from-paths src --ignore-src -r -y --rosdistro humble
     colcon build --symlink-install
+    bash "$REPO/scripts/instalar_atajos.sh" || true
     printf '\nInstalación completa. Si se agregaron grupos al usuario, cierre sesión y vuelva a entrar.\n'
     exit 0
 fi

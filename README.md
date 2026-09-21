@@ -49,7 +49,7 @@ bash scripts/soarm.sh real  --puerto /dev/ttyACM0     # sólo el brazo físico
 bash scripts/soarm.sh ambos --puerto /dev/ttyACM0     # las dos plantas a la vez
 ```
 
-Con `--dry-run` el lanzador muestra qué va a hacer sin instalar ni iniciar nada. Todas las opciones, los tópicos que usa cada modo y el orden de arranque están en [docs/14 — Lanzador unificado](docs/14-lanzador-v13.md).
+Después de instalar, basta escribir **`teleop`**, o abrir el icono **SO-ARM100 Teleoperación**. Pregunta la cámara (integrada, virtual o un teléfono por Wi-Fi con su IP), detecta el brazo y arranca el modo que corresponde, en Ubuntu nativo, en máquina virtual o en WSL2 ([docs/14](docs/14-lanzador-v13.md#atajos-de-una-palabra)). Con `--dry-run` el lanzador muestra qué va a hacer sin instalar ni iniciar nada. Todas las opciones, los tópicos que usa cada modo y el orden de arranque están en [docs/14 — Lanzador unificado](docs/14-lanzador-v13.md).
 
 > **Antes de conectar el brazo físico** conviene leer el bloqueo 6 de [docs/09](docs/09-robot-fisico.md): la versión 13 arranca suponiendo que el brazo está en la postura cero y no lee `/joint_states`. Con el brazo sostenido y sin carga en la pinza la primera vez.
 
@@ -80,6 +80,7 @@ Con `--dry-run` el lanzador muestra qué va a hacer sin instalar ni iniciar nada
 | 14 | [**Lanzador unificado**](docs/14-lanzador-v13.md) | Instalación y operación de la versión presentada en los tres modos |
 | 15 | [**v14, MoveIt y posturas seguras**](docs/15-v14-moveit-y-posturas-seguras.md) | Arranque y reanudación desde la postura medida, MoveIt junto a la teleoperación, cierre en `init` y apagado en `home` |
 | 16 | [**v15: mejor estimación de ángulos**](docs/16-v15-estimacion-de-angulos.md) | Confianza por articulación, ganancia por postura de referencia y giro de muñeca en 3D |
+| 17 | [**Ensayos de rendimiento**](docs/17-ensayos-de-rendimiento.md) | Precisión, respuesta, repetibilidad, carga, temperatura y fidelidad del espejo |
 | — | [**Modelo cinemático completo**](analisis/cinematica/ANALISIS_CINEMATICO.md) | Tabla D-H, cinemática directa e inversa, jacobiano, singularidades, verificación cruzada |
 | — | [**Documentos entregados**](docs/entregables/README.md) | Documento técnico, formulación y evaluación, y las dos presentaciones |
 

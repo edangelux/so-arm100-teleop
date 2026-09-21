@@ -1,6 +1,6 @@
 # 16 — Versión 15: mejor estimación de los ángulos del operador
 
-[← Anterior: v14, MoveIt y posturas seguras](15-v14-moveit-y-posturas-seguras.md) · [Volver al inicio](../README.md)
+[← Anterior: v14, MoveIt y posturas seguras](15-v14-moveit-y-posturas-seguras.md) · [Volver al inicio](../README.md) · [Siguiente: ensayos de rendimiento →](17-ensayos-de-rendimiento.md)
 
 ---
 
