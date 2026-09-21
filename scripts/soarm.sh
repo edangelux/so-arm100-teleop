@@ -127,9 +127,10 @@ if [[ "$ACTION" == instalar ]]; then
     [[ ! -e "$VENV" || -f "$VENV/pyvenv.cfg" ]] || die 'La ruta del entorno existe y no es un entorno virtual.'
     [[ -f "$VENV/pyvenv.cfg" ]] || python3 -m venv --system-site-packages "$VENV"
     "$VENV/bin/python" -m pip install -r "$REPO/entrega/entorno/requirements-recuperado.txt"
+    # rclpy procede de ROS 2 (/opt/ros/humble); se carga antes de comprobar el entorno.
+    load_ros
     "$VENV/bin/python" -c 'import cv2, mediapipe as mp, numpy, rclpy; mp.solutions.pose; mp.solutions.hands; print(cv2.__version__, mp.__version__, numpy.__version__)'
     sudo usermod -a -G dialout,video "$USER"
-    load_ros
     cd "$WS"
     rosdep install --from-paths src --ignore-src -r -y --rosdistro humble
     colcon build --symlink-install
