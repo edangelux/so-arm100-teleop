@@ -32,9 +32,14 @@ y se cambian estas dos líneas en el script.
 
 ## Estado de verificación
 
-Lo que está compilado y verificado, y lo que no, está pieza por pieza en la
-tabla de [docs/09](../docs/09-robot-fisico.md). **Dos bloqueos siguen abiertos**
-y hay que leerlos antes de conectar el brazo.
+El estado de cada pieza, con su evidencia, está en la tabla de
+[docs/09](../docs/09-robot-fisico.md). El brazo físico se operó con éxito en 23
+sesiones y en la defensa del proyecto. De los seis bloqueos identificados antes
+de tenerlo, el 6 se conserva como limitación conocida del nodo de teleoperación,
+y conviene leerlo antes de conectar el brazo.
+
+Los instrumentos de medición y puesta en marcha que se usaron están en
+[`utilidades/originales/`](utilidades/originales/).
 
 ## Créditos
 

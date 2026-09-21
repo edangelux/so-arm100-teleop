@@ -1,6 +1,6 @@
 # 11 — Instalación en WSL2
 
-[← Anterior: espejo simulación ↔ robot real](10-espejo-simulacion-y-robot-real.md) · [Volver al inicio](../README.md)
+[← Anterior: espejo simulación ↔ robot real](10-espejo-simulacion-y-robot-real.md) · [Volver al inicio](../README.md) · [Siguiente: cierre del proyecto →](12-cierre-del-proyecto.md)
 
 ---
 
@@ -10,7 +10,7 @@
 >
 > **Lo no verificado:** el procedimiento paso a paso de abajo. Está escrito a partir de la configuración que funcionó, pero **nadie lo ha seguido desde cero sobre una máquina limpia**. Si lo sigues y encuentras una diferencia, corrígela aquí.
 >
-> Si quieres la ruta segura y probada desde cero, usa [docs/01 — máquina virtual](01-instalacion-maquina-virtual.md).
+> La ruta probada desde cero es la de [docs/01 — máquina virtual](01-instalacion-maquina-virtual.md).
 
 ---
 
@@ -47,7 +47,7 @@ wsl --install -d Ubuntu-22.04
 wsl --set-default-version 2
 ```
 
-Comprueba que quedó en versión 2, porque WSL1 no sirve:
+Se comprueba que quedó en versión 2, porque WSL1 no sirve:
 
 ```powershell
 wsl -l -v
@@ -81,7 +81,7 @@ Esta es la parte que no tiene equivalente en las otras rutas.
 winget install --interactive --exact dorssel.usbipd-win
 ```
 
-Cierra y vuelve a abrir PowerShell. Luego, **como administrador**, lista los dispositivos:
+Se cierra y se vuelve a abrir PowerShell. Luego, **como administrador**, se listan los dispositivos:
 
 ```powershell
 usbipd list
@@ -96,7 +96,7 @@ usbipd attach --wsl --busid 1-6
 
 `bind` se hace una vez. `attach` hay que repetirlo **cada vez que reinicias Windows o WSL**.
 
-Comprueba dentro de Ubuntu:
+Comprobación dentro de Ubuntu:
 
 ```bash
 ls -l /dev/video*
@@ -123,7 +123,7 @@ python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py
 
 Lo que hace es forzar el backend V4L2, el fourcc MJPG y una resolución de 640×480, que es además la resolución de trabajo del proyecto.
 
-> **Si no estás en WSL2, no definas esa variable.** En máquina virtual y en instalación nativa la apertura simple funciona, y forzar MJPG podría fallar con cámaras que no lo expongan.
+> **Fuera de WSL2 esa variable no se define.** En máquina virtual y en instalación nativa la apertura simple funciona, y forzar MJPG podría fallar con cámaras que no lo expongan.
 
 Para no tener que escribirlo cada vez:
 
@@ -149,7 +149,7 @@ Y dentro de Ubuntu:
 ls -l /dev/ttyUSB* /dev/ttyACM*
 ```
 
-Si tu placa aparece como `ttyACM0` en lugar de `ttyUSB0`, lee el [bloqueo 3 de docs/09](09-robot-fisico.md#3-el-overlay-se-come-los-parámetros-del-puerto-serie--abierto) antes de seguir: sigue abierto y el argumento `serial_port` se ignora en silencio.
+Si la placa aparece como `ttyACM0` en lugar de `ttyUSB0`, conviene leer el bloqueo 3 de [docs/09](09-robot-fisico.md) antes de seguir. Con el xacro del overlay de la fase 5 el argumento `serial_port` se ignora en silencio; con el workspace de la entrega, que es el que se operó bajo WSL2 con `/dev/ttyACM0`, el argumento llega al driver. El lanzador `scripts/soarm.sh` usa ese workspace.
 
 El grupo `dialout` se aplica igual que en las demás rutas; lo hace `scripts/06_brazo_fisico.sh`. Bajo WSL, «cerrar sesión y volver a entrar» significa:
 
@@ -168,7 +168,7 @@ y volver a abrir Ubuntu.
 | El script se queda colgado al abrir la cámara, sin mensaje | Falta `export SOARM_CAMERA_MJPG=1` |
 | `/dev/video0` no existe | Falta `usbipd attach`, o se perdió al reiniciar |
 | `/dev/video0` desaparece tras reiniciar Windows | Normal: `attach` no es persistente, hay que repetirlo |
-| Gazebo va muy lento | Comprueba que **no** tengas `LIBGL_ALWAYS_SOFTWARE=1` puesto |
+| Gazebo va muy lento | Comprobar que **no** esté definida `LIBGL_ALWAYS_SOFTWARE=1` |
 | `wsl -l -v` dice `VERSION 1` | `wsl --set-version Ubuntu-22.04 2` |
 | `usbipd: command not found` | Se instala en Windows, no dentro de WSL |
 

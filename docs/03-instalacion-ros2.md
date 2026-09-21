@@ -4,9 +4,9 @@
 
 ---
 
-Desde aquí todo es terminal. Abre una con **Ctrl + Alt + T**.
+Desde aquí todo es terminal. Se abre una con **Ctrl + Alt + T**.
 
-> **Cuidado con cómo pegas los comandos.** Un espacio de más o una línea partida a la mitad y el comando falla. Si estás en máquina virtual, activa antes el portapapeles bidireccional: *Dispositivos → Portapapeles compartido → Bidireccional*. En GitHub, cada bloque de código tiene un botón de copiar en la esquina superior derecha — úsalo.
+> **Cuidado al pegar los comandos.** Un espacio de más o una línea partida a la mitad y el comando falla. En máquina virtual conviene activar antes el portapapeles bidireccional: *Dispositivos → Portapapeles compartido → Bidireccional*. En GitHub, cada bloque de código tiene un botón de copiar en la esquina superior derecha, que evita esos errores.
 
 ## Atajo: hacerlo todo de una vez
 
@@ -16,9 +16,9 @@ git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
 cd ~/so-arm100-teleop && bash scripts/install.sh
 ```
 
-Si prefieres entender qué hace cada paso, o si el script se detuvo en algún punto, sigue leyendo: abajo está exactamente lo mismo, bloque por bloque.
+Para entender qué hace cada paso, o si el guion se detuvo en algún punto, abajo está exactamente lo mismo, bloque por bloque.
 
-> **Si vas por la ruta manual, no termines aquí.** Este documento cubre ROS 2, Gazebo y Python. Falta el workspace y, sobre todo, el **overlay de configuración** — sin él los paquetes del robot **no arrancan en Humble**. Todo eso está en [04 — Workspace y compilación](04-workspace-y-compilacion.md), y es obligatorio.
+> **La ruta manual no termina aquí.** Este documento cubre ROS 2, Gazebo y Python. Falta el workspace y, sobre todo, el **overlay de configuración** — sin él los paquetes del robot **no arrancan en Humble**. Todo eso está en [04 — Workspace y compilación](04-workspace-y-compilacion.md), y es obligatorio.
 
 ---
 
@@ -33,7 +33,7 @@ sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 export LANG=en_US.UTF-8
 ```
 
-Verifica:
+Verificación:
 
 ```bash
 locale
@@ -83,9 +83,9 @@ sudo apt install -y \
     python3-vcstool
 ```
 
-Esta es la descarga grande: ~2 GB, entre 10 y 30 minutos según tu conexión.
+Esta es la descarga grande: ~2 GB, entre 10 y 30 minutos según la conexión.
 
-Inicializa `rosdep`, que es la herramienta que resuelve las dependencias de los paquetes que vas a compilar:
+Se inicializa `rosdep`, la herramienta que resuelve las dependencias de los paquetes que se van a compilar:
 
 ```bash
 sudo rosdep init || true
@@ -94,7 +94,7 @@ rosdep update
 
 > El `|| true` está a propósito: si `rosdep` ya estaba inicializado, el comando falla con "*default sources list file already exists*" y detendría el script. Con `|| true` se ignora ese caso, que es inofensivo.
 
-Haz que ROS 2 se cargue solo en cada terminal nueva:
+Para que ROS 2 se cargue solo en cada terminal nueva:
 
 ```bash
 grep -qxF "source /opt/ros/humble/setup.bash" ~/.bashrc || echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
@@ -103,7 +103,7 @@ source /opt/ros/humble/setup.bash
 
 > El `grep -qxF ... ||` evita que la línea se duplique si corres el comando dos veces. Es un detalle pequeño pero un `.bashrc` con la misma línea diez veces es una fuente real de problemas.
 
-**Comprueba que quedó:**
+**Comprobación:**
 
 ```bash
 ros2 --help
@@ -142,9 +142,9 @@ sudo apt install -y \
 >
 > Los paquetes del SO-ARM100 usan el **Gazebo nuevo** (`gz sim`, antes llamado Ignition), que es lo que instala `ros-humble-ros-gz`. Instalar los dos a la vez descarga ~1 GB de más, crea comandos `gazebo` y `gz` que se confunden entre sí, y es una fuente clásica de "*el mundo carga pero el robot no aparece*".
 >
-> En Ubuntu 22.04 + Humble, `ros-humble-ros-gz` instala **Gazebo Fortress**, que es el emparejamiento oficialmente soportado. El repositorio original del robot menciona Gazebo Garden; Fortress funciona para la simulación de este proyecto y es mucho más fácil de instalar. Si algún día necesitas Garden, hay que agregar el repositorio de `osrfoundation` y usar `ros-humble-ros-gzgarden`, que entra en conflicto con `ros-humble-ros-gz*` — no lo hagas salvo que sepas por qué lo necesitas.
+> En Ubuntu 22.04 + Humble, `ros-humble-ros-gz` instala **Gazebo Fortress**, que es el emparejamiento oficialmente soportado. El repositorio original del robot menciona Gazebo Garden; Fortress funciona para la simulación de este proyecto y es mucho más fácil de instalar. Usar Garden exige agregar el repositorio de `osrfoundation` e instalar `ros-humble-ros-gzgarden`, que entra en conflicto con `ros-humble-ros-gz*`; no se recomienda sin una razón concreta.
 
-Verifica:
+Verificación:
 
 ```bash
 gz sim --version
@@ -154,7 +154,7 @@ gz sim --version
 
 ## Fase 5 — Permisos de cámara
 
-Para que tu usuario pueda leer `/dev/video0` sin `sudo`:
+Para que el usuario pueda leer `/dev/video0` sin `sudo`:
 
 ```bash
 sudo usermod -a -G video $USER
@@ -167,7 +167,7 @@ sudo usermod -a -G video $USER
 ## Fase 6 — Python: OpenCV, MediaPipe y NumPy
 
 > ### Aquí hay tres trampas. Ninguna es evidente, y las tres rompen el sistema.
-> Esta fase es la que más problemas dio en la práctica. Si prefieres saltártela, corre `bash scripts/03_vision_python.sh`, que ya trae todo esto resuelto.
+> Esta fase es la que más problemas dio en la práctica. Para saltarla, `bash scripts/03_vision_python.sh` la ejecuta con todo esto ya resuelto.
 
 **1. OpenCV desde APT, nunca desde pip:**
 
@@ -220,7 +220,7 @@ python3 -m pip install -c /tmp/restricciones.txt \
 
 > **Dos que no son obvias.** `certifi` es necesario o `import mediapipe` falla; y `protobuf` tiene que ser **menor que 5**, o aparece `AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'`.
 
-**Verifica que todo quedó bien:**
+**Verificación final:**
 
 ```bash
 python3 -c "import cv2, mediapipe, numpy; print(cv2.__version__, mediapipe.__version__, numpy.__version__)"
@@ -233,7 +233,7 @@ La combinación verificada en una instalación real es:
 opencv 4.5.4 | mediapipe 0.10.21 | numpy 1.26.4
 ```
 
-Si el segundo comando falla con `has no attribute 'solutions'`, tienes una versión demasiado nueva:
+Si el segundo comando falla con `has no attribute 'solutions'`, la versión instalada es demasiado nueva:
 
 ```bash
 python3 -m pip install --no-deps "mediapipe==0.10.21" --force-reinstall

@@ -8,7 +8,7 @@ Los archivos que hay aquí son **marcadores** que dicen "CAPTURA PENDIENTE". Los
 
 **Opción rápida (recomendada):** Google Docs → **Archivo → Descargar → Página web (.html, comprimido)**.
 
-Se descarga un `.zip` con una carpeta `images/` que ya contiene **todas** las imágenes del documento en su resolución original, y —esto es lo importante— **en el mismo orden en que aparecen en el documento**: `image1.png`, `image2.png`, `image3.png`… Así que solo tienes que renombrarlas en orden según la tabla de abajo.
+Se descarga un `.zip` con una carpeta `images/` que ya contiene **todas** las imágenes del documento en su resolución original, y —esto es lo importante— **en el mismo orden en que aparecen en el documento**: `image1.png`, `image2.png`, `image3.png`… Así que basta renombrarlas en orden según la tabla de abajo.
 
 **Opción manual:** clic derecho sobre cada imagen → *Guardar imagen como*. Sirve, pero es lento y a veces guarda una versión reescalada.
 
@@ -60,4 +60,4 @@ El orden de esta tabla es **exactamente** el orden en que las imágenes aparecen
 
 - Formato **PNG** para capturas de interfaz (texto nítido), **JPG** solo para fotos.
 - Ancho máximo **1600 px**: por encima de eso GitHub las reescala igual y solo pesan más.
-- Si una captura muestra tu nombre de usuario, correo o cualquier dato personal, recórtalo o difumínalo antes de subirla — el repositorio es público.
+- Si una captura muestra un nombre de usuario, un correo o cualquier dato personal, se recorta o se difumina antes de subirla: el repositorio es público.

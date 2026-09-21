@@ -40,7 +40,7 @@ Conviene aclararlo antes de justificar nada, porque la lista es más larga de lo
 | **Cinemática inversa** | El solver **KDL** de MoveIt, configurado en `kinematics.yaml`. Es lo que corre al usar *Plan & Execute* en RViz | **No.** Disponible, pero fuera del lazo |
 | **Planeación de trayectorias** | OMPL dentro de `move_group`, y el `joint_trajectory_controller` interpolando cada comando con `time_from_start = 40 ms` | La interpolación sí; la planeación completa no |
 
-Es decir: **la cinemática inversa está instalada, configurada y es demostrable en vivo desde RViz.** Lo que no hace es traducir la posición de tu mano a ángulos del robot.
+Es decir: **la cinemática inversa está instalada, configurada y es demostrable en vivo desde RViz.** Lo que no hace es traducir la posición de la mano del operador a ángulos del robot.
 
 ---
 
@@ -66,7 +66,7 @@ Las consecuencias son duras y no se pueden programar para que desaparezcan:
 - **No hay muñeca esférica** (no existen tres ejes que se corten en un punto), así que no aplica la descomposición de Pieper y **no hay solución en forma cerrada**. Cualquier CI tendría que ser numérica e iterativa, cada fotograma.
 - Para una posición dada del efector, la orientación **no es libre**: forma una familia de 2 parámetros, no los 3 de SO(3).
 
-> **Aquí es exactamente donde entrarían los cuaterniones**, y también donde se ve por qué no ayudarían tanto como parece. Un cuaternión te deja *especificar* la orientación deseada con precisión y sin bloqueo de cardán. Pero si el objetivo no cumple la restricción del plano, el brazo **no puede alcanzarlo**: el solver devolvería la proyección más cercana, no lo que pediste. El cuaternión describiría bien un objetivo imposible.
+> **Aquí es exactamente donde entrarían los cuaterniones**, y también donde se ve por qué no ayudarían tanto como parece. Un cuaternión permite *especificar* la orientación deseada con precisión y sin bloqueo de cardán. Pero si el objetivo no cumple la restricción del plano, el brazo **no puede alcanzarlo**: el solver devolvería la proyección más cercana, no lo que se pidió. El cuaternión describiría bien un objetivo imposible.
 
 ---
 
@@ -80,7 +80,7 @@ Las consecuencias son duras y no se pueden programar para que desaparezcan:
 
 `L1 = 0.1160 m` y `L2 = 0.1350 m` no son estimaciones: son la norma de los `origin xyz` de los joints `Elbow` y `Wrist_Pitch` en el URDF.
 
-La cinemática inversa consume **posiciones métricas**. Tu mano se mueve en un volumen 2.3 veces más grande que el del robot, así que la posición no se le puede pasar tal cual: hace falta un factor de escalado, que es **un parámetro más que calibrar** y que cambia según tu estatura y tu distancia a la cámara.
+La cinemática inversa consume **posiciones métricas**. La mano del operador se mueve en un volumen 2,3 veces más grande que el del robot, así que la posición no se le puede pasar tal cual: hace falta un factor de escalado, que es **un parámetro más que calibrar** y que cambia según la estatura del operador y su distancia a la cámara.
 
 El mapeo articular directo consume **ángulos**, que son adimensionales. Un codo doblado 90° es 90° midas lo que midas.
 
@@ -166,7 +166,7 @@ No toca el código que funciona. Consiste en formalizar lo que ya está implíci
 - **Análisis de singularidades** y mapa del espacio de trabajo alcanzable.
 - La comparación cuantitativa de este documento.
 
-**Beneficio:** demuestra el dominio completo de la materia y convierte "no usamos CI" en "no usamos CI, y aquí está la medición que lo justifica". **Costo:** tiempo de escritura. **Riesgo para la demostración: cero.**
+**Beneficio:** demuestra el dominio completo de la materia y convierte «no se usó CI» en «no se usó CI, y aquí está la medición que lo justifica». **Costo:** tiempo de escritura. **Riesgo para la demostración: cero.**
 
 ### Nivel 2 — Modo cartesiano seleccionable (riesgo medio)
 

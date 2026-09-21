@@ -18,13 +18,13 @@ Elige qué opción tomarás:
    Está más vista para computadoras que tienen buen procesador, gráfica y RAM de sobra.
 
 2. **[Instalación ISO](02-instalacion-nativa-iso.md)**
-   Está más vista para computadoras que tienen *stats* básicos o generales. Se necesita tener una USB y un disco duro aparte, o un espacio de almacenamiento de 50 GB: en una USB, en el mismo disco duro que tienes para Windows, o en uno externo.
+   Está más vista para computadoras que tienen *stats* básicos o generales. Se necesita tener una USB y un disco duro aparte, o un espacio de almacenamiento de 50 GB: en una USB, en el mismo disco duro donde está Windows, o en uno externo.
 
 ---
 
 ROS 2 Humble requiere de forma estricta **Ubuntu 22.04 LTS**. Versiones más recientes (como 24.04) o anteriores (20.04) generan incompatibilidades directas con las dependencias binarias de ROS y Gazebo.
 
-Descarga la imagen ISO oficial:
+Se descarga la imagen ISO oficial:
 
 - **Archivo ISO:** [Ubuntu 22.04.5 LTS Desktop (64-bit)](https://releases.ubuntu.com/22.04/)
 
@@ -51,7 +51,7 @@ Esta opción permite trabajar dentro de Windows sin modificar particiones de dis
 
 ### 2. Instalación de VirtualBox y Extension Pack
 
-Instala **VirtualBox** y el **VirtualBox Extension Pack** correspondiente a la misma versión desde la web oficial de Oracle. El Extension Pack es obligatorio para habilitar el controlador USB 3.0, que es el que permite transferir la webcam del host a la máquina virtual.
+Se instalan **VirtualBox** y el **VirtualBox Extension Pack** correspondiente a la misma versión desde la web oficial de Oracle. El Extension Pack es obligatorio para habilitar el controlador USB 3.0, que es el que permite transferir la webcam del host a la máquina virtual.
 
 Bueno, no es necesario que sea VirtualBox, sino que cualquier máquina virtual sirve: puede ser **VMware**, **QEMU/KVM**, **Xen Project** o **VirtualBox**.
 
@@ -91,15 +91,15 @@ Finalizamos con la instalación de VirtualBox, listo.
 
 ### 3. Crear la máquina virtual
 
-Abre VirtualBox y haz clic en **Nueva**:
+Se abre VirtualBox y se hace clic en **Nueva**:
 
 - **Nombre:** `Robotcito`
 - **Tipo:** Linux
 - **Versión:** Ubuntu (64-bit)
-- **Imagen ISO:** selecciona el archivo `.iso` descargado
+- **Imagen ISO:** el archivo `.iso` descargado
 - Marca la casilla **Omitir instalación desatendida** (*Unattended Installation*) para configurar usuario y contraseñas manualmente
 
-> Marcar **Omitir instalación desatendida** es lo que hace que después el instalador de Ubuntu te pregunte idioma, teclado, usuario y contraseña pantalla por pantalla. Si la dejas sin marcar, VirtualBox te pide esos datos en el asistente y luego instala solo, sin preguntarte nada.
+> Marcar **Omitir instalación desatendida** es lo que hace que después el instalador de Ubuntu pregunte idioma, teclado, usuario y contraseña pantalla por pantalla. Si queda sin marcar, VirtualBox pide esos datos en el asistente y luego instala solo, sin preguntar nada.
 
 ![Diálogo Nueva máquina virtual](img/vm-12-vbox-nueva-1.png)
 
@@ -109,7 +109,7 @@ Abre VirtualBox y haz clic en **Nueva**:
 
 ### 4. Ajustes críticos de la máquina virtual (antes de iniciar)
 
-Haz clic derecho en la máquina virtual → **Configuración**:
+Clic derecho en la máquina virtual → **Configuración**:
 
 - **Sistema → Placa Base:** asigna mínimo 4096 MB de RAM.
 - **Sistema → Procesador:** asigna 2 o 4 núcleos.
@@ -117,7 +117,7 @@ Haz clic derecho en la máquina virtual → **Configuración**:
   - Memoria de video: **128 MB**
   - Controlador gráfico: **VMSVGA**
   - Marca la casilla **Habilitar aceleración 3D** (indispensable para la interfaz gráfica de Gazebo y RViz)
-- **USB:** selecciona **Controlador USB 3.0 (xHCI)**
+- **USB:** **Controlador USB 3.0 (xHCI)**
 
 ![Configuración de la máquina virtual](img/vm-14-vbox-config-1.png)
 
@@ -137,17 +137,17 @@ Configuramos la pantalla, la disposición de video y la aceleración 3D.
 
 ![Pantalla, memoria de video y aceleración 3D](img/vm-19-vbox-pantalla-3d.png)
 
-Ve a **Red** y configura el **NAT** a **Adaptador puente**, así usa la misma tarjeta de red tanto tu PC como la máquina virtual.
+En **Red**, el **NAT** se cambia a **Adaptador puente**, para que el equipo anfitrión y la máquina virtual usen la misma tarjeta de red.
 
 ![Red en modo Adaptador puente](img/vm-20-vbox-red-puente.png)
 
-> **Este paso es opcional. Si te da problemas, déjalo en NAT y sigue.**
+> **Este paso es opcional. Si da problemas, se deja en NAT y se continúa.**
 >
-> Con **NAT** la máquina virtual ya sale a internet y descarga paquetes sin configurar nada. El puente sirve para otra cosa: hace que la VM aparezca como un equipo más de tu red local, con IP propia visible desde Windows. Eso solo hace falta si algún día quieres repartir nodos de ROS 2 entre tu Windows y la VM — **para esta guía no es necesario en ningún momento**, porque todo corre dentro de la misma VM y el robot físico entra por USB.
+> Con **NAT** la máquina virtual ya sale a internet y descarga paquetes sin configurar nada. El puente sirve para otra cosa: hace que la VM aparezca como un equipo más de la red local, con IP propia visible desde Windows. Eso sólo hace falta para repartir nodos de ROS 2 entre Windows y la VM — **para esta guía no es necesario en ningún momento**, porque todo corre dentro de la misma VM y el robot físico entra por USB.
 >
-> Si el desplegable aparece vacío y no sale tu tarjeta de red, es un problema conocido de VirtualBox en Windows: está en [docs/06](06-solucion-de-problemas.md#la-máquina-virtual-no-tiene-internet-de-verdad). No te detengas ahí; deja NAT y continúa.
+> Si el desplegable aparece vacío y no sale la tarjeta de red, es un problema conocido de VirtualBox en Windows: está en [docs/06](06-solucion-de-problemas.md#la-máquina-virtual-no-tiene-internet-de-verdad). No hace falta detenerse ahí: se deja NAT y se continúa.
 
-Ve a **USB**, para la entrada de los servomotores. Si no los tienes, *chill*: esto es por si en el dado caso tienes el robot en físico y quieras accionarlo.
+En **USB** se configura la entrada de la placa de los servomotores. Sólo hace falta si se va a accionar el brazo físico; para la simulación puede omitirse.
 
 ![USB para los servomotores](img/vm-21-vbox-usb-servomotores.png)
 
@@ -159,7 +159,7 @@ Enciende la máquina virtual con **doble clic** encima de ella.
 
 ![Encender la máquina virtual](img/vm-22-vbox-encender-maquina.png)
 
-Ahora sí empieza la instalación de Ubuntu. Como marcaste **Omitir instalación desatendida**, el instalador te va a ir preguntando todo pantalla por pantalla. Vas dándole siguiente con las opciones por defecto; espera a que termine.
+Ahora sí empieza la instalación de Ubuntu. Como se marcó **Omitir instalación desatendida**, el instalador pregunta todo pantalla por pantalla. Se avanza con las opciones por defecto y se espera a que termine.
 
 ![Instalador de Ubuntu](img/vm-23-ubuntu-instalador-1.png)
 
@@ -171,12 +171,12 @@ Ahora sí empieza la instalación de Ubuntu. Como marcaste **Omitir instalación
 
 ![Instalador de Ubuntu](img/vm-27-ubuntu-instalador-5.png)
 
-Recuerda la contraseña que colocas y el usuario.
+Conviene anotar el usuario y la contraseña.
 
 > ## ⚠️ PERO EN SERIO RECUERDA BIEN LA CONTRASEÑA
 > **POR LO MÁS SAGRADO DEL MUNDO. NO ES BROMA, ES ADVERTENCIA, COMPLETAMENTE EN SERIO.**
 >
-> La vas a escribir decenas de veces con `sudo` durante toda la instalación de ROS. Si la pierdes, la única salida práctica es reinstalar todo desde cero.
+> La contraseña se escribe decenas de veces con `sudo` durante la instalación de ROS. Si se pierde, la única salida práctica es reinstalar todo desde cero.
 
 ![Usuario y contraseña](img/vm-28-ubuntu-usuario-password-1.png)
 
@@ -206,29 +206,29 @@ Abres terminal como en la imagen, o por comando **Ctrl + Alt + T**.
 
 ### 7. Conectar la webcam
 
-Antes que sigamos, porque vamos a ocupar la webcam, haz esta configuración: ve a **Dispositivos → Webcams** y selecciónala.
+Antes de seguir, como el sistema usa la webcam, se habilita en **Dispositivos → Webcams**.
 
 ![Dispositivos → Webcams](img/vm-35-vbox-webcam.png)
 
-Comprueba que Ubuntu la ve:
+Se comprueba que Ubuntu la ve:
 
 ```bash
 ls -l /dev/video*
 ```
 
-Debe aparecer al menos `/dev/video0`. Si no aparece nada, revisa que el **Extension Pack** esté instalado y que la cámara no esté siendo usada por otra aplicación en Windows (Zoom, Teams, la app Cámara).
+Debe aparecer al menos `/dev/video0`. Si no aparece nada, hay que revisar que el **Extension Pack** esté instalado y que la cámara no esté siendo usada por otra aplicación en Windows (Zoom, Teams, la app Cámara).
 
 ---
 
 ### 8. Antes de los comandos
 
-Ahora sí vamos con comandos. **Ten cuidado con cómo colocas los comandos**: si le colocas un espacio o algo de más, no van a funcionar o puedes dañar algo.
+A partir de aquí todo son comandos. **Conviene copiarlos exactamente**: un espacio o un carácter de más hace que fallen o que hagan algo distinto.
 
-Si es posible, configura tu VirtualBox para que sea **copiar y pegar bidireccional** (no voy a enseñar eso porque no es totalmente necesario).
+Si es posible, conviene activar en VirtualBox el **portapapeles bidireccional**, para copiar y pegar entre Windows y la VM. No es imprescindible.
 
 > Está en **Dispositivos → Portapapeles compartido → Bidireccional**, con la máquina encendida.
 
-Y si quieres pantalla completa de verdad y que la ventana se redimensione sola, instala las **Guest Additions**: menú superior de VirtualBox → **Dispositivos → Insertar imagen de CD de las «Guest Additions»**, y luego en la terminal:
+Para tener pantalla completa y que la ventana se redimensione sola se instalan las **Guest Additions**: menú superior de VirtualBox → **Dispositivos → Insertar imagen de CD de las «Guest Additions»**, y luego en la terminal:
 
 ```bash
 sudo apt update && sudo apt install -y build-essential dkms linux-headers-$(uname -r)
@@ -240,11 +240,11 @@ sudo reboot
 
 ## Listo
 
-Ya tienes Ubuntu 22.04 funcionando. Continúa con:
+Con Ubuntu 22.04 funcionando, se continúa con:
 
 **[→ 03 — Instalación de ROS 2 Humble](03-instalacion-ros2.md)**
 
-O, si prefieres que un script haga todos los comandos de terminal por ti:
+O bien, para que un guion ejecute todos los comandos de terminal:
 
 ```bash
 sudo apt update && sudo apt install -y git

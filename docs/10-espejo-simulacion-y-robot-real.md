@@ -6,7 +6,7 @@
 
 Este documento explica cómo el sistema comanda **el robot simulado y el brazo físico al mismo tiempo**, con la misma consigna, sin duplicar el nodo de teleoperación.
 
-> **Estado:** los dos nodos espejo están compilados y verificados. El launch conjunto `gz_moveit_real.launch.py` **no se ha ejecutado de principio a fin**. Ver la tabla de estado en [docs/09](09-robot-fisico.md).
+> **Estado:** la arquitectura de réplica **se operó en la defensa del proyecto**, con los dos nodos espejo gobernando a la vez el gemelo digital y el brazo físico. La secuencia exacta que se usó está en [La secuencia de la defensa](#la-secuencia-de-la-defensa). El launch conjunto `gz_moveit_real.launch.py` es una alternativa que agrupa esos pasos y no se ejecutó de principio a fin. Estado de cada componente en [docs/09](09-robot-fisico.md).
 
 ---
 
@@ -92,7 +92,33 @@ python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py
 
 ---
 
-## Orden de arranque
+## La secuencia de la defensa
+
+El historial de órdenes del equipo con el que se presentó el proyecto registra, en este orden, los cinco procesos que se levantaron. Cada uno ocupa su propia terminal:
+
+```bash
+# Terminal 1 — gemelo digital en Gazebo
+ros2 launch so_arm_100_bringup gz.launch.py
+
+# Terminal 2 — brazo físico bajo el espacio de nombres /real
+ros2 launch so_arm_100_bringup hardware.launch.py serial_port:=/dev/ttyACM0
+
+# Terminal 3 — espejo de acciones (MoveIt y pinza)
+ros2 run trajectory_mirror trajectory_mirror_node
+
+# Terminal 4 — espejo del tópico de teleoperación
+ros2 run trajectory_mirror topic_mirror_node
+
+# Terminal 5 — teleoperación, versión 13
+source ~/teleop_venv/bin/activate
+python3 ~/teleop_scripts/teleop_v13.py
+```
+
+En la versión 13 la acción de la pinza está fijada en el código a `/mirror_gripper_controller/gripper_cmd`, la que ofrece `trajectory_mirror_node`, de modo que no hace falta ninguna variable de entorno.
+
+Esa misma secuencia es la que automatiza `bash scripts/soarm.sh ambos`, que además espera a que los controladores de cada planta estén activos antes de abrir la teleoperación y cierra todos los procesos al salir. Véase [docs/14](14-lanzador-v13.md).
+
+## Orden de arranque con el launch conjunto
 
 ```bash
 # Terminal 1 — las dos plantas y los dos espejos
@@ -116,7 +142,7 @@ export SOARM_GRIPPER_ACTION=/mirror_gripper_controller/gripper_cmd
 python3 ~/so-arm100-teleop/teleop_vision/teleop_vision.py
 ```
 
-> **La primera vez, con el brazo sostenido a mano o apoyado, sin carga en la pinza y con un dedo en el interruptor de la fuente.** El nodo de teleoperación arranca asumiendo que el brazo está en todo-ceros; en Gazebo eso es inofensivo, en el brazo físico no. Ver [docs/09, bloqueo 6](09-robot-fisico.md#6-el-nodo-de-teleoperación-no-es-seguro-para-hardware-real--abierto-lee-esto-antes-de-conectar), que sigue abierto.
+> **La primera vez, con el brazo sostenido a mano o apoyado, sin carga en la pinza y con un dedo en el interruptor de la fuente.** El nodo de teleoperación arranca suponiendo que el brazo está en todo-ceros; en Gazebo eso es inofensivo, en el brazo físico no. Es el bloqueo 6 de [docs/09](09-robot-fisico.md), que la versión 13 conserva.
 
 ---
 
@@ -144,7 +170,7 @@ Si ves `No se pudo conectar a /arm_controller (Gazebo)`, sube ese valor. El arre
 | El brazo físico va a ángulos equivocados | La calibración es la de fábrica — [docs/09, bloqueo 4](09-robot-fisico.md) |
 | `No se pudo conectar a /real/arm_controller` | Los controladores del lado físico no llegaron a activarse. Revisa permisos del puerto (`dialout`) y que el puerto exista |
 | `Permission denied` al abrir `/dev/ttyUSB0` | Falta cerrar sesión y volver a entrar tras `usermod -a -G dialout` |
-| Lanzar con `serial_port:=/dev/ttyACM0` no surte efecto | [docs/09, bloqueo 3](09-robot-fisico.md) — sigue abierto |
+| Lanzar con `serial_port:=/dev/ttyACM0` no surte efecto | [docs/09, bloqueo 3](09-robot-fisico.md): ocurre con el xacro del overlay, no con el workspace de la entrega |
 
 ---
 

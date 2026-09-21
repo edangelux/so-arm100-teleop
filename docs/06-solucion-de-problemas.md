@@ -30,9 +30,9 @@ Cuando el instalador se detiene, muestra un recuadro como este:
   Registro completo:  /home/tu_usuario/so-arm100-instalacion.log
 ```
 
-**El mensaje de error de verdad está unas líneas MÁS ARRIBA de ese recuadro.** El recuadro te dice dónde se detuvo; la causa la imprimió el comando que falló, justo antes. Es el error más común al pedir ayuda: pegar solo la última línea, que casi nunca es la útil.
+**El mensaje de error de verdad está unas líneas MÁS ARRIBA de ese recuadro.** El recuadro indica dónde se detuvo; la causa la imprimió el comando que falló, justo antes. Es el error más común al pedir ayuda: pegar solo la última línea, que casi nunca es la útil.
 
-Todo queda guardado en `~/so-arm100-instalacion.log`, así que no importa si el texto se te fue de la ventana:
+Todo queda guardado en `~/so-arm100-instalacion.log`, así que no importa si el texto ya salió de la ventana:
 
 ```bash
 tail -n 40 ~/so-arm100-instalacion.log     # el error y su contexto
@@ -59,7 +59,7 @@ bash scripts/install.sh
 ```
 
 <details>
-<summary><b>Qué pasaba, por si te interesa</b></summary>
+<summary><b>Qué pasaba, para quien quiera el detalle</b></summary>
 
 Los scripts corren con `set -u`, que detiene la ejecución ante cualquier variable sin definir. Es una buena práctica: evita que un error tipográfico en un nombre de variable pase desapercibido y borre algo que no debía.
 
@@ -73,7 +73,7 @@ source /opt/ros/humble/setup.bash
 set -u
 ```
 
-Esto **no te afecta al usar ROS normalmente**: tu terminal interactiva no tiene `set -u` activado. Solo pasaba dentro de los scripts.
+Esto **no afecta al uso normal de ROS**: la terminal interactiva no tiene `set -u` activado. Solo pasaba dentro de los scripts.
 
 </details>
 
@@ -92,7 +92,7 @@ cd ~/so-arm100-teleop
 bash scripts/install.sh
 ```
 
-**Solución permanente**, si es tu propio repositorio:
+**Solución permanente**, en un repositorio propio:
 
 ```bash
 cd ~/so-arm100-teleop
@@ -102,26 +102,26 @@ git commit -m "Restaura el permiso de ejecución de los scripts"
 git push
 ```
 
-`git update-index --chmod=+x` marca el permiso **dentro del repositorio**, no solo en tu copia local. Funciona incluso desde Windows, donde `chmod` por sí solo no se registra porque Git tiene `core.filemode` en `false`.
+`git update-index --chmod=+x` marca el permiso **dentro del repositorio**, no sólo en la copia local. Funciona incluso desde Windows, donde `chmod` por sí solo no se registra porque Git tiene `core.filemode` en `false`.
 
 ---
 
 ### `bash: ./scripts/install.sh: /usr/bin/env: bad interpreter: No such file or directory`
 
-Fíjate si al final del mensaje aparece un `^M`. Si es así, el archivo tiene finales de línea de Windows (CRLF) y Linux lee el `\r` como parte del nombre del intérprete.
+Hay que fijarse si al final del mensaje aparece un `^M`. Si es así, el archivo tiene finales de línea de Windows (CRLF) y Linux lee el `\r` como parte del nombre del intérprete.
 
 ```bash
 sudo apt install -y dos2unix
 dos2unix scripts/*.sh teleop_vision/*.py
 ```
 
-El repositorio incluye un `.gitattributes` que fuerza finales de línea LF precisamente para que esto no pase. Si te ocurrió, es que clonaste una versión anterior a ese archivo.
+El repositorio incluye un `.gitattributes` que fuerza finales de línea LF precisamente para que esto no pase. Si ocurre, el clon es de una versión anterior a ese archivo.
 
 ---
 
 ### `✗ No hay conexión a internet (o packages.ros.org no responde)` pero sí tengo internet
 
-**Era un fallo del script, corregido.** Si te aparece, actualiza el repositorio:
+**Era un fallo del guion, ya corregido.** Si aparece, se actualiza el repositorio:
 
 ```bash
 cd ~/so-arm100-teleop
@@ -130,7 +130,7 @@ bash scripts/install.sh
 ```
 
 <details>
-<summary><b>Qué pasaba, por si te interesa</b></summary>
+<summary><b>Qué pasaba, para quien quiera el detalle</b></summary>
 
 La comprobación de red hacía `curl -fsS https://packages.ros.org`. Dos errores en una sola línea:
 
@@ -139,7 +139,7 @@ La comprobación de red hacía `curl -fsS https://packages.ros.org`. Dos errores
 
 Ahora se prueban tres destinos distintos, sin `-f`, y la comprobación **nunca aborta la instalación**: si falla pero la red funciona, `apt` sigue sin problema.
 
-**Cómo saber si tu red está bien:** mira más arriba en la salida del script. Si ves líneas `Hit:1 http://...ubuntu.com... InRelease`, `apt` ya alcanzó los servidores de Ubuntu y tu red funciona.
+**Cómo saber si la red está bien:** más arriba en la salida del guion. Si aparecen líneas `Hit:1 http://...ubuntu.com... InRelease`, `apt` ya alcanzó los servidores de Ubuntu y la red funciona.
 
 </details>
 
@@ -159,16 +159,16 @@ sudo apt update          # ¿llega a los repositorios?
 |---|---|
 | Los tres funcionan | Tienes internet. Si el script decía lo contrario, mira el punto anterior. |
 | `8.8.8.8` sí, `google.com` no | Es DNS, no conectividad. En VirtualBox suele arreglarse cambiando el adaptador de red y volviéndolo a poner, o reiniciando la VM. |
-| Ninguno funciona | Revisa la configuración de red de la máquina virtual. |
+| Ninguno funciona | Hay que revisar la configuración de red de la máquina virtual. |
 
-> ### NAT ya te da internet
-> **No necesitas «Adaptador puente» para navegar ni para instalar paquetes.** Con **NAT** la VM sale a internet sin configurar nada.
+> ### NAT ya da internet
+> **No hace falta «Adaptador puente» para navegar ni para instalar paquetes.** Con **NAT** la VM sale a internet sin configurar nada.
 >
-> El adaptador puente sirve para otra cosa: hace que la VM aparezca como un equipo más de tu red local, con IP propia visible desde Windows. Eso solo hace falta si algún día quieres repartir nodos de ROS 2 entre tu Windows y la VM. **Para este proyecto no es necesario en ningún momento**: Gazebo, ROS 2 y el script de visión corren todos dentro de la misma VM, y el robot físico entra por USB, no por red.
+> El adaptador puente sirve para otra cosa: hace que la VM aparezca como un equipo más de la red local, con IP propia visible desde Windows. Eso sólo hace falta para repartir nodos de ROS 2 entre Windows y la VM. **Para este proyecto no es necesario en ningún momento**: Gazebo, ROS 2 y el script de visión corren todos dentro de la misma VM, y el robot físico entra por USB, no por red.
 
-**Si el desplegable de «Adaptador puente» aparece vacío** (no sale tu tarjeta de red), es casi siempre una de estas:
+**Si el desplegable de «Adaptador puente» aparece vacío** (no sale la tarjeta de red), es casi siempre una de estas:
 
-1. **Falta el driver de puente.** En Windows: `Win + R` → `ncpa.cpl` → clic derecho en tu adaptador → **Propiedades**. Busca **VirtualBox NDIS6 Bridged Networking Driver** en la lista y márcalo.
+1. **Falta el driver de puente.** En Windows: `Win + R` → `ncpa.cpl` → clic derecho en el adaptador → **Propiedades**. En la lista se busca **VirtualBox NDIS6 Bridged Networking Driver** y se marca.
 2. **VirtualBox se instaló sin los componentes de red.** Vuelve a correr su instalador, elige **Repair**, y **reinicia Windows** — este último paso se salta mucha gente y es justo el que hace que aparezca.
 3. **Estás sobre Wi-Fi.** Muchos drivers de Wi-Fi no permiten el modo promiscuo que el puente necesita, así que la tarjeta no aparece, o aparece pero no pasa tráfico. Por cable suele funcionar a la primera.
 
@@ -200,13 +200,13 @@ El primer `rm` borra la configuración vieja para que no queden dos repositorios
 
 Tres causas posibles, en orden de frecuencia:
 
-1. **No estás en Ubuntu 22.04.** Comprueba:
+1. **El sistema no es Ubuntu 22.04.** Se comprueba con:
    ```bash
    lsb_release -a
    ```
    Debe decir `22.04` y `jammy`. Si dice 24.04 (`noble`) o 20.04 (`focal`), no existe `ros-humble-desktop` para ese sistema. Hay que reinstalar Ubuntu 22.04.
 
-2. **No corriste `sudo apt update`** después de agregar el repositorio de ROS.
+2. **No se ejecutó `sudo apt update`** después de agregar el repositorio de ROS.
 
 3. **Falta el repositorio `universe`:**
    ```bash
@@ -237,13 +237,13 @@ rosdep update
 
 ### `ERROR: cannot download default sources list from ... Website may be down`
 
-Problema de red o de DNS, no de ROS. Comprueba que tienes internet dentro de la máquina virtual:
+Problema de red o de DNS, no de ROS. Se comprueba que hay internet dentro de la máquina virtual:
 
 ```bash
 ping -c 3 raw.githubusercontent.com
 ```
 
-Si no responde y estás en VirtualBox, revisa la configuración de red de la máquina virtual (**Adaptador puente** o **NAT**, cualquiera de los dos, pero conectado).
+Si no responde en VirtualBox, hay que revisar la configuración de red de la máquina virtual (**Adaptador puente** o **NAT**, cualquiera de los dos, pero conectado).
 
 ---
 
@@ -258,7 +258,7 @@ touch ~/ros2_ws/src/SO-100-arm/so_arm_100_5dof_arm_ikfast_plugin/COLCON_IGNORE
 cd ~/ros2_ws && colcon build --symlink-install
 ```
 
-Si quieres forzar KDL explícitamente, edita `so_arm_100_moveit_config/config/kinematics.yaml` y usa:
+Para forzar KDL de forma explícita se edita `so_arm_100_moveit_config/config/kinematics.yaml` con:
 
 ```yaml
 kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
@@ -268,7 +268,7 @@ kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
 
 ### `colcon build` se queda congelado o mata la terminal
 
-Te quedaste sin RAM. `colcon` compila varios paquetes en paralelo por defecto. Compila de uno en uno:
+Se agotó la RAM. `colcon` compila varios paquetes en paralelo por defecto; se compila de uno en uno:
 
 ```bash
 cd ~/ros2_ws
@@ -281,7 +281,7 @@ En una máquina virtual con 4 GB, esto es prácticamente obligatorio.
 
 ### `Package 'so_arm_100_bringup' not found`
 
-Casi siempre es que **no hiciste `source` del workspace en esa terminal**:
+Casi siempre es que **no se hizo `source` del workspace en esa terminal**:
 
 ```bash
 source /opt/ros/humble/setup.bash
@@ -295,7 +295,7 @@ Si aún así no aparece, es que la compilación falló o el repositorio equivoca
 ls ~/ros2_ws/src/SO-100-arm
 ```
 
-Debe contener las carpetas `so_arm_100_bringup`, `so_arm_100_description`, `so_arm_100_moveit_config`. Si en su lugar ves archivos `.stl` y `.step`, clonaste `TheRobotStudio/SO-ARM100` — ese repositorio no tiene paquetes de ROS 2. Ve a [docs/04](04-workspace-y-compilacion.md#2-descargar-los-paquetes-del-so-arm100).
+Debe contener las carpetas `so_arm_100_bringup`, `so_arm_100_description`, `so_arm_100_moveit_config`. Si en su lugar aparecen archivos `.stl` y `.step`, se clonó `TheRobotStudio/SO-ARM100` — ese repositorio no tiene paquetes de ROS 2. Ve a [docs/04](04-workspace-y-compilacion.md#2-descargar-los-paquetes-del-so-arm100).
 
 ---
 
@@ -303,13 +303,13 @@ Debe contener las carpetas `so_arm_100_bringup`, `so_arm_100_description`, `so_a
 
 ### `Error: No se pudo abrir la camara` / `Cannot open camera /dev/video0`
 
-**Si estás en VirtualBox**, la causa casi segura es que la webcam no está pasada a la máquina virtual:
+**En VirtualBox**, la causa casi segura es que la webcam no está pasada a la máquina virtual:
 
-1. Menú superior de VirtualBox: **Dispositivos → Webcams →** selecciona tu cámara.
-2. Verifica que el **Extension Pack** esté instalado (sin él no hay soporte de webcam).
-3. Cierra cualquier aplicación en Windows que esté usando la cámara: Zoom, Teams, la app *Cámara*, el navegador. **Solo un sistema puede tomar la cámara a la vez.**
+1. Menú superior de VirtualBox: **Dispositivos → Webcams →** la cámara.
+2. Verificar que el **Extension Pack** esté instalado (sin él no hay soporte de webcam).
+3. Cerrar cualquier aplicación de Windows que esté usando la cámara: Zoom, Teams, la app *Cámara*, el navegador. **Solo un sistema puede tomar la cámara a la vez.**
 
-**En cualquier instalación**, comprueba que el dispositivo existe y que tienes permiso:
+**En cualquier instalación**, se comprueba que el dispositivo existe y que hay permiso:
 
 ```bash
 ls -l /dev/video*
@@ -326,7 +326,7 @@ y luego **cierra sesión y vuelve a entrar** (o reinicia). El cambio de grupo no
 
 ### La cámara existe pero el video sale negro o congelado
 
-Prueba otro índice de cámara. En `teleop_vision.py`, busca esta línea y cambia el `0`:
+Se prueba otro índice de cámara. En `teleop_vision.py` se cambia el `0` de esta línea (con el lanzador, basta `--camara 1`):
 
 ```python
 cap = cv2.VideoCapture(0)      # prueba 1, 2, ...
@@ -357,14 +357,14 @@ python3 -c "import cv2; print(cv2.__version__)"
 
 MediaPipe funciona con el `cv2` del sistema sin problema. Esta es la opción recomendada.
 
-**Solución B — apuntar Qt al plugin correcto**, si por alguna razón necesitas el OpenCV de `pip`:
+**Solución B — apuntar Qt al plugin correcto**, si por alguna razón hace falta el OpenCV de `pip`:
 
 ```bash
 echo 'export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/x86_64-linux-gnu/qt5/plugins/platforms' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-**Solución C — entorno virtual aislado**, si quieres mantener las dos versiones separadas de forma permanente:
+**Solución C — entorno virtual aislado**, para mantener las dos versiones separadas de forma permanente:
 
 ```bash
 python3 -m venv --system-site-packages ~/venv_teleop
@@ -410,7 +410,7 @@ cd ~/so-arm100-teleop && git pull && bash scripts/install.sh --desde 3
 ```
 
 <details>
-<summary><b>Qué pasaba, por si te interesa</b></summary>
+<summary><b>Qué pasaba, para quien quiera el detalle</b></summary>
 
 OpenCV y MediaPipe están compilados contra **NumPy 1.x** en Ubuntu 22.04. Con NumPy 2 instalado, `import cv2` falla.
 
@@ -437,7 +437,7 @@ cd ~/ros2_ws
 LIBGL_ALWAYS_SOFTWARE=1 ros2 launch so_arm_100_bringup gz_moveit.launch.py
 ```
 
-Si quieres que sea permanente:
+Para que sea permanente:
 
 ```bash
 echo 'export LIBGL_ALWAYS_SOFTWARE=1' >> ~/.bashrc
@@ -449,7 +449,7 @@ echo 'export LIBGL_ALWAYS_SOFTWARE=1' >> ~/.bashrc
 2. **Configuración → Pantalla**: memoria de video **128 MB**, controlador **VMSVGA**, y ✅ **Habilitar aceleración 3D**.
 3. Confirma que las **Guest Additions** están instaladas — sin ellas no hay aceleración real (ver [docs/01](01-instalacion-maquina-virtual.md)).
 
-**Solución C — trabaja solo con RViz.** Para la teleoperación **no necesitas la ventana de Gazebo**: RViz muestra el estado real del robot, y ahí sí se ve todo. Gazebo puede seguir corriendo detrás haciendo la física aunque no lo veas.
+**Solución C — trabajar sólo con RViz.** Para la teleoperación **no hace falta la ventana de Gazebo**: RViz muestra el estado real del robot, y ahí sí se ve todo. Gazebo puede seguir corriendo detrás haciendo la física aunque no lo veas.
 
 > En instalación nativa esto casi nunca pasa: es un problema de la gráfica virtual, no de Gazebo.
 
@@ -461,7 +461,7 @@ echo 'export LIBGL_ALWAYS_SOFTWARE=1' >> ~/.bashrc
 
 1. Apaga la máquina virtual.
 2. **Configuración → Pantalla:** memoria de video **128 MB**, controlador **VMSVGA**, y marca ✅ **Habilitar aceleración 3D**.
-3. Verifica que las **Guest Additions** estén instaladas (ver [docs/01](01-instalacion-maquina-virtual.md#6-guest-additions--pantalla-completa-y-portapapeles)).
+3. Verificar que las **Guest Additions** estén instaladas (ver [docs/01](01-instalacion-maquina-virtual.md), al final de la guía).
 
 Si aun así va lento, fuerza el renderizado por software — más lento pero estable:
 
@@ -470,7 +470,7 @@ export LIBGL_ALWAYS_SOFTWARE=1
 ros2 launch so_arm_100_bringup gz.launch.py
 ```
 
-**Instalación nativa:** instala los controladores propietarios de tu tarjeta:
+**Instalación nativa:** se instalan los controladores propietarios de la tarjeta gráfica:
 
 ```bash
 sudo ubuntu-drivers autoinstall
@@ -557,7 +557,7 @@ bash scripts/05_aplicar_overlay.sh
 ```
 
 <details>
-<summary><b>Qué pasaba, por si te interesa</b></summary>
+<summary><b>Qué pasaba, para quien quiera el detalle</b></summary>
 
 La comprobación hacía `grep` sobre **todos** los `.yaml` de la carpeta `config/`, y encontraba la cadena en **`hardware_controllers.yaml`** — un archivo que solo carga `hardware.launch.py`, es decir el **robot físico**. La simulación no lo lee nunca.
 
@@ -608,17 +608,17 @@ El brazo se mueve, pero la pinza no. Recorre esto en orden:
    ros2 action list | grep gripper     # /gripper_controller/gripper_cmd
    ```
 
-3. **Mira el HUD del script.** Si al lado de `Gripper` dice `[accion NO disp.]`, el script no encontró el servidor de acción — el problema está del lado del controlador, no del script.
+3. **El panel del guion lo dice.** Si al lado de `Gripper` dice `[accion NO disp.]`, el script no encontró el servidor de acción — el problema está del lado del controlador, no del script.
 
 4. **¿Aplicaste el overlay?** Sin él, `gripper_controller` ni siquiera carga.
 
-> **Por qué acción y no tópico:** `position_controllers/GripperActionController` solo acepta acciones. Una versión anterior de este script publicaba a `/gripper_controller/joint_trajectory`, un tópico que con este controlador **no existe** — los mensajes se perdían sin dar ningún error. Si alguna vez ves el brazo moverse y la pinza quieta sin mensajes de error, esta es la sospecha número uno.
+> **Por qué acción y no tópico:** `position_controllers/GripperActionController` solo acepta acciones. Una versión anterior de este script publicaba a `/gripper_controller/joint_trajectory`, un tópico que con este controlador **no existe** — los mensajes se perdían sin dar ningún error. Si el brazo se mueve y la pinza queda quieta sin mensajes de error, ésta es la sospecha número uno.
 
 ---
 
 ### «Se abre Gazebo pero no se abre ROS»
 
-No falta nada: **ROS 2 no es un programa con ventana.** Es un conjunto de procesos que se comunican entre sí, sin interfaz gráfica propia. Cuando lanzas `gz.launch.py`, ROS 2 **ya está corriendo** — lo que ves es Gazebo, que es la ventana del simulador.
+No falta nada: **ROS 2 no es un programa con ventana.** Es un conjunto de procesos que se comunican entre sí, sin interfaz gráfica propia. Al lanzar `gz.launch.py`, ROS 2 **ya está corriendo**: lo que se ve es Gazebo, que es la ventana del simulador.
 
 Compruébalo con la simulación abierta, en otra terminal:
 
@@ -627,27 +627,27 @@ ros2 node list      # los nodos de ROS 2 en marcha
 ros2 topic list     # los tópicos por los que se hablan
 ```
 
-La otra ventana que quizá esperabas es **RViz**, que visualiza el estado del robot y la planificación de MoveIt. `gz.launch.py` no la abre, a propósito: en una máquina virtual, Gazebo y RViz a la vez se comen la RAM y la gráfica. Si la quieres:
+La otra ventana que quizá se esperaba es **RViz**, que visualiza el estado del robot y la planificación de MoveIt. `gz.launch.py` no la abre, a propósito: en una máquina virtual, Gazebo y RViz a la vez agotan la RAM y la gráfica. Para abrirla:
 
 ```bash
 ros2 launch so_arm_100_bringup rviz.launch.py     # solo RViz
 ros2 launch so_arm_100_moveit_config demo.launch.py   # MoveIt + RViz, sin Gazebo
 ```
 
-Para este proyecto **no necesitas RViz**: la teleoperación publica directamente a los controladores y el resultado se ve en Gazebo.
+Para este proyecto **no hace falta RViz**: la teleoperación publica directamente a los controladores y el resultado se ve en Gazebo.
 
 ---
 
 ### Los controladores no se activan / `arm_controller` queda en `inactive`
 
-Espera un poco más: el spawner de controladores a veces tarda 10–20 segundos en una máquina virtual lenta. Si pasado ese tiempo sigue inactivo:
+Conviene esperar un poco más: el spawner de controladores a veces tarda 10–20 segundos en una máquina virtual lenta. Si pasado ese tiempo sigue inactivo:
 
 ```bash
 ros2 control list_controllers
 ros2 control set_controller_state arm_controller active
 ```
 
-Y revisa la salida completa del `ros2 launch` buscando líneas rojas — el error real suele estar 50 líneas más arriba de donde te quedaste mirando.
+Y se revisa la salida completa del `ros2 launch` buscando líneas rojas: el error real suele estar 50 líneas más arriba de donde se deja de mirar.
 
 ---
 
@@ -685,7 +685,7 @@ Recorre esta lista en orden:
 
 ### El brazo se mueve al revés de como me muevo yo
 
-No es un fallo: **el sentido correcto depende de tu cámara, de si la imagen está en espejo y de tu lateralidad.** No hay un valor universal.
+No es un fallo: **el sentido correcto depende de la cámara, de si la imagen está en espejo y de la lateralidad del operador.** No hay un valor universal.
 
 Con la ventana de video enfocada, presiona el **número de la articulación** (`1`–`5`) y su signo se invierte al instante. Verás cambiar `s=+1` a `s=-1` en el panel.
 
@@ -697,9 +697,9 @@ Con la ventana de video enfocada, presiona el **número de la articulación** (`
 | `4` | `Wrist_Pitch` |
 | `5` | `Wrist_Roll` |
 
-Cuando quede a tu gusto, presiona **`S`** para guardarlo en `~/teleop_config.json`. La próxima vez se carga solo.
+Cuando queda bien, se presiona **`S`** para guardarlo en `~/teleop_config.json`. La próxima vez se carga solo.
 
-> **No borres `~/teleop_config.json` sin respaldarlo.** Ese archivo guarda un ajuste que solo se consigue probando en vivo; borrarlo devuelve todo a los valores por defecto del código, que pueden no ser los correctos para tu montaje. Si necesitas resetearlo: `cp ~/teleop_config.json ~/teleop_config.json.bak` primero.
+> **`~/teleop_config.json` no se borra sin respaldarlo.** Ese archivo guarda un ajuste que solo se consigue probando en vivo; borrarlo devuelve todo a los valores por defecto del código, que pueden no ser los correctos para el montaje. Para reiniciarlo: `cp ~/teleop_config.json ~/teleop_config.json.bak` primero.
 
 ---
 
@@ -719,7 +719,7 @@ ONE_EURO = {
 - **`min_cutoff` más bajo** → más suave en reposo, elimina el temblor
 - **`beta` más alto** → responde más rápido al movimiento, menos retraso
 
-También puedes subir la zona muerta, que es el movimiento mínimo antes de que la articulación reaccione:
+También se puede subir la zona muerta, que es el movimiento mínimo antes de que la articulación reaccione:
 
 ```python
 DEADZONE = {'Shoulder_Rotation': 0.012, ...}   # en radianes
@@ -729,7 +729,7 @@ DEADZONE = {'Shoulder_Rotation': 0.012, ...}   # en radianes
 
 ### El robot se mueve muy poco / tengo que exagerar el movimiento
 
-Sube la **ganancia** de la articulación, en vivo:
+Se sube la **ganancia** de la articulación, en vivo:
 
 1. **`TAB`** hasta seleccionar la articulación (queda marcada con `>`)
 2. **`+`** para subirla (hasta 3.0)
@@ -739,16 +739,16 @@ Sube la **ganancia** de la articulación, en vivo:
 
 ### Las muñecas se quedan congeladas
 
-Mira el mensaje del panel — hay **dos causas distintas** y el script las distingue:
+El mensaje del panel lo aclara: hay **dos causas distintas** y el script las distingue:
 
 | Mensaje | Causa | Qué hacer |
 |---|---|---|
-| `MANO NO DETECTADA` (rojo) | MediaPipe no ve tu mano | Métela en cuadro; mejora la luz |
-| `MUÑECA EN ESCORZO` (naranja) | La mano se ve, pero el antebrazo apunta hacia la cámara | Gira el cuerpo para que el antebrazo quede **perpendicular** a la cámara |
+| `MANO NO DETECTADA` (rojo) | MediaPipe no ve la mano | Meterla en cuadro; mejorar la luz |
+| `MUÑECA EN ESCORZO` (naranja) | La mano se ve, pero el antebrazo apunta hacia la cámara | Girar el cuerpo para que el antebrazo quede **perpendicular** a la cámara |
 
 El escorzo no es un bug: cuando el antebrazo apunta hacia la cámara, su proyección 2D se acorta casi a cero, y cualquier ruido de detección se amplifica en un ángulo enorme e inestable. El script prefiere **congelar** el último valor válido antes que comandar un ángulo calculado sobre un vector casi nulo.
 
-Si te pasa demasiado, baja los umbrales en `teleop_vision.py`:
+Si pasa demasiado, se bajan los umbrales en `teleop_vision.py`:
 
 ```python
 MIN_FORE_LEN = 0.04      # bájalo para tolerar más escorzo
@@ -760,7 +760,7 @@ MIN_KNUCKLE_LEN = 0.02
 
 ### El índice `w=` se acerca a cero
 
-`w` es el **índice de manipulabilidad**: cuánto margen de movimiento le queda al brazo en esa postura. Cerca de cero significa que estás en una **singularidad** — el brazo casi extendido del todo o casi plegado sobre sí mismo, donde pequeños cambios de postura exigen movimientos articulares enormes.
+`w` es el **índice de manipulabilidad**: cuánto margen de movimiento le queda al brazo en esa postura. Cerca de cero significa que el brazo está en una **singularidad** — el brazo casi extendido del todo o casi plegado sobre sí mismo, donde pequeños cambios de postura exigen movimientos articulares enormes.
 
 No es un error, es información. Recalibra (**`C`**) con el brazo en una postura más media, ni muy extendida ni muy recogida.
 
@@ -770,10 +770,10 @@ No es un error, es información. Recalibra (**`C`**) con el brazo en una postura
 
 ### Todo va lento
 
-- **Cierra RViz** si no lo estás usando: consume muchísimo.
-- **Sube la RAM y los núcleos** de la máquina virtual (nunca más de la mitad de los de tu equipo físico).
+- **Cerrar RViz** si no se está usando: consume muchísimo.
+- **Subir la RAM y los núcleos** de la máquina virtual (nunca más de la mitad de los del equipo físico).
 - Considera la [instalación nativa](02-instalacion-nativa-iso.md): la diferencia en FPS es grande.
-- Baja la resolución de captura editando `CAP_PROP_FRAME_WIDTH` / `HEIGHT` en `teleop_vision.py`.
+- Bajar la resolución de captura editando `CAP_PROP_FRAME_WIDTH` / `HEIGHT` en `teleop_vision.py`.
 
 ---
 
@@ -781,7 +781,7 @@ No es un error, es información. Recalibra (**`C`**) con el brazo en una postura
 
 **No es un error tuyo: el repositorio todavía no soporta el brazo físico.**
 
-Los síntomas esperados son `Error loading controller 'gripper_controller'`, o bien `open:: No such file or directory` seguido de `Failed to initialize motors`. Hay seis bloqueos identificados —el driver no se instala y no tiene versión para Humble, el controlador de la pinza es el de Jazzy, el overlay se come los parámetros del puerto serie, falta la calibración de *ticks* a radianes, falta el grupo `dialout`, y el nodo de teleoperación no es seguro para hardware real— y cada uno está explicado con su archivo y su arreglo en:
+Los síntomas esperados son `Error loading controller 'gripper_controller'`, o bien `open:: No such file or directory` seguido de `Failed to initialize motors`. Hay seis bloqueos identificados —el driver no se instala y no tiene versión para Humble, el controlador de la pinza es el de Jazzy, el overlay se come los parámetros del puerto serie, falta la calibración de *ticks* a radianes, falta el grupo `dialout`, y el nodo de teleoperación no es seguro para hardware real— y cada uno está explicado con su archivo, su arreglo y su desenlace tras la puesta en marcha del brazo en:
 
 **[→ 09 — Estado del robot físico](09-robot-fisico.md)**
 
@@ -789,4 +789,4 @@ No intentes forzarlo antes de leerlo: el bloqueo 6 hace que el brazo salte a la 
 
 ---
 
-¿Un error que no está aquí? Copia el mensaje **completo** de la terminal (no solo la última línea — la causa real suele estar varias líneas más arriba) y ábrelo como *issue* en el repositorio.
+¿Un error que no está aquí? Se copia el mensaje **completo** de la terminal —no sólo la última línea: la causa real suele estar varias líneas más arriba— y se abre como *issue* en el repositorio.

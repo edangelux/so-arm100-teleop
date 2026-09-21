@@ -25,9 +25,9 @@ git clone https://github.com/brukg/SO-100-arm.git
 > ### ⚠️ Cuidado con el repositorio equivocado
 > El repositorio **[`TheRobotStudio/SO-ARM100`](https://github.com/TheRobotStudio/SO-ARM100)** es el proyecto original del brazo, y aparece en casi todas las búsquedas — pero **contiene únicamente los archivos STL, los CAD en STEP y la lista de materiales**. No tiene URDF, ni paquetes de ROS 2, ni launch files. Si lo clonas en `src/`, `colcon build` no encuentra nada que compilar y `ros2 launch` falla con *package not found*.
 >
-> El repositorio con los **paquetes de ROS 2** (descripción, MoveIt, bringup, control) es **[`brukg/SO-100-arm`](https://github.com/brukg/SO-100-arm)**. Ese es el que necesitas.
+> El repositorio con los **paquetes de ROS 2** (descripción, MoveIt, bringup, control) es **[`brukg/SO-100-arm`](https://github.com/brukg/SO-100-arm)**. Ése es el que hace falta.
 >
-> Usa `TheRobotStudio/SO-ARM100` solo si vas a **imprimir y ensamblar** el brazo físico.
+> `TheRobotStudio/SO-ARM100` sólo hace falta para **imprimir y ensamblar** el brazo físico.
 
 Después del clonado tendrás estos paquetes en `~/ros2_ws/src/SO-100-arm/`:
 
@@ -63,10 +63,10 @@ colcon build --symlink-install
 
 La primera compilación tarda entre 3 y 15 minutos.
 
-- `--symlink-install` crea enlaces simbólicos en lugar de copiar archivos. Con esto, si editas un archivo de Python o un URDF, **no tienes que recompilar** para ver el cambio.
+- `--symlink-install` crea enlaces simbólicos en lugar de copiar archivos. Con esto, al editar un archivo de Python o un URDF **no hace falta recompilar** para ver el cambio.
 
 > ### Si la compilación falla en `so_arm_100_5dof_arm_ikfast_plugin`
-> Ese paquete es un solucionador de cinemática opcional y es el que más problemas de compilación da. **No lo necesitas** para la simulación: MoveIt funciona perfectamente con el solucionador KDL por defecto.
+> Ese paquete es un solucionador de cinemática opcional y es el que más problemas de compilación da. **No hace falta** para la simulación: MoveIt funciona perfectamente con el solucionador KDL por defecto.
 >
 > Sáltalo así:
 >
@@ -95,13 +95,13 @@ El script copia sobre el clon los archivos ya corregidos que están en `overlay/
 |---|---|---|
 | `config/ros2_controllers.yaml`<br>`config/controllers_5dof.yaml` | `gripper_controller` declarado como `parallel_gripper_action_controller/GripperActionController`, que **solo existe en Jazzy** | Pasa a `position_controllers/GripperActionController` |
 | `config/moveit_controllers.yaml` | `ParallelGripperCommand`, también de Jazzy | Pasa a `GripperCommand` |
-| `config/kinematics.yaml` | Usa el plugin **IKFast**, que no compila de forma fiable en Humble | Pasa a **KDL**, que resuelve este brazo sin problema |
+| `config/kinematics.yaml` | Declara el plugin **IKFast**, que no compila de forma fiable en Humble | Pasa a **KDL**, que resuelve este brazo sin problema |
 | `config/so_arm_100.urdf.xacro`<br>`config/so_arm_100.srdf` | El xacro de MoveIt **no coincide** con el del paquete de descripción | Se reescribe con la misma estructura, y el robot pasa a llamarse `so_arm_100_5dof` |
 | `launch/move_group.launch.py`<br>`launch/moveit_rviz.launch.py` | Los generadores de `moveit_configs_utils` no permiten pasar `use_sim_time` | Se construye el nodo a mano con `use_sim_time: true` |
 | `launch/gz_moveit.launch.py` | No existía | **Archivo nuevo**: lanza Gazebo + `move_group` + RViz de una vez |
 
 > ### El arreglo importante es el del URDF
-> Sin el overlay, el error visible es el del `gripper_controller` — es el que aborta el lanzamiento y el que vas a ver primero. Pero debajo hay uno más profundo: **Gazebo y MoveIt cargaban dos URDF distintos** y no se entendían entre sí. Por eso `gz.launch.py` y `demo.launch.py` funcionaban por separado pero no juntos. Reescribir `so_arm_100.urdf.xacro` para que use la misma estructura que `so_arm_100_description` es lo que hace posible `gz_moveit.launch.py`.
+> Sin el overlay, el error visible es el del `gripper_controller` — es el que aborta el lanzamiento y el que aparece primero. Pero debajo hay uno más profundo: **Gazebo y MoveIt cargaban dos URDF distintos** y no se entendían entre sí. Por eso `gz.launch.py` y `demo.launch.py` funcionaban por separado pero no juntos. Reescribir `so_arm_100.urdf.xacro` para que use la misma estructura que `so_arm_100_description` es lo que hace posible `gz_moveit.launch.py`.
 >
 > Y sin `use_sim_time: true`, MoveIt usa el reloj de pared mientras Gazebo usa el de simulación: las trayectorias quedan desfasadas aunque todo lo demás esté bien.
 
@@ -149,9 +149,9 @@ so_arm_100_description
 so_arm_100_moveit_config
 ```
 
-Si ese comando no devuelve nada, es casi siempre porque **no hiciste `source` del workspace en esta terminal**. Cada terminal nueva necesita su `source` — por eso lo agregamos al `.bashrc`, pero las terminales que ya estaban abiertas antes no lo tienen.
+Si ese comando no devuelve nada, es casi siempre porque **no se hizo `source` del workspace en esta terminal**. Cada terminal nueva necesita su `source` — por eso lo agregamos al `.bashrc`, pero las terminales que ya estaban abiertas antes no lo tienen.
 
-También puedes correr el diagnóstico completo:
+También se puede ejecutar el diagnóstico completo:
 
 ```bash
 bash ~/so-arm100-teleop/scripts/verificar.sh
@@ -176,7 +176,7 @@ source /opt/ros/humble/setup.bash
 source ~/ros2_ws/install/setup.bash
 ```
 
-(Ya está en tu `.bashrc`, así que en la práctica basta con abrir una terminal nueva.)
+(Ya está en el `.bashrc`, así que en la práctica basta con abrir una terminal nueva.)
 
 ---
 

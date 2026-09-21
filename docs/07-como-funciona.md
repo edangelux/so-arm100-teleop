@@ -10,7 +10,7 @@ Este documento explica la arquitectura: qué son los nodos, cómo se comunican, 
 
 **Sí. Todo el sistema son nodos de ROS 2 comunicándose entre sí.** No hay ningún programa que "controle el robot" directamente: hay siete procesos independientes que se pasan mensajes.
 
-Y no es una respuesta de manual — lo puedes **demostrar en vivo**. Con el sistema corriendo, en otra terminal:
+Y no es una respuesta de manual — se puede **demostrar en vivo**. Con el sistema corriendo, en otra terminal:
 
 ```bash
 ros2 node list
@@ -88,7 +88,7 @@ graph LR
     MG --> ARM
 ```
 
-Los recuadros grises son **un solo proceso cada uno**. Fíjate en que `controller_manager` y los tres controladores viven **dentro del proceso de Gazebo** — eso es importante y se explica abajo.
+Los recuadros grises son **un solo proceso cada uno**. Conviene notar que `controller_manager` y los tres controladores viven **dentro del proceso de Gazebo** — eso es importante y se explica abajo.
 
 ---
 
@@ -129,7 +129,7 @@ Ambos ángulos son **relativos al antebrazo**, no a los ejes de la pantalla. Si 
 ```python
 smoothed = filters[n](target, dt)
 ```
-Un promedio simple obliga a elegir entre suavizar (con retraso) o responder (con temblor). El **filtro One Euro** adapta su frecuencia de corte a la velocidad: filtra fuerte cuando te mueves lento y poco cuando te mueves rápido.
+Un promedio simple obliga a elegir entre suavizar (con retraso) o responder (con temblor). El **filtro One Euro** adapta su frecuencia de corte a la velocidad: filtra fuerte ante movimientos lentos y poco ante movimientos rápidos.
 
 **5. Publicación — el salto a ROS 2**
 ```python
@@ -227,7 +227,7 @@ Eso hace que **`controller_manager` se cargue dentro del proceso de Gazebo**, no
 <param name="serial_baudrate">1000000</param>
 ```
 
-El nodo de teleoperación publica al mismo tópico en los dos casos. **Eso es lo que hace valiosa la abstracción de `ros2_control`**, y es una respuesta sólida si te preguntan por el salto a hardware.
+El nodo de teleoperación publica al mismo tópico en los dos casos. **Eso es lo que hace valiosa la abstracción de `ros2_control`**, y es la respuesta a la pregunta por el salto a hardware.
 
 ---
 
@@ -260,11 +260,11 @@ if frame_i % HANDS_EVERY == 0:
 
 ### Se copian ángulos, no posiciones
 
-**El sistema no calcula dónde poner la mano del robot en el espacio.** Mide los ángulos de tus articulaciones y se los copia, articulación por articulación.
+**El sistema no calcula dónde poner la mano del robot en el espacio.** Mide los ángulos de las articulaciones del operador y los replica, articulación por articulación.
 
 No hay cinemática inversa en el lazo de control. Es una decisión de diseño con ventajas concretas: no hay singularidades que resolver, no hay soluciones múltiples que elegir, y el mapeo es predecible — si doblas el codo, se dobla el codo.
 
-*(El índice de manipulabilidad `w=` que muestra la pantalla sí usa el jacobiano, pero solo para **informar** de qué tan cerca estás de una singularidad. No interviene en el control.)*
+*(El índice de manipulabilidad `w=` que muestra la pantalla sí usa el jacobiano, pero solo para **informar** de qué tan cerca está el brazo de una singularidad. No interviene en el control.)*
 
 > **La justificación completa, con mediciones, está en [08 — Análisis cinemático](08-analisis-cinematico.md):** por qué 5 GDL no bastan para una pose completa, por qué la cinemática inversa es entre 4 y 22 veces más sensible al ruido de medición, y qué cambiaría si se agregara.
 
@@ -274,7 +274,7 @@ No hay cinemática inversa en el lazo de control. Es una decisión de diseño co
 d = raw[n] - offsets[n]
 ```
 
-Al presionar **`C`**, tu postura actual se guarda como `offsets`. A partir de ahí solo se comanda la **diferencia**. Por eso funciona con cualquier altura, complexión o distancia a la cámara.
+Al presionar **`C`**, la postura actual del operador se guarda como `offsets`. A partir de ahí solo se comanda la **diferencia**. Por eso funciona con cualquier altura, complexión o distancia a la cámara.
 
 ### Los límites salen del URDF, no de la intuición
 
@@ -363,7 +363,7 @@ Alrededor de 40 ms de extremo a extremo. El cuello de botella es la inferencia d
 
 ## Resumen de una frase
 
-**Un nodo de ROS 2 lee la cámara con OpenCV, detecta la postura con MediaPipe, calcula los ángulos de tus articulaciones y los publica como una trayectoria; el controlador dentro de Gazebo la interpola y la ejecuta contra un motor de física, y devuelve el estado real por `/joint_states`.**
+**Un nodo de ROS 2 lee la cámara con OpenCV, detecta la postura con MediaPipe, calcula los ángulos de las articulaciones del operador y los publica como una trayectoria; el controlador dentro de Gazebo la interpola y la ejecuta contra un motor de física, y devuelve el estado real por `/joint_states`.**
 
 ---
 
