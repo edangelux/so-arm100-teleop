@@ -50,11 +50,12 @@ Por omisión no se levanta MoveIt, porque la teleoperación de la versión 13 es
 | `--baud N` | `1000000` | Velocidad del bus serie |
 | `--servo-speed N` | `2400` | Velocidad interna del servo, en pasos por segundo |
 | `--servo-accel N` | `50` | Aceleración interna del servo |
-| `--config RUTA` | `~/teleop_config.json` | Signos y ganancias guardados con `S` |
+| `--config RUTA` | `~/teleop_config.json` (con `--v15`, `~/teleop_config_v15.json`) | Signos y ganancias guardados con `S` |
 | `--ws RUTA` · `--venv RUTA` | `~/ros2_ws_entrega` · `~/teleop_venv_entrega` | Workspace y entorno de Python |
 | `--software-gl` | — | Renderizado por software, para máquinas virtuales sin aceleración 3D y **obligatorio bajo WSL2** (véase [WSL2](#bajo-wsl2)) |
 | `--v14` | — | Usa `teleop_v14.py` en lugar de la versión presentada; [docs/15](15-v14-moveit-y-posturas-seguras.md) |
 | `--moveit` | — | Abre MoveIt 2 y RViz junto con la teleoperación; [docs/15](15-v14-moveit-y-posturas-seguras.md) |
+| `--v15` | — | Usa `teleop_v15.py`: confianza por articulación, ganancia por postura de referencia y giro de muñeca en 3D; [docs/16](16-v15-estimacion-de-angulos.md). Guarda su configuración en `~/teleop_config_v15.json` |
 | `--dry-run` | — | Muestra el plan sin instalar ni iniciar nada |
 
 Los valores por omisión son los que se usaron en la defensa. `--velocidad` es el único que conviene cambiar antes de conectar el brazo por primera vez: un valor de 0,5 a 1,0 rad/s atenúa el riesgo del bloqueo 6 de [docs/09](09-robot-fisico.md). Es un ajuste recomendado, no uno que se haya validado con el brazo.

@@ -1,10 +1,10 @@
 # 15 — Versión 14, MoveIt junto a la teleoperación y posturas seguras
 
-[← Anterior: lanzador unificado](14-lanzador-v13.md) · [Volver al inicio](../README.md)
+[← Anterior: lanzador unificado](14-lanzador-v13.md) · [Volver al inicio](../README.md) · [Siguiente: v15, estimación de ángulos →](16-v15-estimacion-de-angulos.md)
 
 ---
 
-> **Estado:** implementado después de la primera ejecución completa del lanzador (21 de septiembre de 2026) y **todavía no probado**, ni en simulación ni con el brazo físico. El orden de prueba recomendado está en [Secuencia de prueba](#secuencia-de-prueba). La versión 13, la presentada en la defensa, sigue intacta en `entrega/teleoperacion/teleop_v13.py` y sigue siendo la que el lanzador usa por omisión.
+> **Estado (21 de septiembre de 2026):** probado en simulación (cierre en `init`, menú y `home`) y con el brazo físico en modo `real` con `--v14` (cierre en `init` y apagado en `home`). **`--moveit` no se ha comprobado todavía** en ningún modo, ni el modo `ambos` con estas funciones. Los resultados están en [Resultados](#resultados). La versión 13, la presentada en la defensa, sigue intacta en `entrega/teleoperacion/teleop_v13.py` y sigue siendo la que el lanzador usa por omisión.
 
 Este capítulo agrega tres cosas al sistema presentado:
 
@@ -45,7 +45,7 @@ Valores en radianes. Si `home` resultara incómoda en el montaje real (por ejemp
 
 ### Cómo se mueve el brazo a una postura: `scripts/ir_a_pose.py`
 
-El programa hace cinco cosas, en este orden:
+El programa hace seis cosas, en este orden:
 
 1. **Lee la postura actual** en el tópico de estados articulares. Si en 5 s no llega nada, **no mueve el brazo**: sin saber dónde está, no se puede calcular un movimiento seguro.
 2. **Comprueba que el controlador escucha** el tópico de trayectorias. Si no escucha, tampoco mueve nada.
@@ -57,7 +57,8 @@ El programa hace cinco cosas, en este orden:
 
    Con la velocidad por omisión de 0,5 rad/s, ir de `init` a `home` (1,57 rad en la muñeca) toma unos 3,1 s. Así ninguna articulación supera los 0,5 rad/s, y las demás van más lentas porque todas llegan a la vez.
 4. **Envía una sola trayectoria** con ese tiempo. El controlador `joint_trajectory_controller` interpola desde la postura actual hasta el objetivo.
-5. **Espera a que el brazo llegue**, con un error máximo de 0,08 rad por articulación y un plazo de la duración más 4 s. Informa del error final.
+5. **Comprueba que el brazo empezó a moverse.** Si en 1 s ninguna articulación se movió más de 0,02 rad, reenvía la trayectoria, hasta tres veces. Un mensaje publicado justo después de conectar puede perderse mientras DDS termina de enlazar el publicador con el controlador; así pasó en la primera prueba física (véase [Resultados](#resultados)).
+6. **Espera a que el brazo llegue**, con un error máximo de 0,10 rad por articulación y un plazo de la duración más 4 s. Informa del error final de cada articulación y de cuál es la peor.
 
 Recorta además cada objetivo a los mismos límites articulares que usa `teleop_v13.py`, de modo que nunca pide algo que la teleoperación tampoco pediría.
 
@@ -83,6 +84,8 @@ La velocidad se cambia con la variable de entorno `SOARM_RETURN_VEL`, por ejempl
      teleoperación nueva   brazo a home, luego        apagado inmediato:
      desde init            se apaga todo              el brazo pierde el par
 ```
+
+El menú se contesta **en la terminal**, no en la ventana de la cámara: al pulsar `Q` esa ventana ya se cerró.
 
 - **`Q` ya no apaga el robot.** Cierra la teleoperación, lleva el brazo a `init` y deja todo lo demás en marcha: Gazebo, el controlador, los espejos y, si se abrió, MoveIt. Mientras tanto el brazo mantiene el par en `init`, y se puede seguir usando MoveIt desde RViz.
 - **`Enter`** reabre la teleoperación. Con la versión 13 esto también es seguro, porque la v13 arranca ordenando cero y el brazo ya está en `init`, que es cero.
@@ -176,6 +179,26 @@ source ~/.soarm_env
 Se guardan los registros de cada sesión (`~/.local/state/soarm/sesion-*`), incluidos `vision.log` y `moveit.log`, y lo que imprime la terminal al ir a `init` y a `home`: el error final de cada movimiento es el dato que muestra si la postura se alcanzó.
 
 ---
+
+## Resultados
+
+**Simulación.** Funcionaron el cierre en `init`, el menú y `home`. MoveIt y RViz (`--moveit`) quedan pendientes de comprobar.
+
+**Qué abre cada modo.** `real` levanta sólo el controlador del brazo físico y la cámara: no abre Gazebo. MoveIt y RViz se abren sólo con `--moveit`. Para ver Gazebo, RViz y el brazo físico a la vez se usa `ambos --moveit`.
+
+**Brazo físico, modo `real`, `--v14`, velocidad 0,5 rad/s:**
+
+| Acción | Resultado impreso | Lectura |
+|---|---|---|
+| `Q` → `init` | desplazamiento 0,32 rad, 1,0 s; error máximo 0,080 rad | Llegó |
+| `Enter`, `Q` → `init` | desplazamiento 0,09 rad, 1,0 s; error máximo 0,080 rad | Llegó |
+| `h` → `home`, primer intento | desplazamiento 1,57 rad, 3,1 s; **no se alcanzó**, error 1,572 rad | El brazo no se movió: el error es el desplazamiento completo |
+| `h` → `home`, segundo intento | error máximo 0,078 rad | Llegó; la sesión se apagó con el brazo en reposo |
+
+Dos lecturas:
+
+1. **El primer intento hacia `home` no movió nada.** El error final igual al desplazamiento pedido indica que la trayectoria nunca llegó al controlador. Es el comportamiento de un mensaje publicado antes de que DDS terminara de enlazar publicador y suscriptor. Se corrigió con el reenvío del paso 5.
+2. **El error de llegada se quedó en unos 0,08 rad (4,6 grados)** en las tres llegadas, en el límite de la tolerancia de entonces. Es mayor que el error de posicionamiento medido en el proyecto (0,49 a 1,49 grados), así que probablemente una articulación cargada por la gravedad se queda corta. `ir_a_pose.py` ahora informa del error de cada articulación para saber cuál es, y la tolerancia pasa a 0,10 rad. El operador juzgó la postura `home` alcanzada suficiente para el reposo.
 
 ## Archivos
 

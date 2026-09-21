@@ -79,6 +79,7 @@ Con `--dry-run` el lanzador muestra qué va a hacer sin instalar ni iniciar nada
 | 12 | [**Cierre del proyecto**](docs/12-cierre-del-proyecto.md) | Qué se hizo, qué se midió, qué quedó fuera del alcance |
 | 14 | [**Lanzador unificado**](docs/14-lanzador-v13.md) | Instalación y operación de la versión presentada en los tres modos |
 | 15 | [**v14, MoveIt y posturas seguras**](docs/15-v14-moveit-y-posturas-seguras.md) | Arranque y reanudación desde la postura medida, MoveIt junto a la teleoperación, cierre en `init` y apagado en `home` |
+| 16 | [**v15: mejor estimación de ángulos**](docs/16-v15-estimacion-de-angulos.md) | Confianza por articulación, ganancia por postura de referencia y giro de muñeca en 3D |
 | — | [**Modelo cinemático completo**](analisis/cinematica/ANALISIS_CINEMATICO.md) | Tabla D-H, cinemática directa e inversa, jacobiano, singularidades, verificación cruzada |
 | — | [**Documentos entregados**](docs/entregables/README.md) | Documento técnico, formulación y evaluación, y las dos presentaciones |
 

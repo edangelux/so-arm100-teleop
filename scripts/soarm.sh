@@ -14,7 +14,7 @@ VELOCITY="${SOARM_MAX_VEL:-8.0}"
 BAUD="${SOARM_BAUD:-1000000}"
 SERVO_SPEED="${SOARM_SERVO_SPEED:-2400}"
 SERVO_ACCEL="${SOARM_SERVO_ACCEL:-50}"
-CONFIG="${SOARM_CONFIG:-$HOME/teleop_config.json}"
+CONFIG="${SOARM_CONFIG:-}"
 DRY=0
 SOFTWARE_GL=0
 VERSION=13
@@ -43,9 +43,11 @@ Opciones:
   --baud N            Bus serie (1000000)
   --servo-speed N     Velocidad interna del servo (2400 ticks/s)
   --servo-accel N     Aceleración del servo (50)
-  --config RUTA       Signos/ganancias (~/teleop_config.json)
+  --config RUTA       Signos/ganancias (~/teleop_config.json; v15: ~/teleop_config_v15.json)
   --software-gl       Renderizado por software, para máquinas virtuales sin aceleración
   --v14               Usa teleop_v14.py: arranca y reanuda desde la postura medida
+  --v15               Usa teleop_v15.py: v14 más confianza por articulación, ganancia
+                      por postura de referencia (G) y giro de muñeca 3D (docs/16)
   --moveit            Abre además MoveIt 2 y RViz (pausar con P antes de planificar)
   --dry-run           Muestra el plan sin instalar ni iniciar procesos
 
@@ -75,12 +77,18 @@ while [[ $# -gt 0 ]]; do
         --config) need_value "$@"; CONFIG="$2"; shift 2;;
         --software-gl) SOFTWARE_GL=1; shift;;
         --v14) VERSION=14; shift;;
+        --v15) VERSION=15; shift;;
         --moveit) MOVEIT=1; shift;;
         --dry-run) DRY=1; shift;;
         --help|-h) help_text; exit 0;;
         *) die "Opción desconocida: $1";;
     esac
 done
+# v15 guarda sus propios signos y ganancias: su giro de muñeca se mide de otra
+# forma y no debe cambiar la configuración con la que opera v13.
+if [[ -z "$CONFIG" ]]; then
+    if [[ "$VERSION" -eq 15 ]]; then CONFIG="$HOME/teleop_config_v15.json"; else CONFIG="$HOME/teleop_config.json"; fi
+fi
 case "$ACTION" in
     ayuda|help|--help|-h) help_text; exit 0;;
     instalar|sim|real|ambos|verificar) ;;
@@ -270,8 +278,7 @@ go_pose() {
         --estados "$POSE_STATES" --velocidad "$RETURN_VEL"
 }
 start_vision() {
-    local runner="$REPO/teleop_vision/ejecutar_v13.py"
-    [[ "$VERSION" -eq 13 ]] || runner="$REPO/teleop_vision/ejecutar_v14.py"
+    local runner="$REPO/teleop_vision/ejecutar_v$VERSION.py"
     setsid "$VENV/bin/python" "$runner" >>"$RUN_DIR/vision.log" 2>&1 &
     vision_pid=$!
     printf 'Teleoperación v%s iniciada. C: referencia gestual; P: pausa; Q: cerrar y volver a init. Registros: %s\n' "$VERSION" "$RUN_DIR"

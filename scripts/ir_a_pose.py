@@ -67,7 +67,7 @@ def main():
                    help='Tópico JointTrajectory del controlador; puede repetirse')
     p.add_argument('--estados', required=True, help='Tópico sensor_msgs/JointState de referencia')
     p.add_argument('--velocidad', type=float, default=0.5, help='rad/s en la articulación más lenta (0.5)')
-    p.add_argument('--tolerancia', type=float, default=0.08, help='rad de error aceptado al llegar (0.08)')
+    p.add_argument('--tolerancia', type=float, default=0.10, help='rad de error aceptado al llegar (0.10)')
     a = p.parse_args()
 
     poses = json.loads(POSES.read_text(encoding='utf-8'))
@@ -102,15 +102,31 @@ def main():
         punto.velocities = [0.0] * 5
         punto.time_from_start = Duration(sec=int(duracion), nanosec=int((duracion % 1) * 1e9))
         msg.points = [punto]
-        for pub in nodo.pubs:
-            pub.publish(msg)
+        # Un mensaje publicado justo después de conectar puede perderse mientras
+        # DDS termina de enlazar publicador y suscriptor (pasó el 21-09-2026:
+        # el primer intento hacia home no movió nada y el segundo sí). Si en
+        # 1 s ninguna articulación se movió, se reenvía, hasta tres veces.
+        for intento in range(1, 4):
+            for pub in nodo.pubs:
+                pub.publish(msg)
+            if mayor < 0.05 or nodo.esperar(
+                    lambda: max(abs(q - q0) for q, q0 in zip(nodo.actual(), inicio)) > 0.02, 1.0):
+                break
+            print(f'El brazo no empezó a moverse; reenvío {intento} de 3.', flush=True)
+        else:
+            print('El controlador no respondió a la trayectoria.', file=sys.stderr)
+            return 2
 
         llego = nodo.esperar(
             lambda: max(abs(o - q) for o, q in zip(objetivo, nodo.actual())) <= a.tolerancia,
             duracion + 4.0)
         final = nodo.actual()
-        error = max(abs(o - q) for o, q in zip(objetivo, final))
-        print(('En ' if llego else 'No se alcanzó ') + f'{a.pose}: error máximo {error:.3f} rad.', flush=True)
+        errores = [o - q for o, q in zip(objetivo, final)]
+        peor = max(range(5), key=lambda i: abs(errores[i]))
+        print(('En ' if llego else 'No se alcanzó ') + f'{a.pose}: error máximo {abs(errores[peor]):.3f} rad '
+              f'({ARTICULACIONES[peor]}).', flush=True)
+        print('  errores por articulación (rad): '
+              + '  '.join(f'{n}={e:+.3f}' for n, e in zip(ARTICULACIONES, errores)), flush=True)
         return 0 if llego else 1
     finally:
         nodo.destroy_node()
