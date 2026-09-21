@@ -171,9 +171,12 @@ wait_controllers() {
     local manager="$1" result deadline=$((SECONDS+120))
     while (( SECONDS < deadline )); do
         alive
-        result="$(timeout 6 ros2 control list_controllers -c "$manager" 2>/dev/null || true)"
-        if grep -Eq '^arm_controller[[:space:]].*[[:space:]]active' <<<"$result" &&
-           grep -Eq '^gripper_controller[[:space:]].*[[:space:]]active' <<<"$result"; then return; fi
+        # Humble imprime códigos de color ANSI al inicio de cada línea; se quitan antes
+        # de buscar. Se aceptan los dos formatos de Humble: «nombre  tipo  estado» y
+        # «nombre[tipo] estado».
+        result="$(timeout 6 ros2 control list_controllers -c "$manager" 2>/dev/null | sed 's/\x1b\[[0-9;]*m//g' || true)"
+        if grep -Eq '^arm_controller([[:space:]]|\[).*[[:space:]]active' <<<"$result" &&
+           grep -Eq '^gripper_controller([[:space:]]|\[).*[[:space:]]active' <<<"$result"; then return; fi
         sleep 1
     done
     die "Los controladores de $manager no se activaron en 120 s. Registros: $RUN_DIR"

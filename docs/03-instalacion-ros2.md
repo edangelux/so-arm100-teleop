@@ -160,7 +160,7 @@ Para que el usuario pueda leer `/dev/video0` sin `sudo`:
 sudo usermod -a -G video $USER
 ```
 
-> **Este cambio no surte efecto hasta que cierras sesión y vuelves a entrar** (o reinicias). Es el motivo por el que a mucha gente le sigue fallando la cámara justo después de correr el comando.
+> **Este cambio no surte efecto hasta cerrar sesión y volver a entrar** (o reiniciar). Es el motivo por el que a mucha gente le sigue fallando la cámara justo después de correr el comando.
 
 ---
 

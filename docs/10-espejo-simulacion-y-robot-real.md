@@ -168,7 +168,7 @@ Si ves `No se pudo conectar a /arm_controller (Gazebo)`, sube ese valor. El arre
 | El brazo físico se mueve, la pinza física no | Falta `export SOARM_GRIPPER_ACTION=...` |
 | MoveIt aborta el objetivo al planificar | `trajectory_mirror` no está corriendo, o arrancó antes que los controladores — sube `RETARDO_ESPEJOS` |
 | El brazo físico va a ángulos equivocados | La calibración es la de fábrica — [docs/09, bloqueo 4](09-robot-fisico.md) |
-| `No se pudo conectar a /real/arm_controller` | Los controladores del lado físico no llegaron a activarse. Revisa permisos del puerto (`dialout`) y que el puerto exista |
+| `No se pudo conectar a /real/arm_controller` | Los controladores del lado físico no llegaron a activarse. Hay que revisar los permisos del puerto (`dialout`) y que el puerto exista |
 | `Permission denied` al abrir `/dev/ttyUSB0` | Falta cerrar sesión y volver a entrar tras `usermod -a -G dialout` |
 | Lanzar con `serial_port:=/dev/ttyACM0` no surte efecto | [docs/09, bloqueo 3](09-robot-fisico.md): ocurre con el xacro del overlay, no con el workspace de la entrega |
 

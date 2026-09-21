@@ -67,7 +67,7 @@ git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
 cd ~/so-arm100-teleop && bash scripts/install.sh
 ```
 
-**No uses `LIBGL_ALWAYS_SOFTWARE=1`.** Ese ajuste es para VirtualBox; bajo WSLg la aceleración funciona y forzar software rendering solo lo haría lento.
+**Bajo WSL2 no se usa `LIBGL_ALWAYS_SOFTWARE=1`.** Ese ajuste es para VirtualBox; bajo WSLg la aceleración funciona y forzar software rendering solo lo haría lento.
 
 ---
 
@@ -87,14 +87,14 @@ Se cierra y se vuelve a abrir PowerShell. Luego, **como administrador**, se list
 usbipd list
 ```
 
-Identifica la cámara por su nombre y anota su `BUSID` (algo como `1-6`). Después:
+Se identifica la cámara por su nombre y se anota su `BUSID` (algo como `1-6`). Después:
 
 ```powershell
 usbipd bind   --busid 1-6
 usbipd attach --wsl --busid 1-6
 ```
 
-`bind` se hace una vez. `attach` hay que repetirlo **cada vez que reinicias Windows o WSL**.
+`bind` se hace una vez. `attach` hay que repetirlo **cada vez que se reinicia Windows o WSL**.
 
 Comprobación dentro de Ubuntu:
 
@@ -131,9 +131,11 @@ Para no tener que escribirlo cada vez:
 echo 'export SOARM_CAMERA_MJPG=1' >> ~/.bashrc
 ```
 
+> **La versión 13, la presentada, ya fuerza V4L2, MJPG y 640×480 en su propio código**, así que con `bash scripts/soarm.sh` esta variable no hace falta. Sólo la necesita el nodo anterior, `teleop_vision/teleop_vision.py`.
+
 ---
 
-## 5. Pasar la placa de servos (solo si tienes el brazo)
+## 5. Pasar la placa de servos (sólo con el brazo físico)
 
 Mismo procedimiento que la cámara. Con la placa conectada, en PowerShell como administrador:
 
