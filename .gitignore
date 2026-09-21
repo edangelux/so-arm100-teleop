@@ -34,3 +34,10 @@ rosbag2_*/
 
 # Excepcion: el video del ensamble del modelo parametrico si se publica
 !cad/ensamblajes/*.mp4
+
+# Respaldos locales y ajustes personales
+.bak_*
+*.bak
+teleop_config.json
+.env
+.env.*

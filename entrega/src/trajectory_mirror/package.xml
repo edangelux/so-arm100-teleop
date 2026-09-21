@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>trajectory_mirror</name>
+  <version>0.0.1</version>
+  <description>Reenvia trayectorias completas de MoveIt2 a Gazebo y al brazo real en simultaneo</description>
+  <maintainer email="crist@example.com">crist</maintainer>
+  <license>Apache-2.0</license>
+  <depend>rclpy</depend>
+  <depend>control_msgs</depend>
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

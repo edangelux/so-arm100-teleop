@@ -1,0 +1,4 @@
+Python 3.10.12
+include-system-site-packages = true
+ROS 2 Humble
+Ubuntu 22.04 (entorno WSL2 documentado)

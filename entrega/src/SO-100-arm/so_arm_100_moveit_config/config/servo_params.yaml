@@ -1,0 +1,66 @@
+servo_node:
+  ros__parameters:
+    moveit_servo:
+      use_gazebo: false  # No usar el reloj de Gazebo aqui; el nodo Servo corre en tiempo real
+                          # del sistema, igual que tu trajectory_mirror_node existente.
+
+      # --- Grupo de planificacion y frames (de tu SRDF) ---
+      move_group_name: arm
+      planning_frame: base_link          # el virtual_joint fija base_link al frame "world"
+      ee_frame_name: End_Effector        # end_effector definido en el SRDF (parent_link)
+      robot_link_command_frame: End_Effector
+
+      # --- Topicos de entrada (comandos) ---
+      # Para teleoperacion cartesiana con posicion de mano via MediaPipe,
+      # usaremos cartesian_command_in_topic con mensajes TwistStamped.
+      cartesian_command_in_topic: ~/delta_twist_cmds
+      joint_command_in_topic: ~/delta_joint_cmds
+      joint_topic: /joint_states
+      status_topic: ~/status
+      command_in_type: "unitless"        # velocidades relativas [-1, 1], escaladas por
+                                          # linear_scale/rotational_scale mas abajo
+
+      # --- Topico y tipo de salida ---
+      # IMPORTANTE: apunta directo al topico que Gazebo ya escucha
+      # (confirmado con `ros2 topic list | grep arm_controller`).
+      # Tu topic_mirror_node debe suscribirse a este mismo topico para
+      # replicar hacia /real/arm_controller/joint_trajectory.
+      command_out_topic: /arm_controller/joint_trajectory
+      command_out_type: trajectory_msgs/JointTrajectory
+      publish_joint_positions: true
+      publish_joint_velocities: false
+      publish_joint_accelerations: false
+
+      # --- Escalado de velocidad ---
+      # Multiplican el comando unitless [-1,1] recibido. Empieza conservador.
+      linear_scale: 0.4      # m/s maximos aprox. Baja esto si el movimiento se siente brusco.
+      rotational_scale: 0.5  # rad/s maximos aprox.
+
+      # --- Suavizado ---
+      low_pass_filter_coeff: 2.0
+
+      # --- Seguridad: timeouts y parada ---
+      incoming_command_timeout: 0.2    # si no llegan comandos nuevos en este tiempo, detiene
+      num_outgoing_halt_msgs_to_publish: 4
+
+      # --- Singularidades ---
+      # NOTA: valores por defecto (17/30) estan pensados para brazos de 6-7 DOF.
+      # Con 5 DOF el volumen "lejos de singularidad" es mas chico, y el brazo
+      # puede quedar permanentemente en HALT_FOR_SINGULARITY (status code 2)
+      # incluso en su pose de reposo. Se relajan aqui; si el brazo se comporta
+      # erraticamente cerca de limites reales de alcance, vuelve a bajarlos.
+      lower_singularity_threshold: 60.0
+      hard_stop_singularity_threshold: 90.0
+      leaving_singularity_threshold_multiplier: 2.0
+
+      # --- Limites articulares ---
+      joint_limit_margin: 0.1   # radianes de margen antes de los limites duros del URDF
+
+      # --- Colisiones ---
+      check_collisions: true
+      collision_check_rate: 10.0
+      self_collision_proximity_threshold: 0.01
+      scene_collision_proximity_threshold: 0.02
+
+      # --- Estado inicial ---
+      is_primary_planning_scene_monitor: true

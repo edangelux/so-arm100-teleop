@@ -1,0 +1,184 @@
+ros2_control_node_10005_1789175200452.log	[INFO] [1789175200.472294606] [SOARM100Interface]: Servo 1 initialized at position 2046
+ros2_control_node_10005_1789175200452.log	[INFO] [1789175200.487342127] [SOARM100Interface]: Servo 2 initialized at position 2048
+ros2_control_node_10005_1789175200452.log	[INFO] [1789175200.503003274] [SOARM100Interface]: Servo 3 initialized at position 2046
+ros2_control_node_10005_1789175200452.log	[INFO] [1789175200.517958463] [SOARM100Interface]: Servo 4 initialized at position 2046
+ros2_control_node_10005_1789175200452.log	[INFO] [1789175200.534389748] [SOARM100Interface]: Servo 5 initialized at position 2050
+ros2_control_node_10005_1789175200452.log	[INFO] [1789175200.549067609] [SOARM100Interface]: Servo 6 initialized at position 1960
+ros2_control_node_10005_1789175200452.log	[INFO] [1789175200.560082893] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_10005_1789175200452.log	[INFO] [1789175200.565017035] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_1007_1789318710418.log	[INFO] [1789318710.474107679] [SOARM100Interface]: Servo 1 initialized at position 2126
+ros2_control_node_1007_1789318710418.log	[INFO] [1789318710.493152042] [SOARM100Interface]: Servo 2 initialized at position 924
+ros2_control_node_1007_1789318710418.log	[INFO] [1789318710.509231931] [SOARM100Interface]: Servo 3 initialized at position 2990
+ros2_control_node_1007_1789318710418.log	[INFO] [1789318710.527140686] [SOARM100Interface]: Servo 4 initialized at position 2873
+ros2_control_node_1007_1789318710418.log	[INFO] [1789318710.543164360] [SOARM100Interface]: Servo 5 initialized at position 2049
+ros2_control_node_1007_1789318710418.log	[INFO] [1789318710.563535729] [SOARM100Interface]: Servo 6 initialized at position 1927
+ros2_control_node_1007_1789318710418.log	[INFO] [1789318710.575059068] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_1007_1789318710418.log	[INFO] [1789318710.588329983] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_1040_1789503081050.log	[INFO] [1789503081.090489315] [SOARM100Interface]: Servo 1 initialized at position 2006
+ros2_control_node_1040_1789503081050.log	[INFO] [1789503081.106896541] [SOARM100Interface]: Servo 2 initialized at position 2199
+ros2_control_node_1040_1789503081050.log	[INFO] [1789503081.123084432] [SOARM100Interface]: Servo 3 initialized at position 1909
+ros2_control_node_1040_1789503081050.log	[INFO] [1789503081.137803631] [SOARM100Interface]: Servo 4 initialized at position 2051
+ros2_control_node_1040_1789503081050.log	[INFO] [1789503081.154530907] [SOARM100Interface]: Servo 5 initialized at position 3026
+ros2_control_node_1040_1789503081050.log	[INFO] [1789503081.169878711] [SOARM100Interface]: Servo 6 initialized at position 1888
+ros2_control_node_1040_1789503081050.log	[INFO] [1789503081.180973250] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_1040_1789503081050.log	[INFO] [1789503081.190228207] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_1121_1789171136234.log	[INFO] [1789171136.272371415] [SOARM100Interface]: Servo 1 initialized at position 2049
+ros2_control_node_1121_1789171136234.log	[INFO] [1789171136.288912425] [SOARM100Interface]: Servo 2 initialized at position 905
+ros2_control_node_1121_1789171136234.log	[INFO] [1789171136.304192293] [SOARM100Interface]: Servo 3 initialized at position 2990
+ros2_control_node_1121_1789171136234.log	[INFO] [1789171136.319734210] [SOARM100Interface]: Servo 4 initialized at position 2948
+ros2_control_node_1121_1789171136234.log	[INFO] [1789171136.335230260] [SOARM100Interface]: Servo 5 initialized at position 3071
+ros2_control_node_1121_1789171136234.log	[INFO] [1789171136.351264964] [SOARM100Interface]: Servo 6 initialized at position 1962
+ros2_control_node_1121_1789171136234.log	[INFO] [1789171136.362319391] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_1121_1789171136234.log	[INFO] [1789171136.371528091] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_1172_1789833178038.log	[INFO] [1789833178.096305362] [SOARM100Interface]: Servo 1 initialized at position 2024
+ros2_control_node_1172_1789833178038.log	[INFO] [1789833178.112627663] [SOARM100Interface]: Servo 2 initialized at position 924
+ros2_control_node_1172_1789833178038.log	[INFO] [1789833178.128934838] [SOARM100Interface]: Servo 3 initialized at position 2990
+ros2_control_node_1172_1789833178038.log	[INFO] [1789833178.146520160] [SOARM100Interface]: Servo 4 initialized at position 2877
+ros2_control_node_1172_1789833178038.log	[INFO] [1789833178.162768931] [SOARM100Interface]: Servo 5 initialized at position 1995
+ros2_control_node_1172_1789833178038.log	[INFO] [1789833178.182409956] [SOARM100Interface]: Servo 6 initialized at position 1874
+ros2_control_node_1172_1789833178038.log	[INFO] [1789833178.193934573] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_1172_1789833178038.log	[INFO] [1789833178.208349867] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_1296_1789245566687.log	[INFO] [1789245567.040992858] [SOARM100Interface]: Servo 1 initialized at position 2068
+ros2_control_node_1296_1789245566687.log	[INFO] [1789245567.056245763] [SOARM100Interface]: Servo 2 initialized at position 2138
+ros2_control_node_1296_1789245566687.log	[INFO] [1789245567.075214077] [SOARM100Interface]: Servo 3 initialized at position 1930
+ros2_control_node_1296_1789245566687.log	[INFO] [1789245567.093278158] [SOARM100Interface]: Servo 4 initialized at position 2069
+ros2_control_node_1296_1789245566687.log	[INFO] [1789245567.107977552] [SOARM100Interface]: Servo 5 initialized at position 1989
+ros2_control_node_1296_1789245566687.log	[INFO] [1789245567.123196542] [SOARM100Interface]: Servo 6 initialized at position 1872
+ros2_control_node_1296_1789245566687.log	[INFO] [1789245567.134211138] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_1296_1789245566687.log	[INFO] [1789245567.142120341] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_1500_1788921729438.log	[INFO] [1788921729.459786523] [SOARM100Interface]: Servo 1 initialized at position 2093
+ros2_control_node_1500_1788921729438.log	[INFO] [1788921729.474585462] [SOARM100Interface]: Servo 2 initialized at position 2092
+ros2_control_node_1500_1788921729438.log	[INFO] [1788921729.489943847] [SOARM100Interface]: Servo 3 initialized at position 1964
+ros2_control_node_1500_1788921729438.log	[INFO] [1788921729.505357257] [SOARM100Interface]: Servo 4 initialized at position 2055
+ros2_control_node_1500_1788921729438.log	[INFO] [1788921729.520226029] [SOARM100Interface]: Servo 5 initialized at position 2051
+ros2_control_node_1500_1788921729438.log	[INFO] [1788921729.536518836] [SOARM100Interface]: Servo 6 initialized at position 1911
+ros2_control_node_1500_1788921729438.log	[INFO] [1788921729.547670177] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_1500_1788921729438.log	[INFO] [1788921729.553705406] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_1516_1789849032430.log	[INFO] [1789849032.452578823] [SOARM100Interface]: Servo 1 initialized at position 2042
+ros2_control_node_1516_1789849032430.log	[INFO] [1789849032.472299067] [SOARM100Interface]: Servo 2 initialized at position 923
+ros2_control_node_1516_1789849032430.log	[INFO] [1789849032.486434168] [SOARM100Interface]: Servo 3 initialized at position 2990
+ros2_control_node_1516_1789849032430.log	[INFO] [1789849032.507653671] [SOARM100Interface]: Servo 4 initialized at position 2870
+ros2_control_node_1516_1789849032430.log	[INFO] [1789849032.529880766] [SOARM100Interface]: Servo 5 initialized at position 2026
+ros2_control_node_1516_1789849032430.log	[INFO] [1789849032.544248214] [SOARM100Interface]: Servo 6 initialized at position 1882
+ros2_control_node_1516_1789849032430.log	[INFO] [1789849032.555233659] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_1516_1789849032430.log	[INFO] [1789849032.579386093] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_1925_1789171427846.log	[INFO] [1789171428.200355044] [SOARM100Interface]: Servo 1 initialized at position 2046
+ros2_control_node_1925_1789171427846.log	[INFO] [1789171428.215007684] [SOARM100Interface]: Servo 2 initialized at position 2046
+ros2_control_node_1925_1789171427846.log	[INFO] [1789171428.229895030] [SOARM100Interface]: Servo 3 initialized at position 2045
+ros2_control_node_1925_1789171427846.log	[INFO] [1789171428.244900320] [SOARM100Interface]: Servo 4 initialized at position 2045
+ros2_control_node_1925_1789171427846.log	[INFO] [1789171428.259869554] [SOARM100Interface]: Servo 5 initialized at position 2050
+ros2_control_node_1925_1789171427846.log	[INFO] [1789171428.274884428] [SOARM100Interface]: Servo 6 initialized at position 1960
+ros2_control_node_1925_1789171427846.log	[INFO] [1789171428.285765256] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_1925_1789171427846.log	[INFO] [1789171428.292500606] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_2594_1789172143724.log	[INFO] [1789172143.742561138] [SOARM100Interface]: Servo 1 initialized at position 2048
+ros2_control_node_2594_1789172143724.log	[INFO] [1789172143.758035372] [SOARM100Interface]: Servo 2 initialized at position 2045
+ros2_control_node_2594_1789172143724.log	[INFO] [1789172143.772975728] [SOARM100Interface]: Servo 3 initialized at position 2041
+ros2_control_node_2594_1789172143724.log	[INFO] [1789172143.787918860] [SOARM100Interface]: Servo 4 initialized at position 2040
+ros2_control_node_2594_1789172143724.log	[INFO] [1789172143.802797648] [SOARM100Interface]: Servo 5 initialized at position 2050
+ros2_control_node_2594_1789172143724.log	[INFO] [1789172143.817890564] [SOARM100Interface]: Servo 6 initialized at position 1960
+ros2_control_node_2594_1789172143724.log	[INFO] [1789172143.828853717] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_2594_1789172143724.log	[INFO] [1789172143.834426200] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_2719_1788924233557.log	[INFO] [1788924233.575178380] [SOARM100Interface]: Servo 1 initialized at position 2045
+ros2_control_node_2719_1788924233557.log	[INFO] [1788924233.590359025] [SOARM100Interface]: Servo 2 initialized at position 2045
+ros2_control_node_2719_1788924233557.log	[INFO] [1788924233.605063738] [SOARM100Interface]: Servo 3 initialized at position 2044
+ros2_control_node_2719_1788924233557.log	[INFO] [1788924233.619957860] [SOARM100Interface]: Servo 4 initialized at position 2043
+ros2_control_node_2719_1788924233557.log	[INFO] [1788924233.635321773] [SOARM100Interface]: Servo 5 initialized at position 2050
+ros2_control_node_2719_1788924233557.log	[INFO] [1788924233.650345611] [SOARM100Interface]: Servo 6 initialized at position 1912
+ros2_control_node_2719_1788924233557.log	[INFO] [1788924233.661347273] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_2719_1788924233557.log	[INFO] [1788924233.667079649] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_3385_1789172434836.log	[INFO] [1789172434.853421647] [SOARM100Interface]: Servo 1 initialized at position 2048
+ros2_control_node_3385_1789172434836.log	[INFO] [1789172434.871172714] [SOARM100Interface]: Servo 2 initialized at position 2049
+ros2_control_node_3385_1789172434836.log	[INFO] [1789172434.886239294] [SOARM100Interface]: Servo 3 initialized at position 2068
+ros2_control_node_3385_1789172434836.log	[INFO] [1789172434.901678330] [SOARM100Interface]: Servo 4 initialized at position 2048
+ros2_control_node_3385_1789172434836.log	[INFO] [1789172434.916704769] [SOARM100Interface]: Servo 5 initialized at position 2046
+ros2_control_node_3385_1789172434836.log	[INFO] [1789172434.931767342] [SOARM100Interface]: Servo 6 initialized at position 1960
+ros2_control_node_3385_1789172434836.log	[INFO] [1789172434.943022342] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_3385_1789172434836.log	[INFO] [1789172434.949159770] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_3528_1789837480773.log	[INFO] [1789837480.820056739] [SOARM100Interface]: Servo 1 initialized at position 1886
+ros2_control_node_3528_1789837480773.log	[INFO] [1789837480.835706434] [SOARM100Interface]: Servo 2 initialized at position 928
+ros2_control_node_3528_1789837480773.log	[INFO] [1789837480.852408034] [SOARM100Interface]: Servo 3 initialized at position 2990
+ros2_control_node_3528_1789837480773.log	[INFO] [1789837480.869591088] [SOARM100Interface]: Servo 4 initialized at position 2848
+ros2_control_node_3528_1789837480773.log	[INFO] [1789837480.886178626] [SOARM100Interface]: Servo 5 initialized at position 2031
+ros2_control_node_3528_1789837480773.log	[INFO] [1789837480.904316439] [SOARM100Interface]: Servo 6 initialized at position 1873
+ros2_control_node_3528_1789837480773.log	[INFO] [1789837480.915720667] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_3528_1789837480773.log	[INFO] [1789837480.928565026] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_4145_1789172747304.log	[INFO] [1789172747.321399390] [SOARM100Interface]: Servo 1 initialized at position 2047
+ros2_control_node_4145_1789172747304.log	[INFO] [1789172747.338187744] [SOARM100Interface]: Servo 2 initialized at position 2049
+ros2_control_node_4145_1789172747304.log	[INFO] [1789172747.353341876] [SOARM100Interface]: Servo 3 initialized at position 2023
+ros2_control_node_4145_1789172747304.log	[INFO] [1789172747.369156259] [SOARM100Interface]: Servo 4 initialized at position 2043
+ros2_control_node_4145_1789172747304.log	[INFO] [1789172747.384577163] [SOARM100Interface]: Servo 5 initialized at position 2048
+ros2_control_node_4145_1789172747304.log	[INFO] [1789172747.400677191] [SOARM100Interface]: Servo 6 initialized at position 1960
+ros2_control_node_4145_1789172747304.log	[INFO] [1789172747.411600728] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_4145_1789172747304.log	[INFO] [1789172747.416511317] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_4617_1788926099324.log	[INFO] [1788926099.345441485] [SOARM100Interface]: Servo 1 initialized at position 2166
+ros2_control_node_4617_1788926099324.log	[INFO] [1788926099.360032657] [SOARM100Interface]: Servo 2 initialized at position 2094
+ros2_control_node_4617_1788926099324.log	[INFO] [1788926099.374655083] [SOARM100Interface]: Servo 3 initialized at position 1957
+ros2_control_node_4617_1788926099324.log	[INFO] [1788926099.389244857] [SOARM100Interface]: Servo 4 initialized at position 2083
+ros2_control_node_4617_1788926099324.log	[INFO] [1788926099.403665623] [SOARM100Interface]: Servo 5 initialized at position 3465
+ros2_control_node_4617_1788926099324.log	[INFO] [1788926099.418578699] [SOARM100Interface]: Servo 6 initialized at position 1964
+ros2_control_node_4617_1788926099324.log	[INFO] [1788926099.429631188] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_4617_1788926099324.log	[INFO] [1788926099.434566529] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_4887_1789173274930.log	[INFO] [1789173274.948456062] [SOARM100Interface]: Servo 1 initialized at position 2045
+ros2_control_node_4887_1789173274930.log	[INFO] [1789173274.963671503] [SOARM100Interface]: Servo 2 initialized at position 2029
+ros2_control_node_4887_1789173274930.log	[INFO] [1789173274.978554799] [SOARM100Interface]: Servo 3 initialized at position 2045
+ros2_control_node_4887_1789173274930.log	[INFO] [1789173274.993458591] [SOARM100Interface]: Servo 4 initialized at position 2049
+ros2_control_node_4887_1789173274930.log	[INFO] [1789173275.008134213] [SOARM100Interface]: Servo 5 initialized at position 2046
+ros2_control_node_4887_1789173274930.log	[INFO] [1789173275.023200520] [SOARM100Interface]: Servo 6 initialized at position 1960
+ros2_control_node_4887_1789173274930.log	[INFO] [1789173275.034139994] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_4887_1789173274930.log	[INFO] [1789173275.038522783] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_598_1788920771145.log	[INFO] [1788920771.195755135] [SOARM100Interface]: Servo 1 initialized at position 1394
+ros2_control_node_598_1788920771145.log	[INFO] [1788920771.210747926] [SOARM100Interface]: Servo 2 initialized at position 905
+ros2_control_node_598_1788920771145.log	[INFO] [1788920771.225407118] [SOARM100Interface]: Servo 3 initialized at position 2990
+ros2_control_node_598_1788920771145.log	[INFO] [1788920771.240032133] [SOARM100Interface]: Servo 4 initialized at position 2753
+ros2_control_node_598_1788920771145.log	[INFO] [1788920771.254734799] [SOARM100Interface]: Servo 5 initialized at position 1896
+ros2_control_node_598_1788920771145.log	[INFO] [1788920771.269285323] [SOARM100Interface]: Servo 6 initialized at position 1912
+ros2_control_node_598_1788920771145.log	[INFO] [1788920771.280089253] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_598_1788920771145.log	[INFO] [1788920771.285677208] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_7281_1789174234241.log	[INFO] [1789174234.261316357] [SOARM100Interface]: Servo 1 initialized at position 2045
+ros2_control_node_7281_1789174234241.log	[INFO] [1789174234.276066526] [SOARM100Interface]: Servo 2 initialized at position 908
+ros2_control_node_7281_1789174234241.log	[INFO] [1789174234.290641056] [SOARM100Interface]: Servo 3 initialized at position 2990
+ros2_control_node_7281_1789174234241.log	[INFO] [1789174234.305712480] [SOARM100Interface]: Servo 4 initialized at position 2862
+ros2_control_node_7281_1789174234241.log	[INFO] [1789174234.322664173] [SOARM100Interface]: Servo 5 initialized at position 3071
+ros2_control_node_7281_1789174234241.log	[INFO] [1789174234.337887345] [SOARM100Interface]: Servo 6 initialized at position 1960
+ros2_control_node_7281_1789174234241.log	[INFO] [1789174234.349247494] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_7281_1789174234241.log	[INFO] [1789174234.355306343] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_815_1788921130452.log	[INFO] [1788921130.480235990] [SOARM100Interface]: Servo 1 initialized at position 2094
+ros2_control_node_815_1788921130452.log	[INFO] [1788921130.495159577] [SOARM100Interface]: Servo 2 initialized at position 2115
+ros2_control_node_815_1788921130452.log	[INFO] [1788921130.510256841] [SOARM100Interface]: Servo 3 initialized at position 1955
+ros2_control_node_815_1788921130452.log	[INFO] [1788921130.525684036] [SOARM100Interface]: Servo 4 initialized at position 1934
+ros2_control_node_815_1788921130452.log	[INFO] [1788921130.540767762] [SOARM100Interface]: Servo 5 initialized at position 2048
+ros2_control_node_815_1788921130452.log	[INFO] [1788921130.555745088] [SOARM100Interface]: Servo 6 initialized at position 1912
+ros2_control_node_815_1788921130452.log	[INFO] [1788921130.566656585] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_815_1788921130452.log	[INFO] [1788921130.571553030] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_8431_1789174659728.log	[INFO] [1789174660.080185840] [SOARM100Interface]: Servo 1 initialized at position 2252
+ros2_control_node_8431_1789174659728.log	[INFO] [1789174660.094809239] [SOARM100Interface]: Servo 2 initialized at position 2015
+ros2_control_node_8431_1789174659728.log	[INFO] [1789174660.109796282] [SOARM100Interface]: Servo 3 initialized at position 2278
+ros2_control_node_8431_1789174659728.log	[INFO] [1789174660.125819003] [SOARM100Interface]: Servo 4 initialized at position 1388
+ros2_control_node_8431_1789174659728.log	[INFO] [1789174660.141330603] [SOARM100Interface]: Servo 5 initialized at position 1186
+ros2_control_node_8431_1789174659728.log	[INFO] [1789174660.157632091] [SOARM100Interface]: Servo 6 initialized at position 1960
+ros2_control_node_8431_1789174659728.log	[INFO] [1789174660.169069146] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_8431_1789174659728.log	[INFO] [1789174660.175275551] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_9119_1789174938834.log	[INFO] [1789174938.853979226] [SOARM100Interface]: Servo 1 initialized at position 2046
+ros2_control_node_9119_1789174938834.log	[INFO] [1789174938.868249263] [SOARM100Interface]: Servo 2 initialized at position 2049
+ros2_control_node_9119_1789174938834.log	[INFO] [1789174938.882778022] [SOARM100Interface]: Servo 3 initialized at position 2057
+ros2_control_node_9119_1789174938834.log	[INFO] [1789174938.897128383] [SOARM100Interface]: Servo 4 initialized at position 2044
+ros2_control_node_9119_1789174938834.log	[INFO] [1789174938.911612226] [SOARM100Interface]: Servo 5 initialized at position 2049
+ros2_control_node_9119_1789174938834.log	[INFO] [1789174938.925776805] [SOARM100Interface]: Servo 6 initialized at position 1960
+ros2_control_node_9119_1789174938834.log	[INFO] [1789174938.936661588] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_9119_1789174938834.log	[INFO] [1789174938.942720242] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_934_1789245383853.log	[INFO] [1789245383.890499306] [SOARM100Interface]: Servo 1 initialized at position 2112
+ros2_control_node_934_1789245383853.log	[INFO] [1789245383.905419283] [SOARM100Interface]: Servo 2 initialized at position 905
+ros2_control_node_934_1789245383853.log	[INFO] [1789245383.921472536] [SOARM100Interface]: Servo 3 initialized at position 2990
+ros2_control_node_934_1789245383853.log	[INFO] [1789245383.937444838] [SOARM100Interface]: Servo 4 initialized at position 2745
+ros2_control_node_934_1789245383853.log	[INFO] [1789245383.952397882] [SOARM100Interface]: Servo 5 initialized at position 1989
+ros2_control_node_934_1789245383853.log	[INFO] [1789245383.967375114] [SOARM100Interface]: Servo 6 initialized at position 1872
+ros2_control_node_934_1789245383853.log	[INFO] [1789245383.979041412] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_934_1789245383853.log	[INFO] [1789245383.988060149] [SOARM100Interface]: Hardware interface activated
+ros2_control_node_971_1788921301701.log	[INFO] [1788921301.715500299] [SOARM100Interface]: Servo 1 initialized at position 2095
+ros2_control_node_971_1788921301701.log	[INFO] [1788921301.730620243] [SOARM100Interface]: Servo 2 initialized at position 2113
+ros2_control_node_971_1788921301701.log	[INFO] [1788921301.745471358] [SOARM100Interface]: Servo 3 initialized at position 1952
+ros2_control_node_971_1788921301701.log	[INFO] [1788921301.760474374] [SOARM100Interface]: Servo 4 initialized at position 1929
+ros2_control_node_971_1788921301701.log	[INFO] [1788921301.775498337] [SOARM100Interface]: Servo 5 initialized at position 2051
+ros2_control_node_971_1788921301701.log	[INFO] [1788921301.790214436] [SOARM100Interface]: Servo 6 initialized at position 1912
+ros2_control_node_971_1788921301701.log	[INFO] [1788921301.801125475] [SOARM100Interface]: Serial communication initialized on /dev/ttyACM0
+ros2_control_node_971_1788921301701.log	[INFO] [1788921301.805459044] [SOARM100Interface]: Hardware interface activated

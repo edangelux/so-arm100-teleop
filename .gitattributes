@@ -9,3 +9,13 @@
 *.step    filter=lfs diff=lfs merge=lfs -text
 *.STEP    filter=lfs diff=lfs merge=lfs -text
 *.mp4     filter=lfs diff=lfs merge=lfs -text
+*.pdf     filter=lfs diff=lfs merge=lfs -text
+
+# Finales de línea LF para los guiones que se ejecutan en Linux.
+*.sh text eol=lf
+*.py text eol=lf
+# Bytes originales de la entrega, para que coincidan con el manifiesto SHA-256.
+entrega/src/** -text
+entrega/teleoperacion/** -text
+entrega/utilidades_originales/** -text
+pruebas/datos_originales/** -text

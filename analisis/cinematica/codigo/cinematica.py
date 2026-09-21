@@ -19,7 +19,9 @@ def rot_axis(axis,q):
     R=np.eye(3)+np.sin(q)*K+(1-np.cos(q))*K@K
     T=np.eye(4); T[:3,:3]=R; return T
 
-def cargar(path='so_arm_100_5dof_arm.urdf.xacro'):
+def cargar(path=None):
+    if path is None:
+        path = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'so_arm_100_5dof_arm.urdf.xacro')
     s=open(path,encoding='utf-8').read().replace('${prefix}','')
     s=re.sub(r'xmlns:xacro="[^"]*"','',s); s=re.sub(r'</?xacro:[^>]*>','',s)
     root=ET.fromstring(s)

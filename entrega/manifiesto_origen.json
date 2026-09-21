@@ -1,0 +1,750 @@
+{
+ "fecha_integracion": "2026-09-20",
+ "archivos": [
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/LICENSE",
+   "destino": "entrega/src/SO-100-arm/LICENSE",
+   "bytes": 11357,
+   "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/README.md",
+   "destino": "entrega/src/SO-100-arm/README.md",
+   "bytes": 9924,
+   "sha256": "1cd2dbb25d5e078c8377f1ef86a35ddf04d860667cbd3a8b2404645dfd75167d"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100/CMakeLists.txt",
+   "destino": "entrega/src/SO-100-arm/so_arm_100/CMakeLists.txt",
+   "bytes": 765,
+   "sha256": "7291c06818a7fef0af647f3a56ab1156cb9efd3da00f73bb55ebb89d5e888f06"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100/package.xml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100/package.xml",
+   "bytes": 804,
+   "sha256": "cb6a6a7046d1af169cfc1fa036f638990093b10b9a1b28f655b274d4475de6b1"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/package.xml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/package.xml",
+   "bytes": 1131,
+   "sha256": "1e8c1f2537f2013aaf56433d33febb51e4e181fd429f3086df9c36820024f3dd"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/setup.cfg",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/setup.cfg",
+   "bytes": 105,
+   "sha256": "71d8c858dffd0dbb97289fba712e8fa7f6e07ed6cb53c18eadaf85ba9351933e"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/setup.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/setup.py",
+   "bytes": 953,
+   "sha256": "fd2fe3b6ce5867c3a1d3290febe6ab3e5a4ab7f0a9d5b9a18c92e041185f9d78"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/config/ros_gz_bridge.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/config/ros_gz_bridge.yaml",
+   "bytes": 1762,
+   "sha256": "c67c19d990527ceb95e20bbd17f1774b3bc9245439de0a8ce05a61860f6e150c"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/launch/gz.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/launch/gz.launch.py",
+   "bytes": 11546,
+   "sha256": "6caff609177b0a8b22a71206f5b90a3eb8a39b488e32efbabfb15c8e5c9027c2"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/launch/hardware.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/launch/hardware.launch.py",
+   "bytes": 7965,
+   "sha256": "9aa015681081af413399b765458f8b3010dbcbe4582331108a745ddec070cf0e"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/launch/rviz.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/launch/rviz.launch.py",
+   "bytes": 1200,
+   "sha256": "b80669ac843f08681d31ad842c439ae39b03d8156b486de98476180198c5c8f0"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/resource/so_arm_100_bringup",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/resource/so_arm_100_bringup",
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/so_arm_100_bringup/so_arm_100_5dof_cmd_relay.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/so_arm_100_bringup/so_arm_100_5dof_cmd_relay.py",
+   "bytes": 2386,
+   "sha256": "5eb0da1e61f7ec48800f4189cbe385ed89da9797de592d5b793c6f2f65b5f1c8"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_bringup/so_arm_100_bringup/__init__.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_bringup/so_arm_100_bringup/__init__.py",
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/CMakeLists.txt",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/CMakeLists.txt",
+   "bytes": 1594,
+   "sha256": "bc24473b74af498458eaee01fb704b7a349565a84960b2004e4b6a2d7fe768b6"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/package.xml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/package.xml",
+   "bytes": 955,
+   "sha256": "d7bdec13bb85498abf3ce9ba9a8e0f3ff5bf61a94558dae00bf636f7ceb897f7"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/gazebo/so_arm_100_5dof.gazebo.xacro",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/gazebo/so_arm_100_5dof.gazebo.xacro",
+   "bytes": 6412,
+   "sha256": "bd726423d543399ed8feff5e30c49bc29466b420b3202f775c932e48a0d1801d"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/hooks/so_arm_100_description.dsv.in",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/hooks/so_arm_100_description.dsv.in",
+   "bytes": 275,
+   "sha256": "567590cc1d516a9214eda31b9273826465c1be250c29638ac03b4ffc13cef887"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/hooks/so_arm_100_description.sh.in",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/hooks/so_arm_100_description.sh.in",
+   "bytes": 189,
+   "sha256": "0771a6ef3db2c025957e689c8f15e529eb92d7a5e7aa570167fdfba5ec95876e"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/launch/joint_state_pub_gui.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/launch/joint_state_pub_gui.launch.py",
+   "bytes": 2557,
+   "sha256": "78b406beb164ab0c0031b0368cec380e57358de1d75c770c3b1d06fa545090a0"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/model.config",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/model.config",
+   "bytes": 172,
+   "sha256": "a4a40243f49149c63ece6c285b49572bb9c45da133d966fed162acaf2dd79bfd"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Base.STL",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Base.STL",
+   "bytes": 597684,
+   "sha256": "d65990c6442d887825ac5caf5dd66714b89ecd87084c10a6bc176b5ceb68199e"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Fixed_Gripper.STL",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Fixed_Gripper.STL",
+   "bytes": 416384,
+   "sha256": "f2a623117086c3d8c5898b6a6b8cdcbe96d058d93baf670e254bfcbade19dc97"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Lower_Arm.STL",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Lower_Arm.STL",
+   "bytes": 499784,
+   "sha256": "2925c5b8fcc1681ebf57d1d1759a2a8272a899d91d38b22d4ceb5596b456a259"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Moving_Jaw.STL",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Moving_Jaw.STL",
+   "bytes": 177184,
+   "sha256": "aa509ca4273b068885fb2ad44bc6eefa9e439251b53d0089d9b07b89dba71ab5"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Shoulder_Rotation_Pitch.STL",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Shoulder_Rotation_Pitch.STL",
+   "bytes": 501784,
+   "sha256": "2a8cfff7006b3821c7083da155614f2e58b7f5fc9eb31eecf28430912d42ae0a"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Upper_Arm.STL",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Upper_Arm.STL",
+   "bytes": 367384,
+   "sha256": "b808e58ab50186086d0356689b02caf333da2b909e7644ec401e8b991eb8d3ee"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Wrist_Pitch_Roll.STL",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/models/so_arm_100_5dof/meshes/Wrist_Pitch_Roll.STL",
+   "bytes": 475284,
+   "sha256": "5052ca2a917e1aa77f9e0ccd9876da7815c5ebdd26dc634e9c6056150e8379c4"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/ros2_control/so_arm_100_5dof_position.ros2_control.xacro",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/ros2_control/so_arm_100_5dof_position.ros2_control.xacro",
+   "bytes": 6085,
+   "sha256": "0815df67346b068e61c4ec6fd9feaff4c06f9849ad2714e1314365d6bc0ffb3e"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/rviz/so_arm_100.rviz",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/rviz/so_arm_100.rviz",
+   "bytes": 7480,
+   "sha256": "37f18818bbb7c19c0246803214ee08983bd8d88a3fc01516dfb8a6b2fdfbf973"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/urdf/so_arm_100_5dof.csv",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/urdf/so_arm_100_5dof.csv",
+   "bytes": 4860,
+   "sha256": "a9e0cd2be3d8d7939624969bfa33a26c2ad0bfbeedacc30371af36ee49a862ee"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/urdf/so_arm_100_5dof.urdf.xacro",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/urdf/so_arm_100_5dof.urdf.xacro",
+   "bytes": 1777,
+   "sha256": "54c729ee4197f89f8e7dc246ac4738003b4348872868e393c46ae08407fc88b8"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_description/urdf/so_arm_100_5dof_arm.urdf.xacro",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_description/urdf/so_arm_100_5dof_arm.urdf.xacro",
+   "bytes": 11228,
+   "sha256": "06d1104d4c42825ee3e77786f3d4c296c82e58a018f753f5d55866af11238915"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/.setup_assistant",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/.setup_assistant",
+   "bytes": 542,
+   "sha256": "c7d06c4d0679ab9a40bb56168b4e4be36f8b11d4833b0a38536471d0ccd691c9"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/CMakeLists.txt",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/CMakeLists.txt",
+   "bytes": 315,
+   "sha256": "876203c08a68869c1cbfa14ddd29ab2aae04065e1c5f7b290e3128c79e852e69"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/package.xml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/package.xml",
+   "bytes": 2235,
+   "sha256": "af7d4d12a4a133ba1f3a65eb22017c551730f0a1c565750b667069aad2dc9aec"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/controllers_5dof.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/controllers_5dof.yaml",
+   "bytes": 1064,
+   "sha256": "24b69d3f5bfbea51a3be9d17715ee13062735ccafb01288292298607ad08a705"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/controllers_7dof.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/controllers_7dof.yaml",
+   "bytes": 861,
+   "sha256": "911f0b9340e06c3777ed17c707e6006b7dc841a9af5c204bf19ef345658c579a"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/hardware_controllers.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/hardware_controllers.yaml",
+   "bytes": 2712,
+   "sha256": "a4d2f0eacde38aa9606ba107721c1ac80a44c81b956646e33c86c730f540d5ee"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/initial_positions.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/initial_positions.yaml",
+   "bytes": 202,
+   "sha256": "a8335da925f7e0b303e17e78ffad3b37247c82300b586a8ae113345873803eb4"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/joint_limits.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/joint_limits.yaml",
+   "bytes": 1386,
+   "sha256": "476a3a73771021282f66de7f1bc9d49fc2f04ae7a4a770bb76f2a651f6248dfd"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/kinematics.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/kinematics.yaml",
+   "bytes": 690,
+   "sha256": "aef27d647ed0034717cfe16b1871a513a8909130ebe54a566b18e9a06207b5bf"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/moveit.rviz",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/moveit.rviz",
+   "bytes": 7767,
+   "sha256": "4d74aca36ec707c20366c4dbb96b39c1e294512f3db41abc8337fc9b6a4df05c"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/moveit.xtra.rviz",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/moveit.xtra.rviz",
+   "bytes": 12690,
+   "sha256": "5bc744c685288f06e286d05ed3307298fa79159a3b0bec59f65cf5b768269321"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/moveit_controllers.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/moveit_controllers.yaml",
+   "bytes": 1052,
+   "sha256": "2425f45bb23d2237e0db0bf963705948265e016b42cc69745d2179e89d96afab"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/pilz_cartesian_limits.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/pilz_cartesian_limits.yaml",
+   "bytes": 133,
+   "sha256": "fed80b213b77f13fb7b913d703609a66caa72ccb0617b41e83d3057e31749047"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/ros2_controllers.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/ros2_controllers.yaml",
+   "bytes": 2221,
+   "sha256": "2d3a0196dda603f32b96a91ecc2b9ebb24bd25c3ccc0b3f880833b6165c2e8dc"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/sensors_3d.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/sensors_3d.yaml",
+   "bytes": 768,
+   "sha256": "48d7b297c381b72bad0a9b7b9ab45025c435f7181a9032fb75bcb994c798b3cb"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/servo_params.yaml",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/servo_params.yaml",
+   "bytes": 3068,
+   "sha256": "e1635cd9b0868cd4d99b5db1713c95bc55c25264de41fce390815044cb4e57bc"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/so_arm_100.ros2_control.xacro",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/so_arm_100.ros2_control.xacro",
+   "bytes": 4179,
+   "sha256": "4cddd37f90b429767915d5a935d7b6fd613d9aa8fc8886e2f6c76357aee4d462"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/so_arm_100.srdf",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/so_arm_100.srdf",
+   "bytes": 4443,
+   "sha256": "69e8ffb99a7da15d5321970bbea521217a67b240d901587580439f41c61463e2"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/config/so_arm_100.urdf.xacro",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/config/so_arm_100.urdf.xacro",
+   "bytes": 1150,
+   "sha256": "07ca5a37c3369695526ad3cdec062036f718f8bffbeccd083cfd6768e8490aae"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/launch/demo.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/launch/demo.launch.py",
+   "bytes": 317,
+   "sha256": "bc7a9b3414198c0c6a105c427178563a37c6cdfd89493451a40dbfed4b8875f1"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/launch/moveit.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/launch/moveit.launch.py",
+   "bytes": 3530,
+   "sha256": "2b9667237b7f10494af216cb3f545744e49bd11c474178222d0f7811679756e0"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/launch/moveit_rviz.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/launch/moveit_rviz.launch.py",
+   "bytes": 331,
+   "sha256": "f97adfa1bf0fd46279dbc2f49e82d08b197e32ce4186bdb88941aea94e7c4652"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/launch/move_group.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/launch/move_group.launch.py",
+   "bytes": 329,
+   "sha256": "88a508dcaba633f38a2d7d5e63567622b6600e2bf3172d06f35092e772a08ac5"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/launch/rsp.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/launch/rsp.launch.py",
+   "bytes": 315,
+   "sha256": "d078eef3a26edf85bd33d1a379311adc841985c64b403f2d4db7b1aacc29aa78"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/launch/servo.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/launch/servo.launch.py",
+   "bytes": 2325,
+   "sha256": "d3dd1dfbf6802e1c724ecbf2f0d7bad0c564cdf029440bb40f6c4cd4c48f7812"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/launch/setup_assistant.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/launch/setup_assistant.launch.py",
+   "bytes": 339,
+   "sha256": "25a0e22c2c3db0a4d66448ecf705ef76ee9f6e43c221a1a65566defcf0c79370"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/launch/spawn_controllers.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/launch/spawn_controllers.launch.py",
+   "bytes": 1825,
+   "sha256": "7130dc6f2ffca0d9ca91e124e6f81fb8e24f28c40597acca738e4d95ca066323"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/SO-100-arm/so_arm_100_moveit_config/launch/static_virtual_joint_tfs.launch.py",
+   "destino": "entrega/src/SO-100-arm/so_arm_100_moveit_config/launch/static_virtual_joint_tfs.launch.py",
+   "bytes": 357,
+   "sha256": "af4b293142a98e0b63a7f173d155866481e98ba46ba0efeeb6d2440a72b602a6"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/.gitignore",
+   "destino": "entrega/src/so_arm_100_hardware/.gitignore",
+   "bytes": 304,
+   "sha256": "f7f9339c0d1e5adf90b6074a4a6e88b14efa4ce9e8cb13537eca99a1c0778886"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/CMakeLists.txt",
+   "destino": "entrega/src/so_arm_100_hardware/CMakeLists.txt",
+   "bytes": 2532,
+   "sha256": "8b5bf60d012e028785f829e0f9f7943ee89224e9be6e3dc962045a6d21dffe9e"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/LICENSE",
+   "destino": "entrega/src/so_arm_100_hardware/LICENSE",
+   "bytes": 11358,
+   "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/package.xml",
+   "destino": "entrega/src/so_arm_100_hardware/package.xml",
+   "bytes": 958,
+   "sha256": "22f3bc5a0b135984d7f4ce83a4a5a417d3198a88a4e6b78d3e3dff8d43055561"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/README.md",
+   "destino": "entrega/src/so_arm_100_hardware/README.md",
+   "bytes": 4167,
+   "sha256": "20df0afc36607baa018ae757089c4a6cdb8f97cfe88f2d52636e26109098ef28"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/so_arm_100_hardware.xml",
+   "destino": "entrega/src/so_arm_100_hardware/so_arm_100_hardware.xml",
+   "bytes": 386,
+   "sha256": "dd027ac698518af068274beadafcd23191045521eaf83e76aff3ed8efb6668ec"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/config/hardware_config.yaml",
+   "destino": "entrega/src/so_arm_100_hardware/config/hardware_config.yaml",
+   "bytes": 267,
+   "sha256": "6820db8b01c5663c9b2975e548fa1a3a5a48e139a240d4e1edfcdb784cffdc92"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/config/posses/zero.txt",
+   "destino": "entrega/src/so_arm_100_hardware/config/posses/zero.txt",
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/.gitignore",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/.gitignore",
+   "bytes": 291,
+   "sha256": "0404f92ae0b92e76c9c85b455811320def33def3b7762db35412a71abcf21a35"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/CMakeLists.txt",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/CMakeLists.txt",
+   "bytes": 336,
+   "sha256": "0064e137034690fec8bd560cac01fb9e2af0179bc872172296a2b81b7e307c1d"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/INST.h",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/INST.h",
+   "bytes": 479,
+   "sha256": "b8bf9c16f6d1a54197985ceda1359981941a45a843e688a448da49385ad1aa43"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SCS.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SCS.cpp",
+   "bytes": 7656,
+   "sha256": "162f01e3c7b492362f75255501ca2c35d258ed9a9320a5116ab2b15ca041e263"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SCS.h",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SCS.h",
+   "bytes": 2043,
+   "sha256": "f85f02f062dfcf961401e012314cc0d7c783fdb95ef7b250e2f8a4a749cf6b1c"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SCSCL.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SCSCL.cpp",
+   "bytes": 4498,
+   "sha256": "78fea35689b87809ce53b3a40cac47c1b6b08e98582620debf3aba7a538c9ff1"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SCSCL.h",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SCSCL.h",
+   "bytes": 2634,
+   "sha256": "ccec0ea437746e07388909f685dd6a48fdc9dc0c2d633b57deba48934cdc6686"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SCSerial.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SCSerial.cpp",
+   "bytes": 4950,
+   "sha256": "f243a4243791c85fa55afd14b8f4911d0d5eb6d2f1083f3daa225921bac19a77"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SCSerial.h",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SCSerial.h",
+   "bytes": 1059,
+   "sha256": "d5e5d76db00e0659f15e2b9c2a1e4ec4b82e8fa2a4c7285c4e8c8e0083e2daf3"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SCServo.h",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SCServo.h",
+   "bytes": 214,
+   "sha256": "09b87b1222822be31a8cd68d2149c8bfcc87428ee075e93e767587722a50d07e"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SMSBL.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SMSBL.cpp",
+   "bytes": 4853,
+   "sha256": "5d2ee83204864e645ef976e63d17dc2d9477dd6db4e2b6ee9283e00367fc84d0"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SMSBL.h",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SMSBL.h",
+   "bytes": 2804,
+   "sha256": "4d1ef0e75c6bcde54f6bb254cf296fe2a8929e10dc26c5c30b4b62ca830b4d55"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SMSCL.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SMSCL.cpp",
+   "bytes": 4857,
+   "sha256": "36c3bba480a1c7a2439d1541bbd52b9e6e32819ee296309284d005e43c73afc1"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SMSCL.h",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SMSCL.h",
+   "bytes": 3495,
+   "sha256": "311dddef383bf8f120df99bb058db54726602ea46e25ecaf1717a448dcbf126f"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SMS_STS.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SMS_STS.cpp",
+   "bytes": 6812,
+   "sha256": "b6d987a9ed29dc2938b6b24e3ad4311564a54338ced191df0ce0d12d65698c5e"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/SCServo_Linux/SMS_STS.h",
+   "destino": "entrega/src/so_arm_100_hardware/include/SCServo_Linux/SMS_STS.h",
+   "bytes": 3678,
+   "sha256": "c4c94fd4c751e4106ca122428f05ca86c2fde8fdba72e220b035b0dd05250c76"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/include/so_arm_100_hardware/so_arm_100_interface.hpp",
+   "destino": "entrega/src/so_arm_100_hardware/include/so_arm_100_hardware/so_arm_100_interface.hpp",
+   "bytes": 5175,
+   "sha256": "b57b2e17562e2b5a859defe70048896feb50f1e9e663c6e3c97349b5baebd36b"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/scripts/calibrate_arm.py",
+   "destino": "entrega/src/so_arm_100_hardware/scripts/calibrate_arm.py",
+   "bytes": 8250,
+   "sha256": "07b62e6ba99b368c2377e0117d39dee656b929093feeb853ab06caa8948d42b4"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/scripts/jog_joints.py",
+   "destino": "entrega/src/so_arm_100_hardware/scripts/jog_joints.py",
+   "bytes": 11004,
+   "sha256": "7f05c2f8db0070271e7239e314218f1751d38f0681b98ec69047acb0b5419af1"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/scripts/zero_pose.py",
+   "destino": "entrega/src/so_arm_100_hardware/scripts/zero_pose.py",
+   "bytes": 1661,
+   "sha256": "a56e55890ef49919148128e3544a91fec7d058d37f4ce2cce2bae0c8d1d6f972"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/src/so_arm_100_interface.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/src/so_arm_100_interface.cpp",
+   "bytes": 26215,
+   "sha256": "adcdf72700f84f7845dcfa1a452a8829aafc4b40a12a93e6c18b93de60765395"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/test/angular_error_test.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/test/angular_error_test.cpp",
+   "bytes": 1028,
+   "sha256": "c9e9ac615b00ef3cc97f44644decf84ca369390f614b9b278393098c8e1985ea"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/test/bench_serial.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/test/bench_serial.cpp",
+   "bytes": 741,
+   "sha256": "d05d1142841d7c97a439bf1a158b5bfcb0468f58fb3228883f27f838865b5517"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/test/ping_test.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/test/ping_test.cpp",
+   "bytes": 1191,
+   "sha256": "488f9d45c54cb86111b47fa0472505bd0b7e5723645ed78ccdc259a1e4d6ad60"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/test/test_servo.cpp",
+   "destino": "entrega/src/so_arm_100_hardware/test/test_servo.cpp",
+   "bytes": 1993,
+   "sha256": "f22c5e4ada3e265f7e248f70f7a6c07026e66af2fdc61013c7f6da847ab829cf"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/trajectory_mirror/package.xml",
+   "destino": "entrega/src/trajectory_mirror/package.xml",
+   "bytes": 437,
+   "sha256": "0b32f5e586aaaf2b764581e01964c73b7e87ecad090819801faeb5b035d09311"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/trajectory_mirror/setup.cfg",
+   "destino": "entrega/src/trajectory_mirror/setup.cfg",
+   "bytes": 103,
+   "sha256": "101664732516122f3fff0cddcbefe0980daed268b1897cb11d7dc894a4043bb5"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/trajectory_mirror/setup.py",
+   "destino": "entrega/src/trajectory_mirror/setup.py",
+   "bytes": 749,
+   "sha256": "56e2bab9b5382918f38858564045a3d208c8b282f9e1ec649e713d9a4e0a04dc"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/trajectory_mirror/resource/trajectory_mirror",
+   "destino": "entrega/src/trajectory_mirror/resource/trajectory_mirror",
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/trajectory_mirror/trajectory_mirror/topic_mirror_node.py",
+   "destino": "entrega/src/trajectory_mirror/trajectory_mirror/topic_mirror_node.py",
+   "bytes": 881,
+   "sha256": "b0388327c6dedaefb9794df1ee1511d83d87875b75af5ea155612d7ebd69b26a"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/trajectory_mirror/trajectory_mirror/trajectory_mirror_node.py",
+   "destino": "entrega/src/trajectory_mirror/trajectory_mirror/trajectory_mirror_node.py",
+   "bytes": 5908,
+   "sha256": "c4d2ff42e5fd387005cdc8c7fd2efcbbedaf3d0ed06a67a5d3a0cd9c7246ecd3"
+  },
+  {
+   "origen": "home/crist/ros2_ws/src/trajectory_mirror/trajectory_mirror/__init__.py",
+   "destino": "entrega/src/trajectory_mirror/trajectory_mirror/__init__.py",
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "origen": "home/crist/teleop_scripts/go_home.py",
+   "destino": "entrega/teleoperacion/go_home.py",
+   "bytes": 2107,
+   "sha256": "8d31ac5ba00ca1d0dd34ed53bff9b10c755db52a497ee63e4907eca15769a1fe"
+  },
+  {
+   "origen": "home/crist/teleop_scripts/teleop_cartesian.py",
+   "destino": "entrega/teleoperacion/teleop_cartesian.py",
+   "bytes": 18280,
+   "sha256": "ea2946815f1e7fe7016b7f48c57ab566317653a1aff7711ae4e22c4922b294c5"
+  },
+  {
+   "origen": "home/crist/teleop_scripts/teleop_two_arms.py",
+   "destino": "entrega/teleoperacion/teleop_two_arms.py",
+   "bytes": 18488,
+   "sha256": "d1055f3ec928a1eae38ca5c5c05362628b0d92d926c0097413cdf8294101a6f3"
+  },
+  {
+   "origen": "home/crist/teleop_scripts/teleop_two_hands.py",
+   "destino": "entrega/teleoperacion/teleop_two_hands.py",
+   "bytes": 24592,
+   "sha256": "575beee0c313533d0fd68fa90edbd1bf6636de76902c83639613d8574eb0b04d"
+  },
+  {
+   "origen": "home/crist/teleop_scripts/teleop_v13.py",
+   "destino": "entrega/teleoperacion/teleop_v13.py",
+   "bytes": 20213,
+   "sha256": "51b1c7ba1209d89df9c5294bf518ba9b9e294c94f861a09f4504cf379a75232c"
+  },
+  {
+   "origen": "home/crist/teleop_scripts/teleop_zones.py",
+   "destino": "entrega/teleoperacion/teleop_zones.py",
+   "bytes": 20098,
+   "sha256": "dc73bfa9336fd9cba515b36ed963eb1935e4497643e9a6ee58411d48fe260f45"
+  },
+  {
+   "origen": "home/crist/teleop_scripts/test_servo_twist.py",
+   "destino": "entrega/teleoperacion/test_servo_twist.py",
+   "bytes": 1776,
+   "sha256": "be8343d8672d0998214ee226840f95c0feef524d3185d193e7a9c7e128296ce2"
+  },
+  {
+   "origen": "home/crist/center_one.cpp",
+   "destino": "entrega/utilidades_originales/center_one.cpp",
+   "bytes": 552,
+   "sha256": "6e9336d312f2d2b9215e954cf5bdfc0bbeb9b40ba38766ed874a69bca6d42945"
+  },
+  {
+   "origen": "home/crist/center_servos.cpp",
+   "destino": "entrega/utilidades_originales/center_servos.cpp",
+   "bytes": 408,
+   "sha256": "9c5de080bec4f96fbfbb87f36775f3bcc72c46cb91c7f36927d7519a8786c888"
+  },
+  {
+   "origen": "home/crist/change_id.cpp",
+   "destino": "entrega/utilidades_originales/change_id.cpp",
+   "bytes": 1244,
+   "sha256": "f538a20e8d5ba0edcdddb95da8a59a0fd908adb1ef095ca5e9584e958d861157"
+  },
+  {
+   "origen": "home/crist/list_servos.cpp",
+   "destino": "entrega/utilidades_originales/list_servos.cpp",
+   "bytes": 1254,
+   "sha256": "150b1f2bd7053921c905ce208efc95e231fa5c1c19cb74325fc245f83b68847f"
+  },
+  {
+   "origen": "home/crist/angular_error_log_s1.csv",
+   "destino": "pruebas/datos_originales/angular_error_log_s1.csv",
+   "bytes": 60,
+   "sha256": "bd1c7920c0c8b8b2ce126e15b1e0c67645a8263b380cb90ff4b880e63719b44e"
+  },
+  {
+   "origen": "home/crist/angular_error_log_s2.csv",
+   "destino": "pruebas/datos_originales/angular_error_log_s2.csv",
+   "bytes": 60,
+   "sha256": "01822d3b983adaa4e5184e2f27333c41212ab7e0d63d6c6be6a7c5110ff418ac"
+  },
+  {
+   "origen": "home/crist/angular_error_log_s3.csv",
+   "destino": "pruebas/datos_originales/angular_error_log_s3.csv",
+   "bytes": 60,
+   "sha256": "766e5811a2784bb779fd7704f20f4f4f24de3dc44412e634025c496d4ecbc914"
+  },
+  {
+   "origen": "home/crist/angular_error_log_s4.csv",
+   "destino": "pruebas/datos_originales/angular_error_log_s4.csv",
+   "bytes": 60,
+   "sha256": "cae9cd8449189f1e6206f0552fe581ed70fa9d8a526ce72e9fc6cc582235c1be"
+  },
+  {
+   "origen": "home/crist/angular_error_log_s5.csv",
+   "destino": "pruebas/datos_originales/angular_error_log_s5.csv",
+   "bytes": 60,
+   "sha256": "0a9549197f3a4160d2ad87e274a1eb171c0576392b13bb089861295d93c87002"
+  },
+  {
+   "origen": "home/crist/fps_log.csv",
+   "destino": "pruebas/datos_originales/fps_log.csv",
+   "bytes": 576942,
+   "sha256": "34fff2c6f25e53649c33a036f7c9cf108fd227e4f837e96e848e0078b20292ce"
+  },
+  {
+   "origen": "home/crist/latency_log.csv",
+   "destino": "pruebas/datos_originales/latency_log.csv",
+   "bytes": 1472465,
+   "sha256": "3d6dead84d65c25db62bb1d7656b870164b8bc7c6bc307f5302c99f6c49159f4"
+  },
+  {
+   "origen": "documentos_entregados/Formulación y Evaluación de Proyectos.pdf",
+   "destino": "docs/entregables/formulacion_y_evaluacion.pdf",
+   "bytes": 6976519,
+   "sha256": "18685b4ef37e5c9882540138de90df3f8df2cebaedde07f65a95090d702ad05c"
+  },
+  {
+   "origen": "documentos_entregados/Presentacion_Manipulador_Robotico_5GDL.pptx.pdf",
+   "destino": "docs/entregables/presentacion_metodologica.pdf",
+   "bytes": 3593672,
+   "sha256": "c1a4e1cebd8f5c830d5f3530898fc83e3ed7065aea17686d44520b72ef300d3b"
+  },
+  {
+   "origen": "documentos_entregados/SO-ARM100  Defensa de proyecto 2026 .pdf",
+   "destino": "docs/entregables/presentacion_tecnica.pdf",
+   "bytes": 19432092,
+   "sha256": "709fd734d64027921c95202d0b503d39b88e1fadb696f0ae8373eda295031d74"
+  },
+  {
+   "origen": "documentos_entregados/Entrega Final del Documento.pdf",
+   "destino": "docs/entregables/documento_tecnico_final.pdf",
+   "bytes": 20073966,
+   "sha256": "2c0d52568326dfb11f4290a76db293fda23618ece00c8138f8b7a20971031117"
+  }
+ ],
+ "excluidos": [
+  {
+   "origen": "home/crist/ros2_ws/src/so_arm_100_hardware/config/calibration.yaml",
+   "sha256": "102fe84107a10a89c5383b767f5ac621af75490f50a355b97f4855cdbda3f051",
+   "motivo": "Archivo de calibración fechado el 2 de febrero de 2025, correspondiente a otro manipulador. Ningún archivo de lanzamiento ni la descripción ros2_control define el parámetro calibration_file, de modo que el controlador nunca lo cargó; se excluyó para que un tercero no lo active por error."
+  }
+ ]
+}

@@ -1,0 +1,336 @@
+{
+  "angular_grados": {
+    "n": 30,
+    "media": 0.4921875,
+    "minimo": 0.0,
+    "maximo": 1.494140625,
+    "mediana": 0.2197265625,
+    "p95": 1.318359375,
+    "p99": 1.4431640625000002
+  },
+  "por_servo": {
+    "angular_error_log_s1": {
+      "n": 6,
+      "media": 0.1025390625,
+      "minimo": 0.0,
+      "maximo": 0.263671875,
+      "mediana": 0.087890625,
+      "p95": 0.24169921875,
+      "p99": 0.25927734375
+    },
+    "angular_error_log_s2": {
+      "n": 6,
+      "media": 1.0546875,
+      "minimo": 0.703125,
+      "maximo": 1.318359375,
+      "mediana": 1.0986328125,
+      "p95": 1.2744140625,
+      "p99": 1.3095703125
+    },
+    "angular_error_log_s3": {
+      "n": 6,
+      "media": 1.0107421875,
+      "minimo": 0.791015625,
+      "maximo": 1.494140625,
+      "mediana": 0.8349609375,
+      "p95": 1.4501953125,
+      "p99": 1.4853515625
+    },
+    "angular_error_log_s4": {
+      "n": 6,
+      "media": 0.205078125,
+      "minimo": 0.087890625,
+      "maximo": 0.3515625,
+      "mediana": 0.17578125,
+      "p95": 0.3515625,
+      "p99": 0.3515625
+    },
+    "angular_error_log_s5": {
+      "n": 6,
+      "media": 0.087890625,
+      "minimo": 0.0,
+      "maximo": 0.17578125,
+      "mediana": 0.087890625,
+      "p95": 0.15380859375,
+      "p99": 0.17138671875
+    }
+  },
+  "fps": {
+    "globales": {
+      "n": 23322,
+      "media": 32.69947217219792,
+      "minimo": 0.5,
+      "maximo": 40.73,
+      "mediana": 33.45,
+      "p95": 34.94,
+      "p99": 36.14790000000001
+    },
+    "criterio_segmentacion": "Se abre un tramo nuevo ante un salto temporal mayor de 10 s o un retroceso del reloj. Es una separación por huecos del registro, no una identificación certificada de sesiones.",
+    "tramos": [
+      {
+        "fila_inicial": 1,
+        "fila_final": 447,
+        "duracion_s": 147.84224128723145,
+        "n": 447,
+        "media": 33.973020134228186,
+        "minimo": 0.56,
+        "maximo": 36.63,
+        "mediana": 34.21,
+        "p95": 34.808,
+        "p99": 35.4154
+      },
+      {
+        "fila_inicial": 448,
+        "fila_final": 3225,
+        "duracion_s": 923.5121099948883,
+        "n": 2778,
+        "media": 34.111562275017995,
+        "minimo": 0.57,
+        "maximo": 38.74,
+        "mediana": 34.21,
+        "p95": 35.27,
+        "p99": 36.2661
+      },
+      {
+        "fila_inicial": 3226,
+        "fila_final": 3696,
+        "duracion_s": 155.1138036251068,
+        "n": 471,
+        "media": 34.220106157112525,
+        "minimo": 0.57,
+        "maximo": 37.66,
+        "mediana": 34.4,
+        "p95": 35.614999999999995,
+        "p99": 36.654
+      },
+      {
+        "fila_inicial": 3697,
+        "fila_final": 15043,
+        "duracion_s": 4005.504608631134,
+        "n": 11347,
+        "media": 31.880138362562793,
+        "minimo": 0.52,
+        "maximo": 40.73,
+        "mediana": 32.61,
+        "p95": 34.49,
+        "p99": 36.01539999999999
+      },
+      {
+        "fila_inicial": 15044,
+        "fila_final": 15281,
+        "duracion_s": 86.11903667449951,
+        "n": 238,
+        "media": 29.436134453781513,
+        "minimo": 0.5,
+        "maximo": 36.94,
+        "mediana": 28.94,
+        "p95": 32.633,
+        "p99": 35.111
+      },
+      {
+        "fila_inicial": 15282,
+        "fila_final": 15414,
+        "duracion_s": 46.5686719417572,
+        "n": 133,
+        "media": 31.018195488721805,
+        "minimo": 0.56,
+        "maximo": 37.06,
+        "mediana": 31.18,
+        "p95": 34.578,
+        "p99": 35.5536
+      },
+      {
+        "fila_inicial": 15415,
+        "fila_final": 16175,
+        "duracion_s": 274.8341553211212,
+        "n": 761,
+        "media": 31.020341655716162,
+        "minimo": 0.54,
+        "maximo": 37.98,
+        "mediana": 30.89,
+        "p95": 34.67,
+        "p99": 36.682
+      },
+      {
+        "fila_inicial": 16176,
+        "fila_final": 19880,
+        "duracion_s": 1238.893235206604,
+        "n": 3705,
+        "media": 33.46422672064777,
+        "minimo": 0.54,
+        "maximo": 39.56,
+        "mediana": 33.7,
+        "p95": 34.748,
+        "p99": 35.949600000000004
+      },
+      {
+        "fila_inicial": 19881,
+        "fila_final": 23321,
+        "duracion_s": 1148.7073311805725,
+        "n": 3441,
+        "media": 33.73239465271723,
+        "minimo": 0.56,
+        "maximo": 37.82,
+        "mediana": 33.94,
+        "p95": 35.34,
+        "p99": 36.342
+      },
+      {
+        "fila_inicial": 23322,
+        "fila_final": 23322,
+        "duracion_s": 0.0,
+        "n": 1,
+        "media": 11.8,
+        "minimo": 11.8,
+        "maximo": 11.8,
+        "mediana": 11.8,
+        "p95": 11.8,
+        "p99": 11.8
+      }
+    ],
+    "primer_tramo_sin_primera_muestra": {
+      "n": 446,
+      "media": 34.04793721973094,
+      "minimo": 22.49,
+      "maximo": 36.63,
+      "mediana": 34.21,
+      "p95": 34.81,
+      "p99": 35.4155
+    }
+  },
+  "procesamiento_ms": {
+    "globales": {
+      "n": 59526,
+      "media": 25.699643853106206,
+      "minimo": 12.31,
+      "maximo": 3612.83,
+      "mediana": 24.2,
+      "p95": 39.1075,
+      "p99": 48.6125
+    },
+    "criterio_segmentacion": "Se abre un tramo nuevo ante un salto temporal mayor de 10 s o un retroceso del reloj. Es una separación por huecos del registro, no una identificación certificada de sesiones.",
+    "tramos": [
+      {
+        "fila_inicial": 1,
+        "fila_final": 4541,
+        "duracion_s": 155.25750541687012,
+        "n": 4541,
+        "media": 22.516591059238053,
+        "minimo": 14.05,
+        "maximo": 3612.83,
+        "mediana": 22.49,
+        "p95": 26.46,
+        "p99": 32.50800000000002
+      },
+      {
+        "fila_inicial": 4542,
+        "fila_final": 48345,
+        "duracion_s": 1484.2858955860138,
+        "n": 43804,
+        "media": 24.459723997808418,
+        "minimo": 12.31,
+        "maximo": 2901.84,
+        "mediana": 23.34,
+        "p95": 36.99,
+        "p99": 48.339700000000015
+      },
+      {
+        "fila_inicial": 48346,
+        "fila_final": 50662,
+        "duracion_s": 86.26064014434814,
+        "n": 2317,
+        "media": 33.99526974536038,
+        "minimo": 16.34,
+        "maximo": 2496.47,
+        "mediana": 31.54,
+        "p95": 47.66399999999999,
+        "p99": 54.782000000000004
+      },
+      {
+        "fila_inicial": 50663,
+        "fila_final": 51963,
+        "duracion_s": 46.77252912521362,
+        "n": 1301,
+        "media": 32.83749423520369,
+        "minimo": 15.91,
+        "maximo": 2832.09,
+        "mediana": 29.73,
+        "p95": 42.01,
+        "p99": 49.13
+      },
+      {
+        "fila_inicial": 51964,
+        "fila_final": 56141,
+        "duracion_s": 150.95699620246887,
+        "n": 4178,
+        "media": 33.204827668741025,
+        "minimo": 16.32,
+        "maximo": 2970.23,
+        "mediana": 29.835,
+        "p95": 40.592999999999996,
+        "p99": 49.13449999999994
+      },
+      {
+        "fila_inicial": 56142,
+        "fila_final": 56270,
+        "duracion_s": 4.16634202003479,
+        "n": 129,
+        "media": 30.429302325581396,
+        "minimo": 17.49,
+        "maximo": 50.71,
+        "mediana": 33.25,
+        "p95": 39.949999999999996,
+        "p99": 49.62599999999999
+      },
+      {
+        "fila_inicial": 56271,
+        "fila_final": 56782,
+        "duracion_s": 15.580647945404053,
+        "n": 512,
+        "media": 25.9280078125,
+        "minimo": 16.64,
+        "maximo": 44.86,
+        "mediana": 27.35,
+        "p95": 34.955,
+        "p99": 38.6023
+      },
+      {
+        "fila_inicial": 56783,
+        "fila_final": 58766,
+        "duracion_s": 66.35584926605225,
+        "n": 1984,
+        "media": 29.5449747983871,
+        "minimo": 17.66,
+        "maximo": 2967.88,
+        "mediana": 27.67,
+        "p95": 35.48,
+        "p99": 38.92040000000001
+      },
+      {
+        "fila_inicial": 58767,
+        "fila_final": 59526,
+        "duracion_s": 26.069568634033203,
+        "n": 760,
+        "media": 26.42009210526316,
+        "minimo": 17.42,
+        "maximo": 42.26,
+        "mediana": 27.71,
+        "p95": 34.91,
+        "p99": 37.40789999999999
+      }
+    ],
+    "primer_tramo_sin_valores_mayores_1000_ms": {
+      "n": 4539,
+      "media": 20.93508482044503,
+      "minimo": 14.05,
+      "maximo": 36.16,
+      "mediana": 22.46,
+      "p95": 26.450999999999993,
+      "p99": 32.4486
+    },
+    "valores_excluidos_comparacion_ms": [
+      3610.66,
+      3612.83
+    ]
+  }
+}
