@@ -93,7 +93,7 @@ Con `--dry-run` el lanzador muestra qué va a hacer sin instalar ni iniciar nada
 | CPU | 2 núcleos mínimo · 4 recomendados |
 | Disco | 40 GB mínimo · 60–80 GB recomendado |
 | Gráficos | Aceleración 3D habilitada, indispensable para Gazebo y RViz |
-| Cámara | Webcam integrada o USB |
+| Cámara | Webcam integrada o USB, o un teléfono con DroidCam por la red ([docs/14](docs/14-lanzador-v13.md#cámara-por-red-droidcam-o-un-teléfono)) |
 | Brazo físico (opcional) | SO-ARM100 con seis STS3215 de 7,4 V y placa Waveshare Serial Bus Servo Driver |
 
 > **ROS 2 Humble exige Ubuntu 22.04.** Ubuntu 24.04 trae Python y bibliotecas incompatibles con los binarios de Humble, y 20.04 es demasiado antiguo.
@@ -114,6 +114,7 @@ so-arm100-teleop/
 ├── teleop_vision/
 │   ├── ejecutar_v13.py            ← ejecuta v13 con las conexiones del modo elegido
 │   ├── runtime_config.py          ← tópicos y parámetros de cada modo
+│   ├── camara_red.py              ← cámara por red: DroidCam, IP Webcam, RTSP
 │   └── teleop_vision.py           ← versión anterior del nodo, previa a la entrega
 ├── scripts/
 │   ├── soarm.sh                   ← lanzador unificado: instalar, sim, real, ambos

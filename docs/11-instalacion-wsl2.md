@@ -75,6 +75,8 @@ cd ~/so-arm100-teleop && bash scripts/install.sh
 
 Esta es la parte que no tiene equivalente en las otras rutas.
 
+> **Sin webcam USB**, o para no pasar la cámara por `usbipd`, un teléfono con DroidCam sirve de cámara por la red: el lanzador acepta su URL con `--camara http://IP:4747/video`. Bajo WSL2 es la única forma de usar un teléfono, porque el cliente de DroidCam para Linux necesita un módulo del núcleo que WSL2 no trae por omisión. Véase [docs/14](14-lanzador-v13.md#cámara-por-red-droidcam-o-un-teléfono).
+
 **En Windows**, instala `usbipd-win` una sola vez:
 
 ```powershell

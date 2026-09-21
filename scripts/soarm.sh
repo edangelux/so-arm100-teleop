@@ -33,7 +33,8 @@ Opciones:
   --ws RUTA            Workspace (~/ros2_ws_entrega)
   --venv RUTA          Entorno Python (~/teleop_venv_entrega)
   --puerto RUTA        Puerto físico (/dev/ttyACM0)
-  --camara NUMERO      Cámara V4L2 (0)
+  --camara N|URL       Cámara: número de /dev/videoN (0) o URL de una cámara por red,
+                       p. ej. DroidCam: http://192.168.1.50:4747/video
   --ancho N --alto N   Resolución (640 x 480), formato MJPG
   --velocidad RAD_S   Tope de velocidad articular (8.0); rango (0, 8]
   --baud N            Bus serie (1000000)
@@ -75,7 +76,7 @@ case "$ACTION" in
     instalar|sim|real|ambos|verificar) ;;
     *) die "Modo desconocido: $ACTION";;
 esac
-[[ "$CAMERA" =~ ^[0-9]+$ ]] || die 'Índice de cámara inválido.'
+[[ "$CAMERA" =~ ^[0-9]+$ || "$CAMERA" =~ ^(https?|rtsp):// ]] || die 'Cámara inválida: debe ser un número de /dev/video o una URL http:// o rtsp://.'
 for value in "$WIDTH" "$HEIGHT" "$BAUD" "$SERVO_SPEED" "$SERVO_ACCEL"; do
     [[ "$value" =~ ^[1-9][0-9]*$ ]] || die 'Los parámetros numéricos deben ser enteros positivos.'
 done
@@ -83,7 +84,11 @@ done
 awk -v v="$VELOCITY" 'BEGIN {exit !(v>0 && v<=8)}' || die 'Velocidad fuera de (0, 8].'
 plan() {
     printf 'Modo: %s\nWorkspace: %s\nPython: %s/bin/python\nV13: %s/entrega/teleoperacion/teleop_v13.py\n' "$ACTION" "$WS" "$VENV" "$REPO"
-    printf 'Cámara: %s, MJPG %sx%s; velocidad máxima: %s rad/s\n' "$CAMERA" "$WIDTH" "$HEIGHT" "$VELOCITY"
+    if [[ "$CAMERA" =~ ^[0-9]+$ ]]; then
+        printf 'Cámara: /dev/video%s, MJPG %sx%s; velocidad máxima: %s rad/s\n' "$CAMERA" "$WIDTH" "$HEIGHT" "$VELOCITY"
+    else
+        printf 'Cámara por red: %s, redimensionada a %sx%s; velocidad máxima: %s rad/s\n' "$CAMERA" "$WIDTH" "$HEIGHT" "$VELOCITY"
+    fi
     case "$ACTION" in
         instalar) printf 'Plan: ROS 2 + Gazebo + entorno Python + fuentes + rosdep + colcon.\n';;
         sim) printf 'Brazo: /arm_controller/joint_trajectory\nPinza: /gripper_controller/gripper_cmd\n';;
@@ -96,6 +101,12 @@ plan
 [[ "$DRY" -eq 0 ]] || exit 0
 [[ "$(uname -s)" == Linux ]] || die 'Este lanzador requiere Linux o WSL2; Git Bash no ejecuta ROS 2.'
 [[ "$EUID" -ne 0 ]] || die 'Ejecute el lanzador como usuario normal con sudo, no como root.'
+check_camera_url() {
+    # Un flujo MJPEG no termina nunca: se lee durante 3 s y basta con que lleguen datos.
+    local bytes
+    bytes="$(curl -s --max-time 3 -o /dev/null -w '%{size_download}' "$CAMERA" 2>/dev/null || true)"
+    [[ "${bytes:-0}" =~ ^[0-9]+$ && "${bytes:-0}" -gt 0 ]]
+}
 load_ros() {
     [[ -f /opt/ros/humble/setup.bash ]] || die 'No se encontró ROS 2 Humble.'
     set +u
@@ -110,7 +121,7 @@ if [[ "$ACTION" == instalar ]]; then
     python3 "$REPO/scripts/preparar_workspace.py" "$REPO/entrega/src" "$WS"
     if [[ ! -f /opt/ros/humble/setup.bash ]]; then bash "$REPO/scripts/01_ros2_humble.sh"; fi
     bash "$REPO/scripts/02_simulacion.sh"
-    sudo apt-get install -y python3-venv python3-pip python3-colcon-common-extensions python3-rosdep libyaml-cpp-dev libportaudio2 v4l-utils build-essential
+    sudo apt-get install -y python3-venv python3-pip python3-colcon-common-extensions python3-rosdep libyaml-cpp-dev libportaudio2 v4l-utils build-essential curl
     if [[ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]]; then sudo rosdep init; fi
     rosdep update
     [[ ! -e "$VENV" || -f "$VENV/pyvenv.cfg" ]] || die 'La ruta del entorno existe y no es un entorno virtual.'
@@ -137,10 +148,15 @@ if [[ "$ACTION" == verificar ]]; then
     ros2 pkg prefix so_arm_100_bringup
     ros2 pkg prefix so_arm_100_hardware
     ros2 pkg prefix trajectory_mirror
-    ls -l "/dev/video$CAMERA" "$PORT" 2>/dev/null || true
+    if [[ "$CAMERA" =~ ^[0-9]+$ ]]; then ls -l "/dev/video$CAMERA" 2>/dev/null || true; else check_camera_url && echo "Cámara por red accesible: $CAMERA"; fi
+    ls -l "$PORT" 2>/dev/null || true
     exit 0
 fi
-[[ -r "/dev/video$CAMERA" && -w "/dev/video$CAMERA" ]] || die "Cámara inaccesible: /dev/video$CAMERA. Revise la conexión USB (o USB/IP en WSL2) y el grupo video."
+if [[ "$CAMERA" =~ ^[0-9]+$ ]]; then
+    [[ -r "/dev/video$CAMERA" && -w "/dev/video$CAMERA" ]] || die "Cámara inaccesible: /dev/video$CAMERA. Revise la conexión USB (o USB/IP en WSL2) y el grupo video."
+else
+    check_camera_url || die "Cámara por red inaccesible: $CAMERA. Compruebe que la aplicación del teléfono está abierta, que ambos equipos están en la misma red y que ningún navegador tiene el video abierto."
+fi
 if [[ "$ACTION" != sim ]]; then
     [[ -c "$PORT" && -r "$PORT" && -w "$PORT" ]] || die "Puerto inaccesible: $PORT. Revise la conexión USB (o USB/IP en WSL2) y el grupo dialout."
 fi

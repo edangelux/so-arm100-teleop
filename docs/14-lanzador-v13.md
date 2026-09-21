@@ -42,7 +42,7 @@ No se levanta MoveIt: la teleoperación de la versión 13 es articular directa y
 | Opción | Por omisión | Qué cambia |
 |---|---|---|
 | `--puerto RUTA` | `/dev/ttyACM0` | Puerto serie de la placa de servos |
-| `--camara N` | `0` | Índice de la cámara (`/dev/videoN`) |
+| `--camara N\|URL` | `0` | Número de la cámara (`/dev/videoN`) o URL de una cámara por red, como DroidCam; véase [Cámara por red](#cámara-por-red-droidcam-o-un-teléfono) |
 | `--ancho N --alto N` | `640 480` | Resolución de captura, en formato MJPG |
 | `--velocidad RAD_S` | `8.0` | Tope de velocidad articular, entre 0 y 8 rad/s |
 | `--baud N` | `1000000` | Velocidad del bus serie |
@@ -54,6 +54,53 @@ No se levanta MoveIt: la teleoperación de la versión 13 es articular directa y
 | `--dry-run` | — | Muestra el plan sin instalar ni iniciar nada |
 
 Los valores por omisión son los que se usaron en la defensa. `--velocidad` es el único que conviene cambiar antes de conectar el brazo por primera vez: un valor de 0,5 a 1,0 rad/s atenúa el riesgo del bloqueo 6 de [docs/09](09-robot-fisico.md). Es un ajuste recomendado, no uno que se haya validado con el brazo.
+
+## Cámara por red: DroidCam o un teléfono
+
+El sistema no necesita una webcam conectada al equipo. Cualquier teléfono con **DroidCam** (Android o iPhone) o con **IP Webcam** (Android) sirve de cámara por la red, y es la única vía para usar un teléfono bajo WSL2, donde el cliente de DroidCam para Linux no puede crear un `/dev/video` porque el núcleo de WSL2 no trae por omisión el módulo que necesita.
+
+**1. En el teléfono.** Se instala DroidCam desde la tienda de aplicaciones y se abre. La pantalla muestra la dirección **WiFi IP** y el **puerto**, 4747 por omisión. El teléfono y el equipo tienen que estar en la misma red WiFi.
+
+**2. Comprobar la dirección en el navegador** del equipo:
+
+```text
+http://192.168.1.50:4747/video
+```
+
+con la IP que muestra el teléfono. Tiene que verse el video. **Después se cierra esa pestaña**: DroidCam sólo atiende a un cliente a la vez, y con el navegador conectado el sistema no podría abrirla.
+
+**3. Lanzar con la URL:**
+
+```bash
+bash scripts/soarm.sh verificar --camara http://192.168.1.50:4747/video
+bash scripts/soarm.sh sim       --camara http://192.168.1.50:4747/video
+bash scripts/soarm.sh real      --camara http://192.168.1.50:4747/video --puerto /dev/ttyACM0 --velocidad 0.5
+bash scripts/soarm.sh ambos     --camara http://192.168.1.50:4747/video --puerto /dev/ttyACM0 --velocidad 0.5
+```
+
+Antes de arrancar, el lanzador comprueba durante 3 s que llegan datos de esa dirección y, si no llegan, se detiene con un mensaje en lugar de abrir una ventana negra.
+
+**Por cable USB, sin WiFi** (Android, en Ubuntu nativo): se activa la depuración USB en el teléfono, y en Ubuntu:
+
+```bash
+sudo apt install -y adb
+adb forward tcp:4747 tcp:4747
+bash scripts/soarm.sh sim --camara http://127.0.0.1:4747/video
+```
+
+Con **IP Webcam** la dirección es `http://IP:8080/video`. Con cualquier cámara IP que publique MJPEG o RTSP, su URL `http://…` o `rtsp://…`.
+
+**Colocación.** El teléfono se fija en horizontal, en un soporte o trípode, a la altura del pecho y a 60–100 cm del operador. Si se mueve durante la sesión, la calibración con `C` deja de valer.
+
+### Cómo funciona
+
+`teleop_v13.py` abre la cámara con el backend V4L2, que sólo admite dispositivos `/dev/videoN`. Cuando `--camara` es una URL, `ejecutar_v13.py` le entrega a la versión 13 un módulo `cv2` intermediario ([`teleop_vision/camara_red.py`](../teleop_vision/camara_red.py)) que sólo cambia `VideoCapture`: abre la URL y lee en un hilo aparte conservando **únicamente el fotograma más reciente**. Sin ese hilo, OpenCV acumula fotogramas en su búfer y la imagen se retrasa cada vez más respecto del operador. Todo lo demás llega a la versión 13 sin cambios, y el archivo presentado no se modifica.
+
+Se comprobó contra un servidor que imita el flujo de DroidCam a 1280×720 y 30 FPS: 60 lecturas seguidas sin fotogramas repetidos, entrega del fotograma más reciente con 0 o 1 de retraso tras pausas de 0,7 s, redimensionado a 640×480 y cierre limpio de la teleoperación 5 s después de cortarse el flujo. **No se ha probado todavía con DroidCam real.**
+
+### Lo que cambia en las mediciones
+
+La latencia que registra la versión 13 empieza a contar cuando el fotograma ya llegó al equipo. Con una cámara por red, **el tiempo que el teléfono tarda en codificar y enviar la imagen por WiFi no queda registrado**, y suele ser de varias decenas de milisegundos. Por eso las cifras de `~/latency_log.csv` obtenidas con DroidCam no son comparables con los 21,87 ms del proyecto, medidos con una webcam USB, y no deben mezclarse con ellas. Para la teleoperación en sí no es un problema: el umbral de 150 ms deja margen de sobra.
 
 ## Comprobaciones
 
@@ -71,6 +118,7 @@ Los registros de cada sesión quedan en `~/.local/state/soarm/`, un directorio p
 | `scripts/soarm.sh` | Valida las opciones, instala o levanta los procesos, espera a los controladores y cierra todo al salir |
 | `teleop_vision/ejecutar_v13.py` | Carga `entrega/teleoperacion/teleop_v13.py` y sustituye, antes de arrancar, sus constantes de conexión |
 | `teleop_vision/runtime_config.py` | Traduce el modo elegido a tópico, acción, cámara, resolución, velocidad y archivo de configuración |
+| `teleop_vision/camara_red.py` | Cámara por red para DroidCam o IP Webcam: lee la URL en un hilo y entrega siempre el fotograma más reciente |
 | `scripts/preparar_workspace.py` | Copia las fuentes al workspace sin sobrescribir cambios locales |
 | `scripts/07_restaurar_entrega.sh` | Reconstruye el workspace de la entrega en una ruta nueva, sin iniciar el hardware |
 
@@ -84,6 +132,7 @@ El envoltorio sólo cambia siete constantes de `teleop_v13.py`: `ARM_TOPIC`, `GR
 
 Depende de cómo corre Ubuntu:
 
+- **Sin webcam en el equipo:** se usa un teléfono como cámara por la red, con la [sección de DroidCam](#cámara-por-red-droidcam-o-un-teléfono). En todos los pasos se agrega `--camara http://IP:4747/video` a las órdenes de `soarm.sh`, y en el paso 3 se omite `/dev/video*` en el `ls`.
 - **Instalación nativa:** no hay que hacer nada.
 - **VirtualBox:** en el menú de la máquina virtual, **Dispositivos → Webcams →** la cámara, y **Dispositivos → USB →** la placa de servos.
 - **WSL2:** en PowerShell **como administrador**, con la cámara y la placa conectadas ([docs/11](11-instalacion-wsl2.md)):
@@ -214,7 +263,8 @@ El archivo `.tar.gz` contiene los registros de cada proceso de cada sesión. Con
 
 | Mensaje | Causa probable | Qué hacer |
 |---|---|---|
-| `Cámara inaccesible: /dev/video0` | Falta pasar la cámara, o no se cerró sesión tras la instalación | Paso 0 y `groups` del paso 3 |
+| `Cámara inaccesible: /dev/video0` | Falta pasar la cámara, o no se cerró sesión tras la instalación | Paso 0 y `groups` del paso 3. Sin webcam, usar un teléfono: [Cámara por red](#cámara-por-red-droidcam-o-un-teléfono) |
+| `Cámara por red inaccesible` | La aplicación del teléfono está cerrada, el equipo está en otra red o un navegador tiene el video abierto | Abrir la URL en el navegador, comprobar que se ve y cerrar la pestaña |
 | `Puerto inaccesible: /dev/ttyACM0` | Falta pasar la placa, falta el grupo `dialout`, o la placa enumeró con otro nombre | `ls /dev/ttyACM* /dev/ttyUSB*` y usar el nombre que aparezca en `--puerto` |
 | `Los controladores de … no se activaron en 120 s` | Gazebo o el hardware no terminaron de arrancar | Leer `gazebo.log` o `hardware.log` en la carpeta de registros que indica el mensaje |
 | `Un componente se detuvo; se cierra la sesión` | Un proceso terminó con error | El registro de ese proceso, en la misma carpeta |
