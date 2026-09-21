@@ -1,6 +1,6 @@
 # 14 — Lanzador unificado de la versión presentada
 
-[← Anterior: cierre del proyecto](12-cierre-del-proyecto.md) · [Volver al inicio](../README.md)
+[← Anterior: cierre del proyecto](12-cierre-del-proyecto.md) · [Volver al inicio](../README.md) · [Siguiente: v14, MoveIt y posturas seguras →](15-v14-moveit-y-posturas-seguras.md)
 
 ---
 
@@ -33,9 +33,11 @@ bash scripts/soarm.sh ambos --puerto /dev/ttyACM0      # las dos plantas a la ve
 | `real` | Hardware bajo `/real` | `/real/arm_controller/joint_trajectory` | `/real/gripper_controller/gripper_cmd` |
 | `ambos` | Gazebo, hardware y los dos nodos espejo | `/arm_controller/joint_trajectory`, replicado a `/real` | `/mirror_gripper_controller/gripper_cmd` |
 
-En cada modo el lanzador **espera a que los controladores estén activos** antes de abrir la teleoperación; en `ambos` espera además a que aparezca la acción espejo de la pinza. Si un componente se detiene, cierra la sesión entera. Al salir con `Q` en la ventana de visión, o con `Ctrl+C` en la terminal, termina todos los procesos que inició.
+En cada modo el lanzador **espera a que los controladores estén activos** antes de abrir la teleoperación; en `ambos` espera además a que aparezca la acción espejo de la pinza. Si un componente se detiene, cierra la sesión entera.
 
-No se levanta MoveIt: la teleoperación de la versión 13 es articular directa y no pasa por el planificador.
+**Cierre.** `Q` en la ventana de visión cierra sólo la teleoperación: el lanzador lleva el brazo a la postura `init` a 0,5 rad/s y deja la sesión abierta con tres opciones en la terminal: `Enter` reabre la teleoperación, `h` lleva el brazo a `home` y apaga, y `x` apaga sin mover. `Ctrl+C` apaga en el acto sin mover nada; como el controlador desactiva el par de los servos al cerrarse, el brazo cae si no está en `home` o sostenido. Las posturas y el motivo de cada una están en [docs/15](15-v14-moveit-y-posturas-seguras.md).
+
+Por omisión no se levanta MoveIt, porque la teleoperación de la versión 13 es articular directa y no pasa por el planificador. Con `--moveit` se abren además MoveIt 2 y RViz, y con `--v14` se usa la versión que arranca y reanuda desde la postura medida del brazo; las dos cosas se explican en [docs/15](15-v14-moveit-y-posturas-seguras.md).
 
 ## Opciones
 
@@ -50,7 +52,9 @@ No se levanta MoveIt: la teleoperación de la versión 13 es articular directa y
 | `--servo-accel N` | `50` | Aceleración interna del servo |
 | `--config RUTA` | `~/teleop_config.json` | Signos y ganancias guardados con `S` |
 | `--ws RUTA` · `--venv RUTA` | `~/ros2_ws_entrega` · `~/teleop_venv_entrega` | Workspace y entorno de Python |
-| `--software-gl` | — | Renderizado por software, para máquinas virtuales sin aceleración 3D |
+| `--software-gl` | — | Renderizado por software, para máquinas virtuales sin aceleración 3D y **obligatorio bajo WSL2** (véase [WSL2](#bajo-wsl2)) |
+| `--v14` | — | Usa `teleop_v14.py` en lugar de la versión presentada; [docs/15](15-v14-moveit-y-posturas-seguras.md) |
+| `--moveit` | — | Abre MoveIt 2 y RViz junto con la teleoperación; [docs/15](15-v14-moveit-y-posturas-seguras.md) |
 | `--dry-run` | — | Muestra el plan sin instalar ni iniciar nada |
 
 Los valores por omisión son los que se usaron en la defensa. `--velocidad` es el único que conviene cambiar antes de conectar el brazo por primera vez: un valor de 0,5 a 1,0 rad/s atenúa el riesgo del bloqueo 6 de [docs/09](09-robot-fisico.md). Es un ajuste recomendado, no uno que se haya validado con el brazo.
@@ -271,12 +275,35 @@ El archivo `.tar.gz` contiene los registros de cada proceso de cada sesión. Con
 | `La acción espejo de la pinza no apareció en 30 s` | `trajectory_mirror_node` no arrancó | `espejo_acciones.log` |
 | `Error al abrir el puerto /dev/ttyACM0` en `list_servos` | ROS todavía tiene el puerto abierto | Cerrar el lanzador con `Q` o `Ctrl+C` antes de usar las utilidades |
 | Gazebo en blanco en VirtualBox | Sin aceleración 3D | Agregar `--software-gl` |
+| Gazebo se abre y se cierra al instante; `gazebo.log` termina en `process has finished cleanly` tras `Loading controller_manager` | Bajo WSL2 el motor gráfico por omisión no puede crear la ventana, y al cerrarse la ventana Gazebo apaga la simulación | Agregar `--software-gl` |
+| `Cámara por red: … respondió «text/html» en lugar de video` | DroidCam ya atiende a otro cliente: el cliente de Windows o una pestaña del navegador con el video | Cerrar ese cliente, esperar unos segundos y relanzar |
+| `ir_a_pose: No llegaron estados articulares` | El controlador de esa planta no está publicando `joint_states` | El brazo no se mueve; revisar `hardware.log` o `gazebo.log` |
 | El brazo se mueve al revés en una articulación | Signo del operador o de la cámara | Tecla `1`–`5` y `S` para guardar; véase [docs/05](05-ejecucion.md) |
 
 ---
+
+## Bajo WSL2
+
+La primera ejecución completa del lanzador se hizo el 21 de septiembre de 2026 en Windows con WSL2, Ubuntu 22.04 y un teléfono con DroidCam como cámara. Dejó tres requisitos propios de ese entorno:
+
+1. **`--software-gl` en los modos `sim` y `ambos`.** El motor gráfico Ogre2 de Gazebo Fortress no logra crear su ventana con el OpenGL de WSLg. La ventana se cierra en el acto y, con ella, la simulación: el registro sólo muestra `process has finished cleanly`, sin error. Con renderizado por software funciona.
+2. **Un solo cliente de DroidCam a la vez.** Mientras el cliente de Windows o una pestaña del navegador tengan el video abierto, el teléfono responde a cualquier otro programa con una página de texto. El lanzador lo detecta y lo informa.
+3. **La cámara por red se lee sin FFmpeg.** El lector FFmpeg de las ruedas de OpenCV rechazaba la dirección de DroidCam bajo WSL2 sin indicar el motivo. `teleop_vision/camara_red.py` lee el flujo MJPEG directamente: corta el flujo por las marcas de inicio (`FF D8`) y fin (`FF D9`) de cada JPEG y decodifica cada imagen con `cv2.imdecode`.
+
+La secuencia de órdenes para WSL2 queda así:
+
+```bash
+source ~/.soarm_env                       # CAM=http://IP:4747/video
+cd ~/so-arm100-teleop
+bash scripts/soarm.sh sim   --camara "$CAM" --software-gl
+bash scripts/soarm.sh real  --camara "$CAM" --puerto /dev/ttyACM0 --velocidad 0.5
+bash scripts/soarm.sh ambos --camara "$CAM" --puerto /dev/ttyACM0 --software-gl
+```
 
 ## Alcance de lo verificado
 
 El lanzador se probó en sus cuatro modos con `--dry-run`, con entradas inválidas y con la selección de tópicos de cada modo, y se comprobó que el envoltorio localiza el `teleop_v13.py` original. Esa revisión encontró y corrigió un defecto que habría detenido los tres modos: Humble imprime códigos de color al inicio de cada línea de `ros2 control list_controllers`, y la espera de controladores no reconocía la línea del controlador activo. Ahora los quita antes de buscar y acepta los dos formatos de salida de Humble.
 
-**Pendiente:** la primera ejecución completa de la [secuencia de comprobación](#secuencia-completa-de-puesta-en-marcha-y-comprobación) con el brazo físico. La secuencia que el lanzador automatiza es la de la defensa, pero el guion en sí no existía en el equipo de la entrega. Cuando se complete, aquí se registran la fecha, el sistema en que corrió y los registros guardados en `pruebas/`.
+**Primera ejecución completa: 21 de septiembre de 2026, WSL2.** La instalación desde cero, la simulación y la operación del brazo físico funcionaron con el lanzador. Esa ejecución encontró tres defectos, ya corregidos: la instalación comprobaba `rclpy` antes de cargar ROS y se detenía; la comprobación de la cámara por red aceptaba la página de «ocupado» de DroidCam como si fuera video; y el lector FFmpeg de OpenCV no abría el flujo de DroidCam. Los requisitos de ese entorno están en [Bajo WSL2](#bajo-wsl2).
+
+**Pendiente:** archivar en `pruebas/` los registros de esas sesiones (`~/.local/state/soarm/sesion-*`) y repetir la secuencia en Ubuntu nativo. El cierre hacia `init`, el apagado en `home`, `--v14` y `--moveit` son posteriores a esa ejecución y todavía no se han probado; su estado está en [docs/15](15-v14-moveit-y-posturas-seguras.md).

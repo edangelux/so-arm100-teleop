@@ -17,11 +17,14 @@ SERVO_ACCEL="${SOARM_SERVO_ACCEL:-50}"
 CONFIG="${SOARM_CONFIG:-$HOME/teleop_config.json}"
 DRY=0
 SOFTWARE_GL=0
+VERSION=13
+MOVEIT=0
+RETURN_VEL="${SOARM_RETURN_VEL:-0.5}"
 ACTION="${1:-ayuda}"
 [[ $# -eq 0 ]] || shift
 help_text() {
     cat <<'HELP'
-SO-ARM100 — teleoperación gestual, versión 13 (la presentada en la defensa)
+SO-ARM100 — teleoperación gestual: versión 13 (la presentada en la defensa) o 14
 
   bash scripts/soarm.sh instalar [--ws RUTA] [--venv RUTA]
   bash scripts/soarm.sh sim     [opciones]
@@ -42,11 +45,16 @@ Opciones:
   --servo-accel N     Aceleración del servo (50)
   --config RUTA       Signos/ganancias (~/teleop_config.json)
   --software-gl       Renderizado por software, para máquinas virtuales sin aceleración
+  --v14               Usa teleop_v14.py: arranca y reanuda desde la postura medida
+  --moveit            Abre además MoveIt 2 y RViz (pausar con P antes de planificar)
   --dry-run           Muestra el plan sin instalar ni iniciar procesos
 
 El algoritmo de v13 no se modifica: filtros, signos, calibración y horizonte de 40 ms.
+v14 conserva ese algoritmo y sólo cambia el arranque y la reanudación (docs/15).
 Puesta a cero y límites conocidos: docs/09-robot-fisico.md.
-La sesión se cierra con Q en la ventana de visión o con Ctrl+C en esta terminal.
+Q en la ventana de visión cierra la teleoperación y lleva el brazo a init; después
+esta terminal ofrece reabrirla, llevarlo a home y apagar, o apagar sin mover.
+Ctrl+C apaga en el acto, sin mover el brazo: al perder el par, el brazo cae.
 Requiere Ubuntu 22.04 con ROS 2 Humble (nativo, máquina virtual o WSL2).
 HELP
 }
@@ -66,6 +74,8 @@ while [[ $# -gt 0 ]]; do
         --servo-accel) need_value "$@"; SERVO_ACCEL="$2"; shift 2;;
         --config) need_value "$@"; CONFIG="$2"; shift 2;;
         --software-gl) SOFTWARE_GL=1; shift;;
+        --v14) VERSION=14; shift;;
+        --moveit) MOVEIT=1; shift;;
         --dry-run) DRY=1; shift;;
         --help|-h) help_text; exit 0;;
         *) die "Opción desconocida: $1";;
@@ -83,7 +93,7 @@ done
 [[ "$VELOCITY" =~ ^([0-9]+([.][0-9]*)?|[.][0-9]+)$ ]] || die 'Velocidad inválida.'
 awk -v v="$VELOCITY" 'BEGIN {exit !(v>0 && v<=8)}' || die 'Velocidad fuera de (0, 8].'
 plan() {
-    printf 'Modo: %s\nWorkspace: %s\nPython: %s/bin/python\nV13: %s/entrega/teleoperacion/teleop_v13.py\n' "$ACTION" "$WS" "$VENV" "$REPO"
+    printf 'Modo: %s\nWorkspace: %s\nPython: %s/bin/python\nTeleoperación: v%s\n' "$ACTION" "$WS" "$VENV" "$VERSION"
     if [[ "$CAMERA" =~ ^[0-9]+$ ]]; then
         printf 'Cámara: /dev/video%s, MJPG %sx%s; velocidad máxima: %s rad/s\n' "$CAMERA" "$WIDTH" "$HEIGHT" "$VELOCITY"
     else
@@ -96,6 +106,7 @@ plan() {
         ambos) printf 'Brazo: /arm_controller/joint_trajectory + topic_mirror\nPinza: /mirror_gripper_controller/gripper_cmd\n';;
     esac
     [[ "$ACTION" != real && "$ACTION" != ambos ]] || printf 'Puerto: %s; baud: %s; servo-speed: %s; servo-accel: %s\n' "$PORT" "$BAUD" "$SERVO_SPEED" "$SERVO_ACCEL"
+    [[ "$MOVEIT" -eq 0 ]] || printf 'MoveIt 2 + RViz: sí (scripts/moveit/moveit_soarm.launch.py modo:=%s)\n' "$ACTION"
 }
 plan
 [[ "$DRY" -eq 0 ]] || exit 0
@@ -175,11 +186,15 @@ exec 9>"$RUN_BASE/session.lock"
 flock -n 9 || die 'Ya hay otra sesión del lanzador abierta para este usuario.'
 RUN_DIR="$(mktemp -d "$RUN_BASE/sesion-$(date +%Y%m%d-%H%M%S)-XXXXXX")"
 pids=()
+aux_pids=()
+vision_pid=''
 cleanup() {
     trap - EXIT INT TERM
-    for pid in "${pids[@]}"; do kill -INT -- "-$pid" 2>/dev/null || true; done
+    local all=("${pids[@]}" "${aux_pids[@]}")
+    [[ -z "$vision_pid" ]] || all+=("$vision_pid")
+    for pid in "${all[@]}"; do kill -INT -- "-$pid" 2>/dev/null || true; done
     sleep 2
-    for pid in "${pids[@]}"; do kill -TERM -- "-$pid" 2>/dev/null || true; done
+    for pid in "${all[@]}"; do kill -TERM -- "-$pid" 2>/dev/null || true; done
     printf '\nProcesos de esta sesión cerrados. Registros: %s\n' "$RUN_DIR"
 }
 trap cleanup EXIT
@@ -189,6 +204,21 @@ start() {
     local name="$1"; shift
     setsid "$@" >"$RUN_DIR/$name.log" 2>&1 &
     pids+=("$!")
+}
+start_aux() {
+    local name="$1"; shift
+    setsid "$@" >"$RUN_DIR/$name.log" 2>&1 &
+    aux_pids+=("$!")
+}
+check_aux() {
+    local pid
+    for pid in "${aux_pids[@]}"; do
+        if ! kill -0 "$pid" 2>/dev/null; then
+            printf 'AVISO: MoveIt/RViz se cerró; la teleoperación sigue. Registros: %s\n' "$RUN_DIR"
+            aux_pids=()
+            return
+        fi
+    done
 }
 alive() { for pid in "${pids[@]}"; do kill -0 "$pid" 2>/dev/null || die "Un proceso terminó de forma inesperada. Registros: $RUN_DIR"; done; }
 wait_controllers() {
@@ -223,13 +253,58 @@ if [[ "$ACTION" == ambos ]]; then
         sleep 1
     done
 fi
-printf 'Teleoperación iniciada. C: referencia gestual; P: pausa; Q: salir. Registros: %s\n' "$RUN_DIR"
-start vision "$VENV/bin/python" "$REPO/teleop_vision/ejecutar_v13.py"
-vision_pid="${pids[${#pids[@]}-1]}"
-while kill -0 "$vision_pid" 2>/dev/null; do
-    for pid in "${pids[@]}"; do
-        [[ "$pid" == "$vision_pid" ]] || kill -0 "$pid" 2>/dev/null || die "Un componente se detuvo; se cierra la sesión. Registros: $RUN_DIR"
+if [[ "$MOVEIT" -eq 1 ]]; then
+    # MoveIt es auxiliar: si se cierra (por ejemplo, RViz), la teleoperación sigue.
+    start_aux moveit ros2 launch "$REPO/scripts/moveit/moveit_soarm.launch.py" "modo:=$ACTION"
+    printf 'MoveIt 2 y RViz abiertos. Pause la teleoperación con P antes de ejecutar un plan.\n'
+fi
+case "$ACTION" in
+    sim)   POSE_TOPICS=(--topico /arm_controller/joint_trajectory); POSE_STATES=/joint_states;;
+    real)  POSE_TOPICS=(--topico /real/arm_controller/joint_trajectory); POSE_STATES=/real/joint_states;;
+    ambos) POSE_TOPICS=(--topico /arm_controller/joint_trajectory --topico /real/arm_controller/joint_trajectory)
+           POSE_STATES=/real/joint_states;;
+esac
+go_pose() {
+    # Devuelve 0 si llegó; distinto de 0 si no pudo mover o no llegó.
+    timeout 90 python3 "$REPO/scripts/ir_a_pose.py" "$1" "${POSE_TOPICS[@]}" \
+        --estados "$POSE_STATES" --velocidad "$RETURN_VEL"
+}
+start_vision() {
+    local runner="$REPO/teleop_vision/ejecutar_v13.py"
+    [[ "$VERSION" -eq 13 ]] || runner="$REPO/teleop_vision/ejecutar_v14.py"
+    setsid "$VENV/bin/python" "$runner" >>"$RUN_DIR/vision.log" 2>&1 &
+    vision_pid=$!
+    printf 'Teleoperación v%s iniciada. C: referencia gestual; P: pausa; Q: cerrar y volver a init. Registros: %s\n' "$VERSION" "$RUN_DIR"
+}
+session_menu() {
+    local answer
+    printf '\n[Enter] reabrir la teleoperación   [h] llevar a home y apagar   [x] apagar sin mover\n> '
+    while true; do
+        alive
+        check_aux
+        if read -r -t 1 answer; then
+            case "${answer,,}" in
+                '') return 0;;
+                h) if go_pose home; then
+                       printf 'Brazo en home. Se apaga la sesión.\n'; exit 0
+                   fi
+                   printf 'No se pudo llevar el brazo a home. Sosténgalo y elija [x] para apagar, o reintente [h].\n> ';;
+                x) printf 'Apagando sin mover: el brazo pierde el par.\n'; exit 0;;
+                *) printf 'Opción no válida.\n> ';;
+            esac
+        fi
     done
-    sleep 1
+}
+while true; do
+    start_vision
+    while kill -0 "$vision_pid" 2>/dev/null; do
+        alive
+        check_aux
+        sleep 1
+    done
+    wait "$vision_pid" || printf 'La teleoperación terminó con error; vea %s/vision.log\n' "$RUN_DIR"
+    vision_pid=''
+    printf 'Teleoperación cerrada. Llevando el brazo a init a %s rad/s...\n' "$RETURN_VEL"
+    go_pose init || printf 'AVISO: el brazo no llegó a init. Revise su postura antes de reabrir.\n'
+    session_menu
 done
-wait "$vision_pid"

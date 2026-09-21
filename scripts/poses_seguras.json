@@ -1,0 +1,5 @@
+{
+  "_nota": "Posturas en radianes, en el orden Shoulder_Rotation, Shoulder_Pitch, Elbow, Wrist_Pitch, Wrist_Roll. init y home son las mismas que declara so_arm_100.srdf. home debe comprobarse primero en Gazebo: es la postura de reposo en la que el brazo puede quedar sin par al apagar.",
+  "init": [0.0, 0.0, 0.0, 0.0, 0.0],
+  "home": [0.0, -1.4, 1.4, 1.0, 1.5708]
+}

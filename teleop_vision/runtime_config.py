@@ -1,4 +1,6 @@
-"""Selecciona las conexiones de teleop_v13.py según el modo: sim, real o ambos."""
+"""Selecciona las conexiones de teleop_v13.py y teleop_v14.py según el modo: sim, real o ambos.
+
+JOINT_STATES_TOPIC sólo lo usa v14; en v13 queda como un atributo más sin efecto."""
 import math
 import os
 from pathlib import Path
@@ -15,6 +17,9 @@ def settings(env=None):
         'ambos': ('/arm_controller/joint_trajectory', '/mirror_gripper_controller/gripper_cmd'),
     }
     arm, gripper = defaults[mode]
+    # Estados articulares con los que v14 sincroniza su primera orden: los del
+    # brazo físico cuando lo hay, porque es el que puede dar un tirón.
+    joint_states = '/joint_states' if mode == 'sim' else '/real/joint_states'
     velocity = float(env.get('SOARM_MAX_VEL', '8.0'))
     camera_raw = env.get('SOARM_CAMERA', '0').strip()
     if camera_raw.isdigit():
@@ -31,4 +36,5 @@ def settings(env=None):
         raise ValueError('Cámara o resolución inválida.')
     return dict(ARM_TOPIC=arm, GRIPPER_ACTION=gripper, CAMERA_INDEX=camera,
                 CAMERA_WIDTH=width, CAMERA_HEIGHT=height, MAX_JOINT_VEL=velocity,
-                CONFIG_FILE=str(Path(env.get('SOARM_CONFIG', '~/teleop_config.json')).expanduser()))
+                CONFIG_FILE=str(Path(env.get('SOARM_CONFIG', '~/teleop_config.json')).expanduser()),
+                JOINT_STATES_TOPIC=joint_states)
