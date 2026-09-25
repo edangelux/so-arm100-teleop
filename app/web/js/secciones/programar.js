@@ -636,8 +636,7 @@ const seccion = {
 
   // ------------------------------------------------------------ destino
   sesionLista() {
-    const e = this.app.estado;
-    return !!(e && e.ros.disponible && e.sesion.estado === 'menu' && this.app.fuenteViva());
+    return this.app.diagnosticoBrazo().listo;
   },
 
   fijarDestino(d) {
@@ -656,7 +655,7 @@ const seccion = {
       msg = `Se moverá ${m === 'sim' ? 'el robot de Gazebo' : m === 'real' ? 'el brazo físico' : 'el brazo físico y Gazebo'}. Verifique antes y tenga a mano la fuente.`;
       tipo = 'ok';
     } else {
-      msg = 'Para mover el brazo o Gazebo: en Sesión pulse Iniciar y luego «Cerrar teleoperación». Cuando el brazo quede en init, vuelva aquí.';
+      msg = this.app.diagnosticoBrazo().motivo;
       tipo = 'aviso';
     }
     this.notaDestino.className = `mensaje ${tipo}`;
@@ -750,7 +749,7 @@ const seccion = {
     if (this.corriendo) return;
     if (this.analisis.errores.length) return aviso('Corrija los errores del programa antes de ejecutarlo.', 'mal');
     if (this.destino === 'robot') {
-      if (!this.sesionLista()) return aviso('Para mover el brazo o Gazebo hace falta una sesión con la teleoperación cerrada (estado «en init»).', 'mal');
+      if (!this.sesionLista()) return aviso(this.app.diagnosticoBrazo().motivo, 'mal');
       if (!(await this.verificar({ silencioso: true }))) return aviso('La verificación encontró un problema; revise la consola.', 'mal');
       const m = this.app.estado.sesion.modo;
       const ok = await confirmar('Ejecutar en el robot', `El programa moverá ${m === 'sim' ? 'el robot de Gazebo' : '<b>el brazo físico</b>'} a ${Math.round(this.override * 100)} % de velocidad. Deje libre el espacio de trabajo y tenga a mano el interruptor de la fuente.`, { aceptar: 'Ejecutar' });

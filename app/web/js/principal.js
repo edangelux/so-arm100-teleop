@@ -66,6 +66,32 @@ class Aplicacion {
     return null;
   }
 
+  // ¿Se puede mover el robot de verdad? Devuelve { listo, motivo } con la condición
+  // que falta, para que Mover y Programar digan exactamente qué hacer.
+  diagnosticoBrazo() {
+    const e = this.estado;
+    if (!e) return { listo: false, motivo: 'No hay conexión con el servidor de la aplicación.' };
+    const s = e.sesion || {};
+    const planta = s.modo === 'sim' ? 'robot de Gazebo' : s.modo === 'real' ? 'brazo físico' : 'brazo físico y Gazebo';
+    switch (s.estado) {
+      case 'detenida': case undefined:
+        return { listo: false, motivo: 'No hay sesión en marcha. En Sesión pulse Iniciar y, cuando abra la cámara, cierre la teleoperación (Q).' };
+      case 'arrancando': return { listo: false, motivo: 'La sesión está arrancando. Cuando abra la teleoperación, ciérrela (Q) y el brazo quedará en init.' };
+      case 'teleop': return { listo: false, motivo: 'La teleoperación está abierta. Ciérrela con Q en la ventana de la cámara o con «Cerrar teleoperación» en Sesión.' };
+      case 'moviendo': return { listo: false, motivo: 'El brazo va hacia init. Espere unos segundos.' };
+      case 'cerrando': return { listo: false, motivo: 'La sesión se está cerrando.' };
+      default: break;
+    }
+    if (!e.ros?.disponible) {
+      return { listo: false, motivo: `El lanzador está en su menú (brazo en init), pero el servidor de la aplicación no tiene ROS 2 (indicador «Sin ROS»: ${e.ros?.motivo || 'sin detalle'}). Apague la sesión (Home y apagar), ejecute «soarm-app --parar» y abra otra vez con «soarm-app».` };
+    }
+    if (!this.fuenteViva()) {
+      const topico = s.modo === 'sim' ? '/joint_states' : '/real/joint_states';
+      return { listo: false, motivo: `El lanzador está en su menú (brazo en init) y hay ROS 2, pero no llegan las posiciones del ${planta} (${topico}). Compruebe en una terminal «ros2 topic hz ${topico}». Si publica, apague la sesión, ejecute «soarm-app --parar» y «soarm-app», e inicie la sesión otra vez.` };
+    }
+    return { listo: true, motivo: `Se moverá el ${planta}.` };
+  }
+
   _aplicarVivo() {
     if (this.enLeccion) return;            // las lecciones usan el robot virtual
     const f = this.fuenteViva();

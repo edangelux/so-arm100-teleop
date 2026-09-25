@@ -75,14 +75,12 @@ const seccion = {
     app.escena.fijarFantasma(null);
   },
 
-  enVivo() { const s = this.app.estado?.sesion; return !!(this.app.fuenteViva() && s?.estado === 'menu' && this.app.estado.ros.disponible); },
+  enVivo() { return this.app.diagnosticoBrazo().listo; },
 
   pintarEstado() {
-    const s = this.app.estado?.sesion;
-    let msg, tipo;
-    if (this.enVivo()) { msg = `Se moverá el ${s.modo === 'sim' ? 'robot de Gazebo' : s.modo === 'real' ? 'brazo físico' : 'brazo físico y Gazebo'}.`; tipo = 'ok'; }
-    else if (s && s.estado === 'teleop') { msg = 'La teleoperación está activa: ciérrela (Q) para mover desde aquí.'; tipo = 'aviso'; }
-    else { msg = 'Sin sesión en marcha: se mueve el robot virtual de la aplicación. Para mover el brazo real, inicie una sesión y cierre la teleoperación.'; tipo = 'aviso'; }
+    const d = this.app.diagnosticoBrazo();
+    const msg = d.listo ? d.motivo : `Se mueve sólo el robot virtual. ${d.motivo}`;
+    const tipo = d.listo ? 'ok' : 'aviso';
     this.estadoMover.replaceChildren(el('div', { class: `mensaje ${tipo}`, style: 'margin:0 0 10px' }, msg));
     this.botonEjecutar.innerHTML = `${this.enVivo() ? 'Mover el robot a esta postura' : 'Animar en el robot virtual'}`;
   },
