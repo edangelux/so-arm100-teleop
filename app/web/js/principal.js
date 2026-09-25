@@ -5,12 +5,13 @@ import { Escena } from './escena.js';
 import { el, aviso } from './ui.js';
 import sesion from './secciones/sesion.js';
 import mover from './secciones/mover.js';
+import programar from './secciones/programar.js';
 import aprender from './secciones/aprender.js';
 import ensayos from './secciones/ensayos.js';
 import diagnostico from './secciones/diagnostico.js';
 import ajustes from './secciones/ajustes.js';
 
-const SECCIONES = [sesion, mover, aprender, ensayos, diagnostico, ajustes];
+const SECCIONES = [sesion, mover, programar, aprender, ensayos, diagnostico, ajustes];
 
 class Aplicacion {
   constructor() {

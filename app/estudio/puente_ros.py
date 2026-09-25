@@ -104,6 +104,66 @@ class Puente:
             self._pubs[topico].publish(msg)
         return round(duracion, 2)
 
+    def _publicar(self, modo, msg):
+        JointTrajectory = self._tipos[0]
+        for topico in TOPICOS[modo][0]:
+            if topico not in self._pubs:
+                self._pubs[topico] = self.nodo.create_publisher(JointTrajectory, topico, 10)
+                time.sleep(0.3)          # deja que DDS enlace antes del primer mensaje
+            self._pubs[topico].publish(msg)
+
+    def trayectoria(self, modo, puntos):
+        """Trayectoria de varios puntos [{'q': [5 rad], 't': s desde el inicio}], ya
+        planificada por la aplicación (programas con MoveJ, MoveL y MoveC). Se
+        comprueban límites, orden de los tiempos y velocidad entre puntos."""
+        if not self.disponible:
+            raise RuntimeError('ROS no está disponible.')
+        JointTrajectory, JointTrajectoryPoint, Duration, Time, _ = self._tipos
+        ref = self.q['real'] if modo in ('real', 'ambos') else self.q['sim']
+        if ref is None:
+            raise RuntimeError('No llegan estados articulares de esa planta.')
+        if not puntos or len(puntos) > 5000:
+            raise RuntimeError('La trayectoria debe tener entre 1 y 5000 puntos.')
+        msg = JointTrajectory()
+        msg.header.stamp = Time(sec=0, nanosec=0)
+        msg.joint_names = ART
+        previo_q, previo_t = ref[:5], 0.0
+        for p in puntos:
+            q = [float(v) for v in p['q']][:5]
+            t = float(p['t'])
+            if len(q) != 5 or t <= previo_t:
+                raise RuntimeError('Trayectoria mal formada: cada punto lleva 5 ángulos y un tiempo creciente.')
+            for v, (lo, hi) in zip(q, LIM):
+                if not lo - 1e-3 <= v <= hi + 1e-3:
+                    raise RuntimeError('Un punto de la trayectoria sale de los límites de las articulaciones.')
+            vel = max(abs(a - b) for a, b in zip(q, previo_q)) / (t - previo_t)
+            if vel > 2.5:
+                raise RuntimeError(f'La trayectoria pide {vel:.1f} rad/s en una articulación; el máximo es 2,5 rad/s.')
+            jp = JointTrajectoryPoint()
+            jp.positions = q
+            jp.time_from_start = Duration(sec=int(t), nanosec=int((t % 1) * 1e9))
+            msg.points.append(jp)
+            previo_q, previo_t = q, t
+        self._publicar(modo, msg)
+        return round(previo_t, 2)
+
+    def parar(self, modo):
+        """Detiene el movimiento en curso: nueva trayectoria que se queda donde está."""
+        if not self.disponible:
+            return
+        JointTrajectory, JointTrajectoryPoint, Duration, Time, _ = self._tipos
+        ref = self.q['real'] if modo in ('real', 'ambos') else self.q['sim']
+        if ref is None:
+            return
+        msg = JointTrajectory()
+        msg.header.stamp = Time(sec=0, nanosec=0)
+        msg.joint_names = ART
+        jp = JointTrajectoryPoint()
+        jp.positions = [float(v) for v in ref[:5]]
+        jp.time_from_start = Duration(sec=0, nanosec=200_000_000)
+        msg.points = [jp]
+        self._publicar(modo, msg)
+
     def pinza(self, modo, valor):
         if not self.disponible:
             raise RuntimeError('ROS no está disponible.')

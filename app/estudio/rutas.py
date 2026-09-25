@@ -12,3 +12,5 @@ ENSAYOS = REPO / 'pruebas' / 'ensayos'
 RESULTADOS = REPO / 'pruebas' / 'resultados'
 POSES = SCRIPTS / 'poses_seguras.json'
 CONF = Path.home() / '.soarm.conf'
+# Programas del robot que guarda el usuario (formato de texto RAPID, extensión .mod).
+PROGRAMAS = Path.home() / '.local' / 'share' / 'soarm' / 'programas'

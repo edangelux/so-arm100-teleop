@@ -27,8 +27,8 @@ from estudio import puente_ros                    # noqa: E402
 from estudio.eventos import difusor               # noqa: E402
 from estudio.modelo import cargar_modelo          # noqa: E402
 from estudio.procesos import sesion, tarea        # noqa: E402
-from estudio.rutas import (ENSAYOS, LECCIONES, MALLAS, REPO, RESULTADOS,  # noqa: E402
-                           SCRIPTS, WEB)
+from estudio.rutas import (ENSAYOS, LECCIONES, MALLAS, PROGRAMAS, REPO,  # noqa: E402
+                           RESULTADOS, SCRIPTS, WEB)
 
 mimetypes.add_type('text/javascript', '.js')
 mimetypes.add_type('application/json', '.json')
@@ -193,6 +193,31 @@ def resultados():
     return lista
 
 
+# ------------------------------------------------------------ programas del robot
+NOMBRE_VALIDO = re.compile(r'^[\w\- ]{1,60}$')
+
+
+def ruta_programa(nombre):
+    nombre = str(nombre).strip()
+    if nombre.endswith('.mod'):
+        nombre = nombre[:-4]
+    if not NOMBRE_VALIDO.match(nombre):
+        raise RuntimeError('El nombre sólo puede tener letras, números, espacios, guiones y guiones bajos (hasta 60).')
+    return PROGRAMAS / f'{nombre}.mod'
+
+
+def programas():
+    if not PROGRAMAS.is_dir():
+        return []
+    return [{'nombre': p.stem, 'fecha': time.strftime('%Y-%m-%d %H:%M', time.localtime(p.stat().st_mtime)),
+             'bytes': p.stat().st_size} for p in sorted(PROGRAMAS.glob('*.mod'), key=lambda p: -p.stat().st_mtime)]
+
+
+def exigir_menu():
+    if sesion.estado != 'menu':
+        raise RuntimeError('Para mover el brazo, arranque una sesión y cierre la teleoperación (el lanzador debe estar en su menú).')
+
+
 # ------------------------------------------------------------ HTTP
 class Manejador(BaseHTTPRequestHandler):
     server_version = 'SOARM-Estudio/1'
@@ -239,6 +264,16 @@ class Manejador(BaseHTTPRequestHandler):
             return self._json(resultados())
         if p == '/api/eventos':
             return self._eventos()
+        if p == '/api/programas':
+            return self._json(programas())
+        if p.startswith('/api/programas/'):
+            try:
+                ruta = ruta_programa(p[len('/api/programas/'):])
+            except RuntimeError as e:
+                return self._json({'error': str(e)}, 400)
+            if not ruta.is_file():
+                return self._json({'error': 'No existe ese programa.'}, 404)
+            return self._json({'nombre': ruta.stem, 'texto': ruta.read_text(encoding='utf-8')})
         if p.startswith('/mallas/'):
             return self._archivo(MALLAS / p[len('/mallas/'):], MALLAS)
         if p.startswith('/resultados/'):
@@ -303,13 +338,31 @@ class Manejador(BaseHTTPRequestHandler):
                 puerto, msg = ent.conectar_brazo()
                 return self._json({'ok': bool(puerto), 'puerto': puerto, 'mensaje': msg})
             if p == '/api/mover':
-                if sesion.estado not in ('menu',):
-                    raise RuntimeError('Para mover el brazo desde aquí, cierre antes la teleoperación (el lanzador debe estar en su menú).')
+                exigir_menu()
                 return self._json({'duracion': PUENTE.mover(sesion.modo, d['q'], d.get('velocidad', 0.5))})
             if p == '/api/pinza':
-                if sesion.estado not in ('menu',):
-                    raise RuntimeError('Cierre antes la teleoperación.')
+                exigir_menu()
                 PUENTE.pinza(sesion.modo, float(d['valor']))
+                return self._json({'ok': True})
+            if p == '/api/trayectoria':
+                exigir_menu()
+                return self._json({'duracion': PUENTE.trayectoria(sesion.modo, d['puntos'])})
+            if p == '/api/parar':
+                if sesion.modo:
+                    PUENTE.parar(sesion.modo)
+                return self._json({'ok': True})
+            if p == '/api/programas/guardar':
+                ruta = ruta_programa(d.get('nombre', ''))
+                texto = str(d.get('texto', ''))
+                if len(texto) > 200_000:
+                    raise RuntimeError('El programa es demasiado largo.')
+                PROGRAMAS.mkdir(parents=True, exist_ok=True)
+                ruta.write_text(texto, encoding='utf-8')
+                return self._json({'ok': True, 'nombre': ruta.stem, 'ruta': str(ruta)})
+            if p == '/api/programas/borrar':
+                ruta = ruta_programa(d.get('nombre', ''))
+                if ruta.is_file():
+                    ruta.unlink()
                 return self._json({'ok': True})
             if p == '/api/tarea':
                 return self._json(accion_tarea(d))

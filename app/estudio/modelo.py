@@ -52,7 +52,9 @@ def cargar_modelo():
                     'color': _vec(c.get('rgba'), '1 1 1 1') if c is not None else [1, 1, 1, 1],
                 }
         masa = l.find('inertial/mass')
-        eslabones[l.get('name')] = {'malla': malla, 'masa': float(masa.get('value')) if masa is not None else 0.0}
+        cdm = l.find('inertial/origin')
+        eslabones[l.get('name')] = {'malla': malla, 'masa': float(masa.get('value')) if masa is not None else 0.0,
+                                    'cdm': _vec(cdm.get('xyz')) if cdm is not None else [0.0, 0.0, 0.0]}
     juntas = []
     for j in raiz.iter('joint'):
         o, a, lim = j.find('origin'), j.find('axis'), j.find('limit')

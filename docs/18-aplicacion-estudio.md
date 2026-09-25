@@ -1,10 +1,10 @@
 # 18 — SO-ARM100 Estudio: la aplicación de operación, pruebas y aprendizaje
 
-[← Anterior: ensayos de rendimiento](17-ensayos-de-rendimiento.md) · [Volver al inicio](../README.md)
+[← Anterior: ensayos de rendimiento](17-ensayos-de-rendimiento.md) · [Volver al inicio](../README.md) · [Siguiente: Programar →](19-programar.md)
 
 ---
 
-> **Estado:** fase 1 terminada el 25 de septiembre de 2026. Se comprobó en un Ubuntu sin ROS con un navegador Chromium automático: la escena 3D, el arrastre de la pinza, la primera lección completa, el panel de ensayos, el diagnóstico y la máquina de estados de la sesión (con un `soarm.sh` simulado). **Falta abrirla en el equipo del proyecto** (WSL2, Ubuntu nativo y máquina virtual) y arrancar con ella una sesión real con el brazo. Las lecciones 2 a 18 llegan en las fases 2 y 3.
+> **Estado:** las tres fases terminadas el 25 de septiembre de 2026. La fase 1 (sesión, mover, ensayos, revisar y la lección 1) se usó en el equipo del proyecto con el brazo real para ejecutar los ensayos A1 a A5 ([capítulo 17](17-ensayos-de-rendimiento.md#resultados-del-25-de-septiembre-de-2026)). Las lecciones 2 a 18 y la pestaña **Programar** ([capítulo 19](19-programar.md)) se comprobaron en un navegador Chromium automático, recorriendo cada paso de cada lección sin errores.
 
 SO-ARM100 Estudio reúne en una ventana todo lo que hasta el capítulo 17 se hacía escribiendo órdenes: arrancar la teleoperación, elegir la cámara, mover el brazo, llevarlo a una postura segura, ejecutar los ensayos y revisar la instalación. Además trae un recorrido de 18 lecciones de robótica, desde qué es un grado de libertad hasta la integración de una celda industrial, que se practica con el modelo 3D del propio brazo y funciona sin ROS y sin el robot.
 
@@ -19,14 +19,15 @@ SO-ARM100 Estudio reúne en una ventana todo lo que hasta el capítulo 17 se hac
 3. [Sesión: arrancar y cerrar sin terminal](#sesión-arrancar-y-cerrar-sin-terminal)
 4. [Mover: articulaciones, posturas y cinemática inversa](#mover-articulaciones-posturas-y-cinemática-inversa)
 5. [Aprender: el plan de 18 lecciones](#aprender-el-plan-de-18-lecciones)
-6. [Ensayos y Revisar](#ensayos-y-revisar)
-7. [Seguridad](#seguridad)
-8. [Pruebas que debe superar el robot](#pruebas-que-debe-superar-el-robot)
-9. [Pruebas de la aplicación en cada entorno](#pruebas-de-la-aplicación-en-cada-entorno)
-10. [Diseño visual](#diseño-visual)
-11. [Fases](#fases)
-12. [Archivos](#archivos)
-13. [Problemas frecuentes](#problemas-frecuentes)
+6. [Programar](#programar)
+7. [Ensayos y Revisar](#ensayos-y-revisar)
+8. [Seguridad](#seguridad)
+9. [Pruebas que debe superar el robot](#pruebas-que-debe-superar-el-robot)
+10. [Pruebas de la aplicación en cada entorno](#pruebas-de-la-aplicación-en-cada-entorno)
+11. [Diseño visual](#diseño-visual)
+12. [Fases](#fases)
+13. [Archivos](#archivos)
+14. [Problemas frecuentes](#problemas-frecuentes)
 
 ## Cómo se abre
 
@@ -112,6 +113,9 @@ La tabla siguiente relaciona cada ruta de la API con la orden que sustituye.
 | `/api/camaras`, `/api/camaras/probar`, `/api/camaras/buscar` | GET, POST | `soarm-camara` |
 | `/api/brazo/conectar` | POST | `usbipd attach` en WSL2 |
 | `/api/mover`, `/api/pinza` | POST | `ros2 topic pub` de una trayectoria o `ir_a_pose.py` |
+| `/api/trayectoria`, `/api/parar` | POST | Trayectoria articular completa de un programa de la pestaña Programar, y su parada |
+| `/api/programas`, `/api/programas/<nombre>` | GET | Lista y contenido de los programas guardados (`.mod`) |
+| `/api/programas/guardar`, `/api/programas/borrar` | POST | Guardar y borrar programas en `~/.local/share/soarm/programas/` |
 | `/api/tarea` | POST | `soarm-diagnostico`, `centrar`, `servos`, `soarm-ensayo ...` |
 | `/api/conf` | POST | `soarm-config` |
 | `/api/eventos` | GET | Mirar la terminal: registro y estados en vivo |
@@ -179,9 +183,19 @@ Mientras hay una sesión en marcha, el modelo 3D sigue al brazo real o a la simu
 
 ![Lista de lecciones](img/estudio_3_aprender.png)
 
-*Figura 18.5. El plan de estudio. Las lecciones listas aparecen con la etiqueta ABRIR; las atenuadas llegan en las fases 2 y 3.*
+*Figura 18.5. El plan de estudio: 18 lecciones en cuatro niveles. La etiqueta de la derecha dice cuántos pasos tiene cada una o «Hecha» si ya se terminó en este navegador.*
 
-Cada lección es una secuencia corta de pasos sobre el modelo 3D. El texto de cada paso tiene dos o tres frases; lo demás se hace tocando el robot: señalar piezas, mover articulaciones, alcanzar un objetivo. Hay pasos que no dejan avanzar hasta completar el reto.
+Cada lección es una secuencia de cinco a siete pasos sobre el modelo 3D. Cada paso tiene tres partes:
+
+- **En la escena**, algo que se mueve o se toca: deslizadores que mueven el brazo, marcos de coordenadas, flechas de velocidad, nubes de puntos, obstáculos, gráficas y diagramas que cambian en vivo.
+- **En la tarjeta de la lección**, dos o tres frases que dicen qué mirar y qué hacer, con las fórmulas escritas con KaTeX.
+- **En el panel derecho**, la **explicación detallada** del paso: la teoría completa con fórmulas, tablas y referencias, y al final los conceptos clave y la bibliografía de la lección.
+
+Las preguntas de opción múltiple y los retos no dejan avanzar hasta responder bien, y explican la respuesta. Varias lecciones usan los datos reales del proyecto: el ensayo A1 en la de calibración, A2 en la de seguridad (ISO 9283), A3 con 227 g en la de dinámica y A5 en la de control. Las lecciones 15 y 18 tienen botones que abren programas de ejemplo en la pestaña [Programar](19-programar.md).
+
+![Lección 18, paso del PLC](img/estudio_9_leccion_plc.png)
+
+*Figura 18.5b. Lección 18, paso 2: un diagrama de escalera que conduce en vivo (lima) mientras el PLC da la orden al robot de tomar una pieza.*
 
 ![Lección de grados de libertad, paso 3](img/estudio_4_leccion.png)
 
@@ -221,17 +235,21 @@ Los niveles básico e intermedio siguen el orden de un curso universitario de ro
 | 15 | Industrial | Programación de robots industriales | Marcos base, usuario y herramienta (TCP); jog; PTP, LIN y CIRC; zonas de aproximación |
 | 16 | Industrial | Calibración | Cinemática, TCP y mano-ojo (cámara-robot) |
 | 17 | Industrial | Seguridad y normas | ISO 10218, ISO/TS 15066 para cobots, ISO 9283 para desempeño, categorías de parada 0, 1 y 2 |
-| 18 | Industrial | Integración de celda y gemelo digital | PLC, E/S, Modbus y OPC UA, ciclo de recoger y colocar, OEE |
+| 18 | Industrial | Integración de celda y gemelo digital | Apretón de manos con señales, PLC y escalera, Modbus y OPC UA, OEE, gemelo digital y retardo |
 
 ### La lección de cuaterniones duales
 
-La lección 9 se incluyó a pedido expreso y se construye en la fase 3; aquí se deja su planteamiento. Un cuaternión dual reúne en un solo objeto la rotación *r* (un cuaternión unitario) y la traslación *t*:
+La lección 9 se incluyó a pedido expreso. Un cuaternión dual reúne en un solo objeto la rotación *r* (un cuaternión unitario) y la traslación *t*:
 
 ```
 σ = r + ε · ½ t r        con ε² = 0
 ```
 
-Encadenar dos movimientos es multiplicar sus cuaterniones duales, igual que con matrices homogéneas, pero con 8 números en vez de 16 y sin que los errores de redondeo deformen la rotación. La lección mostrará el movimiento de la pinza entre dos posturas de tres maneras sobre el modelo: interpolando por separado posición y orientación, interpolando las matrices e interpolando el cuaternión dual (ScLERP). La tercera sigue un tornillo: gira y avanza a la vez alrededor de un eje fijo, que se dibujará en la escena. De ahí se pasará a la teoría de tornillos y al producto de exponenciales, la alternativa moderna a Denavit–Hartenberg que usa el libro *Modern Robotics* de Lynch y Park.
+Encadenar dos movimientos es multiplicar sus cuaterniones duales, igual que con matrices homogéneas, pero con 8 números en vez de 16 y sin que los errores de redondeo deformen la rotación. La lección muestra una pieza que va de una pose a otra de dos maneras a la vez: interpolando por separado posición y orientación, e interpolando el cuaternión dual (ScLERP), que sigue un tornillo: gira y avanza a la vez alrededor de un eje fijo, dibujado en la escena. Después calcula los tornillos de las cinco articulaciones del SO-ARM100 a partir del URDF y comprueba que el producto de exponenciales, la alternativa moderna a Denavit–Hartenberg que usa el libro *Modern Robotics* de Lynch y Park, da la misma pose que la cadena del URDF (diferencia del orden de 10⁻¹⁶ m).
+
+## Programar
+
+La pestaña **Programar** enseña a mover el brazo con las instrucciones de un robot industrial (`MoveJ`, `MoveL`, `MoveC`, `MoveAbsJ`, `Offs`, pinza, señales, `FOR`, `WHILE`, `IF`, `PROC`), en una lista de instrucciones y en un editor de texto sincronizados, con una celda virtual de tres cubos, una bandeja, un sensor y una torre de luces. Los programas corren en el robot virtual o se envían al brazo y a Gazebo. Todo se explica en el [capítulo 19](19-programar.md).
 
 ## Ensayos y Revisar
 
@@ -358,9 +376,9 @@ Cada articulación conserva un color en toda la aplicación (deslizadores, etiqu
 
 | Fase | Contenido | Estado |
 |---|---|---|
-| 1 | Servidor, escena 3D, Sesión, Mover, Ensayos, Revisar, Ajustes, lección 1, icono y atajo | Terminada; falta la prueba en el equipo del proyecto |
-| 2 | Lecciones 2 a 8 (básico e intermedio) | Pendiente |
-| 3 | Lecciones 9 a 18 (avanzado e industrial), gráficas de los ensayos dentro de la aplicación | Pendiente |
+| 1 | Servidor, escena 3D, Sesión, Mover, Ensayos, Revisar, Ajustes, lección 1, icono y atajo | Terminada y usada con el brazo real (ensayos del 25 de septiembre) |
+| 2 | Lecciones 2 a 8 (básico e intermedio) | Terminada |
+| 3 | Lecciones 9 a 18 (avanzado e industrial) y la pestaña Programar con celda virtual, ejemplos y retos | Terminada; falta ejecutar los ejemplos de Programar en el brazo real |
 
 Cada fase se prueba antes de empezar la siguiente.
 
@@ -378,7 +396,10 @@ Cada fase se prueba antes de empezar la siguiente.
 | `app/web/js/cinematica.js` | Cinemática directa e inversa y manipulabilidad |
 | `app/web/js/secciones/*.js` | Una por sección del panel |
 | `app/web/js/lecciones/gdl.js` | Lección 1 |
-| `app/web/vendor/` | three.js r169 y las fuentes Rubik e IBM Plex Mono, con sus licencias |
+| `app/web/js/lecciones/l02_*.js` … `l18_*.js` | Lecciones 2 a 18, una por archivo |
+| `app/web/js/lecciones/comun.js` | Piezas comunes: deslizadores, gráficas, marcos, flechas, fórmulas, tornillos y cuaterniones duales |
+| `app/web/js/programa/*.js` | Lenguaje, planificador, ejecutor, celda y ejemplos de la pestaña Programar ([capítulo 19](19-programar.md)) |
+| `app/web/vendor/` | three.js r169, KaTeX 0.18.9 (fórmulas) y las fuentes Rubik e IBM Plex Mono, con sus licencias |
 | `scripts/atajos.bash` | Nuevo atajo `soarm-app` |
 | `scripts/instalar_atajos.sh` | Nuevo icono SO-ARM100 Estudio |
 | `scripts/diagnostico.sh` | Nuevo grupo *Aplicación SO-ARM100 Estudio* |
@@ -396,4 +417,4 @@ Cada fase se prueba antes de empezar la siguiente.
 
 ---
 
-[← Anterior: ensayos de rendimiento](17-ensayos-de-rendimiento.md) · [Volver al inicio](../README.md)
+[← Anterior: ensayos de rendimiento](17-ensayos-de-rendimiento.md) · [Volver al inicio](../README.md) · [Siguiente: Programar →](19-programar.md)

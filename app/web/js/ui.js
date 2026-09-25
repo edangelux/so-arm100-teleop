@@ -31,6 +31,24 @@ export function confirmar(titulo, texto, { aceptar = 'Continuar', peligro = fals
   });
 }
 
+export function preguntar(titulo, texto, valor = '') {
+  return new Promise((resolver) => {
+    const modal = document.getElementById('modal');
+    const caja = document.getElementById('modal-caja');
+    const entrada = el('input', { class: 'campo', value: valor });
+    const cerrar = (v) => { modal.classList.add('oculto'); resolver(v); };
+    entrada.addEventListener('keydown', (e) => { if (e.key === 'Enter') cerrar(entrada.value.trim() || null); if (e.key === 'Escape') cerrar(null); });
+    caja.replaceChildren(
+      el('h3', {}, titulo), el('p', { html: texto }), entrada,
+      el('div', { class: 'fila', style: 'margin-top:20px' },
+        el('button', { class: 'boton', onclick: () => cerrar(null) }, 'Cancelar'),
+        el('button', { class: 'boton primario', onclick: () => cerrar(entrada.value.trim() || null) }, 'Aceptar')));
+    modal.classList.remove('oculto');
+    entrada.focus();
+    entrada.select();
+  });
+}
+
 export function linea(texto) {
   // Colorea la salida de la consola según su contenido.
   let clase = '';

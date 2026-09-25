@@ -4,7 +4,114 @@
 
 Estación didáctica de teleoperación en tiempo real para el manipulador de cinco grados de libertad **SO-ARM100**. Una cámara web mide los ángulos de las articulaciones del brazo y la mano del operador, y el sistema los **replica articulación por articulación** sobre el gemelo digital en Gazebo, sobre el brazo físico o sobre ambos a la vez. **No hay cinemática inversa en el lazo de control**: no se calcula dónde situar el efector en el espacio, se replican ángulos. El jacobiano se usa sólo para mostrar el índice de manipulabilidad en pantalla. La explicación completa está en [docs/07 — Cómo funciona el sistema](docs/07-como-funciona.md).
 
+Todo se maneja desde **SO-ARM100 Estudio**, una aplicación con botones y el brazo en 3D: arranca la teleoperación, mueve el brazo, lo **programa con instrucciones de robot industrial** (`MoveJ`, `MoveL`, `MoveC`…), ejecuta los ensayos de rendimiento y enseña robótica en **18 lecciones** interactivas.
+
 > Proyecto de la asignatura Análisis y Diseño de Sistemas Mecatrónicos — Ingeniería Mecatrónica, Universidad Tecnológica La Salle (ULSA), León, Nicaragua, 2026.
+
+![SO-ARM100 Estudio](docs/img/estudio_7_programar.png)
+
+---
+
+## Inicio rápido
+
+Hace falta **Ubuntu 22.04**: instalado en el equipo, en una máquina virtual o en **WSL2** dentro de Windows (en Windows se abre la aplicación **Ubuntu** desde el menú Inicio). Todo lo demás se instala con los comandos de abajo. Cada bloque se copia completo y se pega en la terminal de Ubuntu.
+
+### 1. Instalar (una sola vez)
+
+```bash
+sudo apt update && sudo apt install -y git
+git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
+cd ~/so-arm100-teleop
+bash scripts/soarm.sh instalar
+source ~/.bashrc
+```
+
+Instala ROS 2 Humble, Gazebo, MoveIt, MediaPipe y el workspace del brazo, y crea los atajos de una palabra y los iconos del escritorio. Tarda un buen rato la primera vez; se puede volver a ejecutar sin romper nada.
+
+### 2. Abrir la aplicación
+
+```bash
+soarm-app
+```
+
+Se abre **SO-ARM100 Estudio** en una ventana propia. También se abre con doble clic en el icono **SO-ARM100 Estudio**. Desde ahí se hace todo con botones: iniciar la teleoperación, mover el brazo, programarlo, hacer los ensayos y las lecciones.
+
+### 3. Teleoperar con la cámara (sin la aplicación)
+
+```bash
+teleop
+```
+
+Pregunta qué cámara usar, detecta si el brazo está conectado y arranca Gazebo, el brazo o los dos. Se calibra con la mano visible y la tecla `C`; se sale con `Q`.
+
+### Órdenes de uso diario
+
+| Para… | Comando |
+|---|---|
+| Abrir la aplicación | `soarm-app` |
+| Cerrar el servidor de la aplicación | `soarm-app --parar` |
+| Teleoperación directa | `teleop` · `teleop sim` · `teleop real` · `teleop ambos` |
+| Traer la última versión del repositorio | `soarm-actualizar` |
+| Revisar que todo esté bien instalado | `soarm-diagnostico` |
+| Ver los servos (posición, carga, temperatura) | `servos` |
+| Llevar los seis servos al centro (2048) | `centrar` |
+| Ensayos de rendimiento | `soarm-ensayo a1` … `soarm-ensayo analizar` |
+| Ver todas las órdenes | `soarm-ayuda` |
+
+<details>
+<summary><b>Sólo la aplicación, sin instalar ROS</b> (para las lecciones y el robot virtual)</summary>
+
+Sirve en cualquier Linux con Python 3 y un navegador: Aprender, Programar y Mover funcionan completos con el robot virtual. Sesión y Ensayos avisan de que hace falta ROS.
+
+```bash
+git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
+bash ~/so-arm100-teleop/app/abrir.sh
+```
+
+Si no se abre ninguna ventana, se entra desde el navegador a **http://127.0.0.1:8642**.
+</details>
+
+<details>
+<summary><b>Actualizar una instalación anterior</b></summary>
+
+```bash
+cd ~/so-arm100-teleop
+git pull
+bash scripts/instalar_atajos.sh
+source ~/.bashrc
+```
+</details>
+
+---
+
+## Cómo funciona
+
+```mermaid
+flowchart LR
+  C[Cámara] --> M[MediaPipe<br/>cuerpo y mano]
+  M --> T[Teleoperación<br/>ángulos del operador]
+  T --> R[ROS 2 Humble<br/>ros2_control]
+  R --> B[Brazo físico<br/>servos STS3215]
+  R --> G[Gazebo<br/>gemelo digital]
+  A[SO-ARM100 Estudio<br/>aplicación] -->|sesión, posturas,<br/>programas| R
+  R -->|estado de las<br/>articulaciones| A
+```
+
+1. **La cámara y MediaPipe** encuentran el hombro, el codo, la muñeca y los dedos del operador en cada imagen.
+2. **La teleoperación** convierte esos puntos en cinco ángulos y la apertura de la pinza, los filtra y los envía a ROS 2. No calcula dónde poner la pinza: **copia ángulos**, articulación por articulación.
+3. **ROS 2** mueve el brazo real por el bus serie, el robot de Gazebo o los dos a la vez.
+4. **SO-ARM100 Estudio** es la cara de todo: un servidor local en Python ejecuta las mismas órdenes que se escribirían en la terminal y una página web dibuja el brazo en 3D con sus mallas reales.
+
+| Pestaña de la aplicación | Qué se hace |
+|---|---|
+| **Sesión** | Elegir modo (Gazebo, brazo o ambos) y cámara, iniciar y cerrar la teleoperación, llevar el brazo a `init` o `home` |
+| **Mover** | Mover cada articulación con deslizadores o arrastrando la pinza en 3D (cinemática inversa), guardar posturas |
+| **Programar** | Programas de robot industrial: `MoveJ`, `MoveL`, `MoveC`, pinza, señales, bucles; celda virtual con cubos; ejemplos y retos ([docs/19](docs/19-programar.md)) |
+| **Aprender** | 18 lecciones interactivas, de grados de libertad a cuaterniones duales, dinámica, control, seguridad y celdas industriales |
+| **Ensayos** | Ejecutar y analizar los ensayos A1 a A5 del brazo real |
+| **Revisar** | Diagnóstico completo de la instalación |
+
+La explicación completa está en [docs/07 — Cómo funciona el sistema](docs/07-como-funciona.md) y [docs/18 — SO-ARM100 Estudio](docs/18-aplicacion-estudio.md).
 
 ---
 
@@ -33,11 +140,25 @@ El detalle de cada componente, de los seis bloqueos que se identificaron antes d
 
 Las tres cifras se reproducen exactamente a partir de los registros originales con `python3 pruebas/recalcular_resultados.py`. Qué mide cada una, y qué no, se explica en [pruebas/README.md](pruebas/README.md).
 
+### Ensayos de rendimiento del brazo (25 de septiembre de 2026)
+
+Después de la defensa se midió el brazo real con los ensayos del [capítulo 17](docs/17-ensayos-de-rendimiento.md#resultados-del-25-de-septiembre-de-2026). Los datos, las tablas y las gráficas están en [`pruebas/resultados/2026-09-25/`](pruebas/resultados/2026-09-25/resumen.md).
+
+| Ensayo | Resultado | Lectura |
+|---|---|---|
+| **A1** Precisión estática | Error medio: hombro −1,53°, codo −1,26°; las otras tres articulaciones, menos de 0,25° | La gravedad hace que hombro y codo se queden cortos; en `init`, −2,38° y −1,82° |
+| **A2** Repetibilidad (ISO 9283) | **RP = 2,30 mm** en 30 llegadas | Medida con los codificadores de los servos |
+| **A3** Carga útil | Sostiene **227 g** en las tres posturas; esfuerzo máximo del codo **50 %** | El error del codo sube de −2,0° sin carga a −5,5° con 227 g |
+| **A4** Temperatura | Máxima **54 °C** (hombro, al empezar) y bajó a 50 °C; límite 55 °C | Interrumpido a los 18 min de 30; hombro y codo son los servos críticos |
+| **A5** Respuesta al escalón | Retardo 139–317 ms · subida 161–192 ms · establecimiento 333–501 ms · sobrepaso ≤ 1,1 % | Sobreamortiguado, sin oscilación |
+
+![A3: esfuerzo con 0, 50 y 227 g](pruebas/resultados/2026-09-25/a3_carga.png)
+
 ---
 
 ## Operación con el lanzador unificado
 
-Desde la entrega, el sistema se instala y se opera con un solo guion, [`scripts/soarm.sh`](scripts/soarm.sh), que ejecuta la versión 13 presentada y elige las conexiones según el modo. Requiere **Ubuntu 22.04**, nativo, en máquina virtual o bajo WSL2.
+Los atajos del [inicio rápido](#inicio-rápido) llaman a este guion. Desde la entrega, el sistema se instala y se opera con un solo guion, [`scripts/soarm.sh`](scripts/soarm.sh), que ejecuta la versión 13 presentada y elige las conexiones según el modo. Requiere **Ubuntu 22.04**, nativo, en máquina virtual o bajo WSL2.
 
 ```bash
 sudo apt update && sudo apt install -y git
@@ -80,8 +201,9 @@ Después de instalar, basta escribir **`teleop`**, o abrir el icono **SO-ARM100 
 | 14 | [**Lanzador unificado**](docs/14-lanzador-v13.md) | Instalación y operación de la versión presentada en los tres modos |
 | 15 | [**v14, MoveIt y posturas seguras**](docs/15-v14-moveit-y-posturas-seguras.md) | Arranque y reanudación desde la postura medida, MoveIt junto a la teleoperación, cierre en `init` y apagado en `home` |
 | 16 | [**v15: mejor estimación de ángulos**](docs/16-v15-estimacion-de-angulos.md) | Confianza por articulación, ganancia por postura de referencia y giro de muñeca en 3D |
-| 17 | [**Ensayos de rendimiento**](docs/17-ensayos-de-rendimiento.md) | Precisión, respuesta, repetibilidad, carga, temperatura y fidelidad del espejo |
+| 17 | [**Ensayos de rendimiento**](docs/17-ensayos-de-rendimiento.md) | Precisión, respuesta, repetibilidad, carga, temperatura y fidelidad del espejo, con los resultados del 25/09/2026 |
 | 18 | [**SO-ARM100 Estudio**](docs/18-aplicacion-estudio.md) | Aplicación con botones y brazo en 3D: sesión, movimiento, ensayos, diagnóstico y 18 lecciones de robótica |
+| 19 | [**Programar**](docs/19-programar.md) | Programación tipo robot industrial: MoveJ, MoveL, MoveC, pinza, señales, bucles, celda virtual, ejemplos y retos |
 | — | [**Modelo cinemático completo**](analisis/cinematica/ANALISIS_CINEMATICO.md) | Tabla D-H, cinemática directa e inversa, jacobiano, singularidades, verificación cruzada |
 | — | [**Documentos entregados**](docs/entregables/README.md) | Documento técnico, formulación y evaluación, y las dos presentaciones |
 
@@ -115,6 +237,10 @@ so-arm100-teleop/
 │   ├── utilidades_originales/     ← programas de puesta en marcha usados
 │   ├── entorno/                   ← versiones de Python y paquetes del sistema
 │   └── manifiesto_origen.json     ← SHA-256 de cada archivo recuperado
+├── app/                           ← SO-ARM100 Estudio: servidor Python y página web
+│   ├── abrir.sh                   ← arranca el servidor y abre la ventana (soarm-app)
+│   ├── servidor.py                ← API local en 127.0.0.1:8642
+│   └── web/js/                    ← escena 3D, secciones, lecciones y programación
 ├── teleop_vision/
 │   ├── ejecutar_v13.py            ← ejecuta v13 con las conexiones del modo elegido
 │   ├── runtime_config.py          ← tópicos y parámetros de cada modo
@@ -128,6 +254,8 @@ so-arm100-teleop/
 │   └── verificar.sh               ← diagnóstico de la instalación
 ├── pruebas/
 │   ├── datos_originales/          ← registros CSV de las mediciones
+│   ├── ensayos/                   ← ensayos A1–A5, B1–B2 y su análisis
+│   ├── resultados/2026-09-25/     ← resultados de los ensayos del brazo real
 │   ├── recalcular_resultados.py   ← reproduce las cifras del documento
 │   └── resultados_recalculados.json
 ├── brazo-fisico/
@@ -139,7 +267,7 @@ so-arm100-teleop/
 ├── cad/                           ← modelo paramétrico en STL, STEP y SolidWorks (Git LFS)
 ├── overlay/                       ← configuración verificada de la ruta de simulación
 └── docs/
-    ├── 01 … 14                    ← guías y documentación del proyecto
+    ├── 01 … 19                    ← guías y documentación del proyecto
     ├── entregables/               ← PDF entregados (Git LFS)
     └── img/                       ← capturas de pantalla
 ```

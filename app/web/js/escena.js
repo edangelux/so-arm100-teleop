@@ -274,8 +274,8 @@ export class Escena {
 
   vista(nombre) {
     const t = this.orbita.target;
-    const p = { iso: [0.3, 0.42, 0.95], frente: [1.05, 0.2, 0], lado: [0.13, 0.2, 1.0], arriba: [0.13, 1.15, 0.001], leccion: [0.08, 0.42, 1.02] }[nombre];
-    const objetivo = nombre === 'leccion' ? new THREE.Vector3(0.07, 0.1, 0) : new THREE.Vector3(0.13, 0.13, 0);
+    const p = { iso: [0.3, 0.42, 0.95], frente: [1.05, 0.2, 0], lado: [0.13, 0.2, 1.0], arriba: [0.13, 1.15, 0.001], leccion: [0.08, 0.42, 1.02], programa: [0.78, 0.5, 0.52] }[nombre];
+    const objetivo = nombre === 'leccion' ? new THREE.Vector3(0.07, 0.1, 0) : nombre === 'programa' ? new THREE.Vector3(0.16, 0.06, 0) : new THREE.Vector3(0.13, 0.13, 0);
     void t;
     this._animarCamara(new THREE.Vector3(...p), objetivo);
   }

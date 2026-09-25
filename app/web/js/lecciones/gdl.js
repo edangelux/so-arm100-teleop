@@ -60,6 +60,11 @@ export default {
     ['Efector final', 'Lo que el robot usa para trabajar: aquí, la pinza. Su posición es lo que casi siempre interesa.'],
     ['Espacio articular', 'Describir la postura con los ángulos de cada articulación (5 números).'],
   ],
+  referencias: [
+    'Craig, J. J. (2018). <i>Introduction to Robotics: Mechanics and Control</i>, 4.ª ed. Pearson. Capítulo 1.',
+    'Lynch, K. M. y Park, F. C. (2017). <i>Modern Robotics</i>. Cambridge University Press. Capítulo 2 (grados de libertad y fórmula de Grübler).',
+    'TheRobotStudio, <i>SO-ARM100</i>, repositorio del diseño mecánico (Apache 2.0).',
+  ],
   pasos: [
     {
       titulo: 'Un robot es una cadena',
@@ -70,6 +75,18 @@ export default {
         const orden = [...BRAZO, 'Gripper'];
         return animar((t) => app.escena.resaltar(orden[Math.floor(t / 0.9) % orden.length]));
       },
+      detalle: `<p>Un <b>robot manipulador</b> es una <b>cadena cinemática abierta</b>: una sucesión de cuerpos rígidos (<b>eslabones</b>) unidos de dos en dos por <b>articulaciones</b>, que empieza en una base fija y termina en una herramienta libre (el <b>efector final</b>).</p>
+<p>En el SO-ARM100 la cadena es:</p>
+<table><tr><th>Eslabón</th><th>Articulación que lo mueve</th></tr>
+<tr><td>Base (fija a la mesa)</td><td>—</td></tr>
+<tr><td>Hombro giratorio</td><td>Giro de la base</td></tr>
+<tr><td>Brazo superior</td><td>Hombro</td></tr>
+<tr><td>Antebrazo</td><td>Codo</td></tr>
+<tr><td>Muñeca</td><td>Flexión de muñeca</td></tr>
+<tr><td>Pinza (dedo fijo)</td><td>Giro de muñeca</td></tr>
+<tr><td>Dedo móvil</td><td>Pinza</td></tr></table>
+<p>«Abierta» significa que cada eslabón cuelga sólo del anterior: no hay lazos cerrados, como sí los hay en un robot paralelo (por ejemplo, un robot delta de las líneas de empaque). Por eso un error en una articulación cercana a la base se propaga a todo lo que viene después, un tema que vuelve en las lecciones de calibración y de ensayos.</p>
+<p>Cada articulación es un <b>servo STS3215</b>: un motor, una reductora, un codificador magnético y un controlador en la misma caja. El modelo 3D que se ve aquí se construye con las mallas y las medidas del URDF del proyecto, el mismo archivo que usan ROS 2, Gazebo y MoveIt.</p>`,
     },
     {
       titulo: 'Una articulación, un movimiento',
@@ -87,6 +104,9 @@ export default {
           lectura.textContent = `Codo: ${grados(q[2]).toFixed(0)}°`;
         });
       },
+      detalle: `<p>Una articulación <b>de revolución</b> (giratoria) deja girar un eslabón respecto del anterior alrededor de un eje fijo, como una bisagra. El movimiento queda descrito por <b>un solo número</b>, el ángulo $q$, así que la articulación aporta <b>un grado de libertad</b>.</p>
+<p>Un cuerpo rígido suelto en el espacio tiene <b>6 grados de libertad</b>: tres traslaciones (x, y, z) y tres rotaciones. Una articulación de revolución le quita cinco y le deja uno. Otras articulaciones dejan más: una <b>esférica</b> (como el hombro humano) deja tres; una <b>prismática</b> (lineal) deja una traslación.</p>
+<p>En el codo del SO-ARM100, la aplicación limita el ángulo a ±85° (±1,49 rad) respecto del cero del modelo. El ángulo lo mide el codificador del servo en <b>4096 pasos por vuelta</b>, es decir, $360°/4096 \\approx 0{,}088°$ por paso; la lección 2 explica cómo.</p>`,
     },
     {
       titulo: 'Encuentre las articulaciones',
@@ -111,6 +131,12 @@ export default {
         };
         return () => { app.escena.alClicArticulacion = null; };
       },
+      detalle: `<p>Los <b>grados de libertad</b> de un mecanismo se pueden contar con la fórmula de <b>Grübler–Kutzbach</b>. Para un mecanismo espacial con $N$ eslabones (contando la base), $J$ articulaciones y $f_i$ grados de libertad en cada una:</p>
+$$M = 6\\,(N - 1 - J) + \\sum_{i=1}^{J} f_i$$
+<p>Para el brazo del SO-ARM100 sin contar la pinza: $N = 6$ (base y cinco eslabones), $J = 5$ articulaciones de revolución con $f_i = 1$:</p>
+$$M = 6\\,(6 - 1 - 5) + 5 = 5$$
+<p>En una cadena abierta el término entre paréntesis siempre vale cero, así que <b>los GDL son la suma de los GDL de las articulaciones</b>. La fórmula se vuelve interesante en los mecanismos con lazos cerrados, donde cada lazo resta grados.</p>
+<p>La pinza agrega una sexta articulación, pero no cambia dónde está ni hacia dónde apunta la herramienta: sólo abre y cierra los dedos. Por eso se dice que el SO-ARM100 es un brazo de <b>5 GDL con pinza</b>, y la configuración de MoveIt del proyecto lo modela con dos grupos: <code>arm</code> (cinco articulaciones) y <code>gripper</code> (una).</p>`,
     },
     {
       titulo: 'Cinco números, una postura',
@@ -123,6 +149,12 @@ export default {
         cuerpo.append(mini(app, q, leer), pos);
         leer();
       },
+      detalle: `<p>Los cinco ángulos $q = (q_1, q_2, q_3, q_4, q_5)$ forman un punto del <b>espacio articular</b>. Cada combinación dentro de los límites es una postura, y cada postura tiene una única posición y orientación de la pinza: eso es la <b>cinemática directa</b> (lección 6).</p>
+<p>La pinza, en cambio, vive en el <b>espacio cartesiano</b>: su posición $(x, y, z)$ y su orientación. Para describir por completo la pose de un objeto en el espacio hacen falta 6 números; con 5 articulaciones el brazo sólo puede elegir 5 de ellos. En el SO-ARM100 lo que no se puede elegir libremente es una de las rotaciones: la pinza siempre apunta dentro del plano vertical que contiene el eje de la base (lección 3).</p>
+<p>Consecuencias prácticas de tener 5 GDL:</p>
+<ul><li>Muchos puntos se alcanzan, pero no con cualquier orientación.</li>
+<li>Para tomar un objeto de lado hay que girar la base hasta que el objeto quede en el plano del brazo.</li>
+<li>Los programas de la pestaña Programar describen cada punto con cinco números, <code>[x, y, z, cabeceo, giro]</code>, en lugar de los seis de un robot industrial.</li></ul>`,
     },
     {
       titulo: 'Su brazo tiene 7',
@@ -131,6 +163,13 @@ export default {
         cuerpo.append(el('div', { html: BRAZO_HUMANO }));
         app.escena.fijarPostura(POSE);
       },
+      detalle: `<p>El brazo humano, del hombro a la muñeca, tiene <b>7 grados de libertad</b>:</p>
+<table><tr><th>Articulación</th><th>GDL</th><th>Movimientos</th></tr>
+<tr><td>Hombro</td><td>3</td><td>flexión, abducción y rotación del brazo</td></tr>
+<tr><td>Codo</td><td>1</td><td>flexión</td></tr>
+<tr><td>Antebrazo y muñeca</td><td>3</td><td>pronación–supinación, flexión y desviación lateral</td></tr></table>
+<p>Con 7 GDL para fijar 6 números de la pose de la mano, sobra uno: el brazo humano es <b>redundante</b>. Por eso se puede mantener la mano quieta sobre la mesa y mover el codo: hay infinitas posturas para la misma pose de la mano. Algunos robots industriales y colaborativos también tienen 7 ejes por esa razón.</p>
+<p>El SO-ARM100 tiene 5. La teleoperación del proyecto copia <b>ángulos</b>, no la pose de la mano: el hombro humano da el giro de la base y la elevación del hombro del robot, el codo da el codo, la muñeca da la flexión y el giro de la muñeca. La desviación lateral de la muñeca y la rotación del brazo humano no tienen dónde ir, y el sistema las ignora. La lección 14 explica cómo se calculan esos ángulos a partir de la cámara.</p>`,
     },
     {
       titulo: 'Reto: toque la esfera',
@@ -156,6 +195,12 @@ export default {
         medir();
         return () => app.escena.extras.remove(esfera);
       },
+      detalle: `<p>Este reto es, sin fórmulas, el problema de la <b>cinemática inversa</b>: dado un punto, encontrar los ángulos que llevan la pinza hasta él. A mano se hace por prueba y error; la lección 7 muestra cómo lo resuelve un robot en milisegundos.</p>
+<p>Estrategia que suele funcionar:</p>
+<ol><li>Girar la <b>base</b> hasta que la esfera quede en el plano del brazo.</li>
+<li>Ajustar <b>hombro</b> y <b>codo</b> para acercar la muñeca a la distancia y la altura correctas.</li>
+<li>Terminar con la <b>flexión de muñeca</b>, que mueve la punta poco y con precisión.</li></ol>
+<p>El orden no es casual: las articulaciones cercanas a la base mueven la punta mucho por cada grado (el hombro está a unos 30 cm de la punta) y las de la muñeca poco. Es la misma idea que el <b>jacobiano</b> de la lección 8 y que el jog de la pestaña Programar.</p>`,
     },
   ],
 };

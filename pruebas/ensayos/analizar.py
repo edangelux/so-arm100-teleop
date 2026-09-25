@@ -12,6 +12,7 @@ Escribe resumen.md y las gráficas PNG en la carpeta del primer archivo, o en
 import argparse
 import csv
 import math
+import re
 import sys
 from collections import OrderedDict, defaultdict
 from pathlib import Path
@@ -198,10 +199,16 @@ def repetibilidad(meta, filas, nombre, salida):
 
 
 # ---------------------------------------------------------------- A3
+def gramos(etiqueta):
+    """Masa en gramos de una etiqueta como '50g' o 'sin_carga', para ordenar de menor a mayor."""
+    m = re.match(r'\s*(\d+(?:[.,]\d+)?)\s*g', etiqueta)
+    return float(m.group(1).replace(',', '.')) if m else 0.0
+
+
 def carga(archivos, salida):
     out = '### A3 — Carga útil\n\n'
     filas_t, barras = [], defaultdict(dict)
-    for nombre, meta, filas in archivos:
+    for nombre, meta, filas in sorted(archivos, key=lambda x: gramos(x[1].get('carga', ''))):
         et = meta.get('carga', '?')
         for g_et, g in grupos(filas, 'reposo').items():
             pose = g_et.split('|')[1]
@@ -214,7 +221,7 @@ def carga(archivos, salida):
     out += tabla(['Carga', 'Postura', 'Error hombro (°)', 'Error codo (°)', 'Error muñeca (°)',
                   'Esfuerzo hombro (%)', 'Esfuerzo codo (%)', 'Esfuerzo muñeca (%)'], filas_t)
     if plt and barras:
-        poses = list(barras); cargas = sorted({c for p in barras.values() for c in p})
+        poses = list(barras); cargas = sorted({c for p in barras.values() for c in p}, key=gramos)
         fig, axs = plt.subplots(1, 2, figsize=(9, 3.8))
         for k, (ax, tit) in enumerate(zip(axs, ('Hombro', 'Codo'))):
             ancho = 0.8 / max(len(cargas), 1)
