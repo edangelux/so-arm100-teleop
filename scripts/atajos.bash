@@ -15,6 +15,7 @@
 #   soarm-actualizar  git pull del repositorio
 #   soarm-camara      elige y prueba la cámara sin arrancar nada
 #   soarm-diagnostico revisa la instalación completa y guarda un informe
+#   soarm-app         abre SO-ARM100 Estudio: todo con botones, en 3D (docs/18)
 #   soarm-config      crea o cambia ~/.soarm.conf
 #   soarm-ayuda       esta lista
 #
@@ -268,10 +269,11 @@ CONF
 }
 
 soarm-ayuda() {
-    sed -n '1,22p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '1,23p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     _soarm_cargar
     echo "Configuración actual ($_soarm_conf): modo $SOARM_MODO, v$SOARM_VERSION, MoveIt $SOARM_MOVEIT, cámara $SOARM_CAM"
 }
 
 soarm-camara() { bash "$_soarm_dir/elegir_camara.sh"; }
 soarm-diagnostico() { bash "$_soarm_dir/diagnostico.sh" "$@"; }
+soarm-app() { bash "$_soarm_dir/../app/abrir.sh" "$@"; }

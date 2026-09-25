@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SO-ARM100 Estudio</title>
+<link rel="icon" href="img/icono.svg">
+<meta name="theme-color" content="#1f1633">
+<link rel="stylesheet" href="css/estilo.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+</script>
+</head>
+<body>
+<header class="barra">
+  <a class="marca" href="#sesion">
+    <img src="img/icono.svg" alt="" class="marca-icono">
+    <strong>SO-ARM100</strong><span>estudio</span>
+  </a>
+  <nav class="riel" id="riel"></nav>
+</header>
+
+<main class="escenario">
+  <div id="vista3d" class="vista3d"></div>
+  <div class="capa-superior">
+    <div class="indicadores" id="indicadores"></div>
+    <div class="chip" id="chip-fuente">Simulación interna</div>
+    <div class="chip chip-coord" id="chip-efector">Pinza · x — y — z — mm</div>
+  </div>
+  <div class="capa-herramientas" id="herramientas-vista"></div>
+  <div class="capa-leccion oculto" id="capa-leccion"></div>
+</main>
+
+<aside class="panel" id="panel"></aside>
+
+<div class="avisos" id="avisos"></div>
+<div class="modal oculto" id="modal"><div class="modal-caja" id="modal-caja"></div></div>
+
+<script type="module" src="js/principal.js"></script>
+</body>
+</html>

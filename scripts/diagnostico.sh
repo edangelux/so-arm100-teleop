@@ -11,6 +11,7 @@
 set -uo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$REPO/scripts/ui.bash"
+USER="${USER:-$(id -un)}"
 WS="${ROS2_WS_ENTREGA:-$HOME/ros2_ws_entrega}"
 VENV="${SOARM_VENV:-$HOME/teleop_venv_entrega}"
 CONF="$HOME/.soarm.conf"
@@ -125,6 +126,18 @@ seccion "Atajos"
 grep -q "scripts/atajos.bash" "$HOME/.bashrc" 2>/dev/null && linea OK "Atajos en ~/.bashrc" || linea AVISO "Atajos en ~/.bashrc" "bash scripts/instalar_atajos.sh"
 [[ -f "$CONF" ]] && linea OK "Configuración" "$CONF" || linea AVISO "Configuración" "Se crea con bash scripts/instalar_atajos.sh"
 ls "$HOME/.local/share/applications/soarm-teleop.desktop" >/dev/null 2>&1 && linea OK "Icono en el menú de aplicaciones" || linea AVISO "Icono en el menú de aplicaciones" "bash scripts/instalar_atajos.sh"
+
+seccion "Aplicación SO-ARM100 Estudio"
+python3 -c 'import http.server, json, socketserver' 2>/dev/null && linea OK "Python para el servidor" "$(python3 --version 2>&1)" || linea FALLA "Python para el servidor" "sudo apt install python3"
+[[ -f "$REPO/app/web/vendor/three/three.module.js" ]] && linea OK "Motor 3D incluido" "three.js en app/web/vendor" || linea FALLA "Motor 3D incluido" "Falta app/web/vendor/three: git pull"
+if [[ "$ENT" == wsl ]]; then
+    ls /mnt/c/Program\ Files*/Microsoft/Edge/Application/msedge.exe >/dev/null 2>&1 && linea OK "Ventana de la aplicación" "Microsoft Edge de Windows" ||
+        linea AVISO "Ventana de la aplicación" "Sin Edge: abra http://127.0.0.1:8642 en cualquier navegador de Windows"
+else
+    nav="$(command -v google-chrome chromium chromium-browser microsoft-edge brave-browser firefox 2>/dev/null | head -1)"
+    [[ -n "$nav" ]] && linea OK "Navegador para la ventana" "$nav" || linea AVISO "Navegador para la ventana" "sudo snap install chromium"
+fi
+ls "$HOME/.local/share/applications/soarm-estudio.desktop" >/dev/null 2>&1 && linea OK "Icono de la aplicación" || linea AVISO "Icono de la aplicación" "bash scripts/instalar_atajos.sh"
 
 printf '\nResumen: %d OK, %d AVISO, %d FALLA\n' "$ok" "$aviso" "$falla" | tee -a "$INFORME"
 [[ $falla -eq 0 ]] && echo "Listo para operar: escriba teleop." | tee -a "$INFORME" ||

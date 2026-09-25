@@ -1,6 +1,6 @@
 # 17 — Ensayos de rendimiento del brazo y de la teleoperación
 
-[← Anterior: v15, estimación de ángulos](16-v15-estimacion-de-angulos.md) · [Volver al inicio](../README.md)
+[← Anterior: v15, estimación de ángulos](16-v15-estimacion-de-angulos.md) · [Volver al inicio](../README.md) · [Siguiente: SO-ARM100 Estudio →](18-aplicacion-estudio.md)
 
 ---
 
@@ -153,3 +153,7 @@ Escribe `resumen.md` con todas las tablas y una gráfica PNG por ensayo, en la m
 | `brazo-fisico/utilidades/ensayos/ensayo_termico.cpp` | A4, directo sobre el bus |
 | `pruebas/ensayos/registrador.py` | B1 y B2 |
 | `pruebas/ensayos/analizar.py` | Tablas y gráficas de todos |
+
+---
+
+Las pruebas C a H, que completan estas, están en [el capítulo 18](18-aplicacion-estudio.md#pruebas-que-debe-superar-el-robot).

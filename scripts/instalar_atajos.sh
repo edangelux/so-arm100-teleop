@@ -58,11 +58,25 @@ DESK
 }
 icono soarm-teleop.desktop "SO-ARM100 Teleoperación" "Arranca la teleoperación del brazo SO-ARM100" teleop applications-science
 icono soarm-diagnostico.desktop "SO-ARM100 Diagnóstico" "Revisa la instalación del SO-ARM100" soarm-diagnostico utilities-system-monitor
+# La aplicación no necesita terminal: abre su propia ventana.
+cat >"$APPS/soarm-estudio.desktop" <<DESK
+[Desktop Entry]
+Type=Application
+Name=SO-ARM100 Estudio
+Comment=Opera, prueba y aprende con el brazo SO-ARM100, todo con botones
+Exec=bash "$REPO/app/abrir.sh"
+Terminal=false
+Icon=$REPO/app/web/img/icono.svg
+Categories=Science;Education;
+DESK
+chmod +x "$APPS/soarm-estudio.desktop"
 ESCRITORIO="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")"
 if [[ -d "$ESCRITORIO" && "$ESCRITORIO" != "$HOME" ]]; then
-    cp "$APPS/soarm-teleop.desktop" "$ESCRITORIO/"
-    gio set "$ESCRITORIO/soarm-teleop.desktop" metadata::trusted true 2>/dev/null || true
-    echo "Icono «SO-ARM100 Teleoperación» en el escritorio."
+    for d in soarm-estudio.desktop soarm-teleop.desktop; do
+        cp "$APPS/$d" "$ESCRITORIO/"
+        gio set "$ESCRITORIO/$d" metadata::trusted true 2>/dev/null || true
+    done
+    echo "Iconos «SO-ARM100 Estudio» y «SO-ARM100 Teleoperación» en el escritorio."
 fi
 echo "Iconos agregados al menú de aplicaciones."
 echo "Abra una terminal nueva, o ejecute «source ~/.bashrc», y escriba soarm-ayuda."

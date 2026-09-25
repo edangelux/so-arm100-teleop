@@ -81,6 +81,7 @@ Después de instalar, basta escribir **`teleop`**, o abrir el icono **SO-ARM100 
 | 15 | [**v14, MoveIt y posturas seguras**](docs/15-v14-moveit-y-posturas-seguras.md) | Arranque y reanudación desde la postura medida, MoveIt junto a la teleoperación, cierre en `init` y apagado en `home` |
 | 16 | [**v15: mejor estimación de ángulos**](docs/16-v15-estimacion-de-angulos.md) | Confianza por articulación, ganancia por postura de referencia y giro de muñeca en 3D |
 | 17 | [**Ensayos de rendimiento**](docs/17-ensayos-de-rendimiento.md) | Precisión, respuesta, repetibilidad, carga, temperatura y fidelidad del espejo |
+| 18 | [**SO-ARM100 Estudio**](docs/18-aplicacion-estudio.md) | Aplicación con botones y brazo en 3D: sesión, movimiento, ensayos, diagnóstico y 18 lecciones de robótica |
 | — | [**Modelo cinemático completo**](analisis/cinematica/ANALISIS_CINEMATICO.md) | Tabla D-H, cinemática directa e inversa, jacobiano, singularidades, verificación cruzada |
 | — | [**Documentos entregados**](docs/entregables/README.md) | Documento técnico, formulación y evaluación, y las dos presentaciones |
 
