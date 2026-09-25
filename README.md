@@ -12,67 +12,121 @@ Todo se maneja desde **SO-ARM100 Estudio**, una aplicación con botones y el bra
 
 ---
 
-## Inicio rápido
+## Inicio rápido: de cero a la aplicación abierta
 
-Hace falta **Ubuntu 22.04**: instalado en el equipo, en una máquina virtual o en **WSL2** dentro de Windows (en Windows se abre la aplicación **Ubuntu** desde el menú Inicio). Todo lo demás se instala con los comandos de abajo. Cada bloque se copia completo y se pega en la terminal de Ubuntu.
+Estos son **todos** los pasos, en orden, para abrir **SO-ARM100 Estudio** en una computadora nueva. Cada bloque gris se copia completo y se pega en la ventana que indica su título.
 
-### 1. Instalar (una sola vez)
+| Paso | Qué se hace | Dónde | Cuántas veces |
+|:---:|---|---|---|
+| 1 | Tener Ubuntu 22.04 (en Windows, con WSL2) | PowerShell (sólo en Windows) | Una vez |
+| 2 | Descargar el proyecto e instalarlo: `bash scripts/soarm.sh instalar` | Terminal de Ubuntu | Una vez |
+| 3 | Activar los atajos: `source ~/.bashrc` | Terminal de Ubuntu | Una vez |
+| 4 | **Abrir la aplicación: `soarm-app`** | Terminal de Ubuntu | **Cada vez** |
+| 5 | Usarla con botones | La ventana de la aplicación | — |
+| 6 | Apagar el servidor: `soarm-app --parar` | Terminal de Ubuntu | Al terminar |
+
+> **¿Dónde se escribe cada comando?** Hay dos ventanas distintas y no se mezclan:
+>
+> | Ventana | Cómo se abre | Se reconoce porque… |
+> |---|---|---|
+> | **PowerShell** (sólo en Windows) | Menú Inicio → escribir `PowerShell` → *Ejecutar como administrador* | La línea empieza con `PS C:\…>` |
+> | **Terminal de Ubuntu** | En Windows: menú Inicio → **Ubuntu 22.04**. En Ubuntu: `Ctrl + Alt + T` | La línea termina en `~$` |
+>
+> Todo lo que empieza con `git`, `bash`, `sudo`, `soarm-…` o `teleop` va en la **terminal de Ubuntu**. Si Windows responde *«no se reconoce como nombre de un cmdlet»*, el comando se escribió en PowerShell por error.
+
+### Paso 1 — Tener Ubuntu 22.04
+
+El sistema funciona **sólo en Ubuntu 22.04** (ROS 2 Humble lo exige). Se elige una de tres formas:
+
+<details open>
+<summary><b>Windows 10 u 11 → WSL2</b> (la que usó el proyecto)</summary>
+
+En **PowerShell como administrador**:
+
+```powershell
+wsl --install -d Ubuntu-22.04
+```
+
+Reiniciar la computadora. Al volver, abrir **Ubuntu 22.04** desde el menú Inicio y crear un usuario y una contraseña (la contraseña no se ve mientras se escribe; es normal). Si además se va a conectar el **brazo o una cámara USB**, instalar una sola vez, también en PowerShell como administrador:
+
+```powershell
+winget install --interactive --exact dorssel.usbipd-win
+```
+
+Detalle y problemas frecuentes: [docs/11 — WSL2](docs/11-instalacion-wsl2.md).
+</details>
+
+<details>
+<summary><b>Ubuntu 22.04 instalado en la computadora, o en una máquina virtual</b></summary>
+
+Si todavía no está instalado: [docs/02 — Instalación nativa por USB](docs/02-instalacion-nativa-iso.md) o [docs/01 — Máquina virtual (VirtualBox)](docs/01-instalacion-maquina-virtual.md). Después se abre la terminal con `Ctrl + Alt + T`.
+</details>
+
+Para comprobar la versión, en la terminal de Ubuntu: `lsb_release -d` debe decir **Ubuntu 22.04**.
+
+### Paso 2 — Descargar el proyecto e instalarlo (una sola vez)
+
+En la **terminal de Ubuntu**:
 
 ```bash
-sudo apt update && sudo apt install -y git
+sudo apt update && sudo apt install -y git curl
 git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
 cd ~/so-arm100-teleop
 bash scripts/soarm.sh instalar
+```
+
+Pide la contraseña de Ubuntu y tarda un buen rato: instala ROS 2 Humble, Gazebo, MoveIt, MediaPipe y el workspace del brazo, y al final crea los atajos de una palabra y los iconos. Termina con el mensaje **«Instalación completa»**. Si se corta (por ejemplo, por la red), se vuelve a ejecutar la última línea: continúa sin romper nada.
+
+### Paso 3 — Activar los atajos
+
+En la misma terminal:
+
+```bash
 source ~/.bashrc
 ```
 
-Instala ROS 2 Humble, Gazebo, MoveIt, MediaPipe y el workspace del brazo, y crea los atajos de una palabra y los iconos del escritorio. Tarda un buen rato la primera vez; se puede volver a ejecutar sin romper nada.
+Sólo hace falta esta vez; las terminales que se abran después ya los traen. Para comprobarlo, `soarm-ayuda` muestra la lista de órdenes.
 
-### 2. Abrir la aplicación
+### Paso 4 — Abrir la aplicación
 
 ```bash
 soarm-app
 ```
 
-Se abre **SO-ARM100 Estudio** en una ventana propia. También se abre con doble clic en el icono **SO-ARM100 Estudio**. Desde ahí se hace todo con botones: iniciar la teleoperación, mover el brazo, programarlo, hacer los ensayos y las lecciones.
+La terminal responde `SO-ARM100 Estudio en http://127.0.0.1:8642` y se abre la aplicación en una ventana propia: en WSL2 con **Microsoft Edge** de Windows; en Ubuntu, con Chrome, Chromium, Edge o Brave (el primero que encuentre). También queda el icono **SO-ARM100 Estudio** en el menú de aplicaciones de Ubuntu.
 
-### 3. Teleoperar con la cámara (sin la aplicación)
+Si no se abre ninguna ventana, se escribe **http://127.0.0.1:8642** en la barra de direcciones de cualquier navegador de la misma computadora.
 
-```bash
-teleop
-```
+### Paso 5 — Usarla
 
-Pregunta qué cámara usar, detecta si el brazo está conectado y arranca Gazebo, el brazo o los dos. Se calibra con la mano visible y la tecla `C`; se sale con `Q`.
-
-### Órdenes de uso diario
-
-| Para… | Comando |
+| Para… | En la aplicación |
 |---|---|
-| Abrir la aplicación | `soarm-app` |
-| Cerrar el servidor de la aplicación | `soarm-app --parar` |
-| Teleoperación directa | `teleop` · `teleop sim` · `teleop real` · `teleop ambos` |
-| Traer la última versión del repositorio | `soarm-actualizar` |
-| Revisar que todo esté bien instalado | `soarm-diagnostico` |
-| Ver los servos (posición, carga, temperatura) | `servos` |
-| Llevar los seis servos al centro (2048) | `centrar` |
-| Ensayos de rendimiento | `soarm-ensayo a1` … `soarm-ensayo analizar` |
-| Ver todas las órdenes | `soarm-ayuda` |
+| Teleoperar con la cámara | **Sesión** → elegir modo y cámara → **Iniciar** |
+| Mover el brazo con deslizadores o arrastrando la pinza | **Mover** |
+| Programar con `MoveJ`, `MoveL`… y tomar cubos | **Programar** → *Ejemplos…* → **Ejecutar** |
+| Aprender robótica | **Aprender** → elegir una lección |
+| Medir el brazo real | **Ensayos** |
+| Revisar que todo esté bien instalado | **Revisar** |
 
-<details>
-<summary><b>Sólo la aplicación, sin instalar ROS</b> (para las lecciones y el robot virtual)</summary>
+Aprender, Programar y Mover funcionan **sin brazo y sin cámara**, con el robot virtual.
 
-Sirve en cualquier Linux con Python 3 y un navegador: Aprender, Programar y Mover funcionan completos con el robot virtual. Sesión y Ensayos avisan de que hace falta ROS.
+### Paso 6 — Cerrar
+
+Se cierra la ventana. El servidor sigue encendido a propósito (para no cortar una sesión en marcha); para apagarlo:
 
 ```bash
-git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
-bash ~/so-arm100-teleop/app/abrir.sh
+soarm-app --parar
 ```
 
-Si no se abre ninguna ventana, se entra desde el navegador a **http://127.0.0.1:8642**.
-</details>
+### Las veces siguientes
 
-<details>
-<summary><b>Actualizar una instalación anterior</b></summary>
+Abrir la terminal de Ubuntu (en Windows: **Ubuntu 22.04** en el menú Inicio) y escribir:
+
+```bash
+soarm-app
+```
+
+### Actualizar a la última versión
 
 ```bash
 cd ~/so-arm100-teleop
@@ -80,7 +134,44 @@ git pull
 bash scripts/instalar_atajos.sh
 source ~/.bashrc
 ```
+
+### Otras órdenes
+
+| Para… | Comando |
+|---|---|
+| Teleoperación directa, sin la aplicación | `teleop` · `teleop sim` · `teleop real` · `teleop ambos` |
+| Revisar la instalación y guardar un informe | `soarm-diagnostico` |
+| Ver los servos (posición, carga, temperatura) | `servos` |
+| Llevar los seis servos al centro (2048) | `centrar` |
+| Ensayos de rendimiento | `soarm-ensayo a1` … `soarm-ensayo analizar` |
+| Traer la última versión | `soarm-actualizar` |
+| Ver todas las órdenes | `soarm-ayuda` |
+
+### Si algo falla
+
+| Mensaje | Qué pasó | Solución |
+|---|---|---|
+| `no se reconoce como nombre de un cmdlet` | Se escribió en PowerShell | Abrir **Ubuntu 22.04** y escribirlo ahí |
+| `soarm-app: orden no encontrada` (o `command not found`) | Los atajos no están cargados | `source ~/.bashrc`; si sigue, `bash ~/so-arm100-teleop/scripts/instalar_atajos.sh` y otra vez `source ~/.bashrc` |
+| `fatal: destination path ... already exists` | El proyecto ya estaba descargado | `cd ~/so-arm100-teleop && git pull` y seguir en el paso 2 con `bash scripts/soarm.sh instalar` |
+| `La instalación requiere Ubuntu 22.04` | La versión de Ubuntu es otra | Instalar Ubuntu 22.04 (paso 1) |
+| `El servidor no arrancó` | Algo falló al iniciar | Ver `~/.local/state/soarm/estudio.log`; `soarm-diagnostico` |
+| La ventana no se abre | No se encontró navegador | Abrir **http://127.0.0.1:8642** a mano |
+| La página dice «Sin ROS» | Falta la instalación del paso 2 | Las lecciones y el robot virtual funcionan igual; para el brazo, completar el paso 2 |
+
+<details>
+<summary><b>Sólo la aplicación, sin instalar ROS</b> (para las lecciones y el robot virtual)</summary>
+
+Sirve en cualquier Linux con Python 3 y un navegador: Aprender, Programar y Mover funcionan completos con el robot virtual. Sesión y Ensayos avisan de que hace falta ROS.
+
+```bash
+sudo apt update && sudo apt install -y git curl python3
+git clone https://github.com/Edangelux/so-arm100-teleop.git ~/so-arm100-teleop
+bash ~/so-arm100-teleop/app/abrir.sh
+```
 </details>
+
+> **Comprobado:** la secuencia de los pasos 3 a 6 se ejecutó en una cuenta de usuario nueva, sin nada instalado del proyecto: los atajos quedan en `~/.bashrc`, `soarm-app` arranca el servidor y la página responde en el puerto 8642, un segundo `soarm-app` reutiliza el servidor y `soarm-app --parar` lo apaga. La instalación completa del paso 2 es la que se verificó desde cero en Ubuntu 22.04 durante el proyecto (tabla de estado, más abajo).
 
 ---
 
@@ -158,7 +249,7 @@ Después de la defensa se midió el brazo real con los ensayos del [capítulo 17
 
 ## Operación con el lanzador unificado
 
-Los atajos del [inicio rápido](#inicio-rápido) llaman a este guion. Desde la entrega, el sistema se instala y se opera con un solo guion, [`scripts/soarm.sh`](scripts/soarm.sh), que ejecuta la versión 13 presentada y elige las conexiones según el modo. Requiere **Ubuntu 22.04**, nativo, en máquina virtual o bajo WSL2.
+Los atajos del [inicio rápido](#inicio-rápido-de-cero-a-la-aplicación-abierta) llaman a este guion. Desde la entrega, el sistema se instala y se opera con un solo guion, [`scripts/soarm.sh`](scripts/soarm.sh), que ejecuta la versión 13 presentada y elige las conexiones según el modo. Requiere **Ubuntu 22.04**, nativo, en máquina virtual o bajo WSL2.
 
 ```bash
 sudo apt update && sudo apt install -y git
