@@ -1,14 +1,17 @@
 // Comunicación con el servidor local.
 export async function obtener(ruta) {
   const r = await fetch(ruta, { cache: 'no-store' });
-  if (!r.ok) throw new Error((await r.json()).error || r.statusText);
+  if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(r.status === 404 && j.error === 'Ruta desconocida.' ? VIEJO : j.error || r.statusText); }
   return r.json();
 }
+
+// Un servidor encendido antes de actualizar el repositorio no conoce las rutas nuevas.
+const VIEJO = 'El servidor de la aplicación es de una versión anterior a esta página (el repositorio se actualizó con el servidor encendido). Cierre la sesión, ejecute «soarm-app --parar» en la terminal y abra otra vez con «soarm-app».';
 
 export async function enviar(ruta, datos = {}) {
   const r = await fetch(ruta, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.error || r.statusText);
+  if (!r.ok) throw new Error(r.status === 404 && j.error === 'Ruta desconocida.' ? VIEJO : j.error || r.statusText);
   return j;
 }
 

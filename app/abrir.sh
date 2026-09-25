@@ -18,8 +18,28 @@ source "$REPO/scripts/ui.bash"
 vivo() { curl -s --noproxy '*' -m 1 -o /dev/null "$URL/api/estado"; }
 
 if [[ "${1:-}" == --parar ]]; then
-    pkill -f "app/servidor.py --puerto $PUERTO" && echo "Servidor detenido." || echo "No había servidor."
+    pkill -f "^python3 app/servidor.py --puerto $PUERTO( |$)" && echo "Servidor detenido." || echo "No había servidor."
     exit 0
+fi
+
+# Si ya hay un servidor encendido, se comprueba que corra el código actual: tras
+# un «git pull» con el servidor encendido, la página nueva pediría rutas que el
+# servidor viejo no conoce («Ruta desconocida»).
+if vivo; then
+    local_v="$(python3 "$REPO/app/estudio/version.py" 2>/dev/null)"
+    remoto="$(curl -s --noproxy '*' -m 2 "$URL/api/estado" | python3 -c 'import json,sys
+d=json.load(sys.stdin); print(d.get("version", "antigua"), d.get("sesion", {}).get("estado", "detenida"))' 2>/dev/null)"
+    remoto_v="${remoto%% *}"; sesion_e="${remoto##* }"
+    if [[ -n "$local_v" && "$remoto_v" != "$local_v" ]]; then
+        if [[ "$sesion_e" == detenida ]]; then
+            echo "El servidor encendido es de una versión anterior; se reinicia con el código actual."
+            pkill -f "^python3 app/servidor.py --puerto $PUERTO( |$)"
+            for _ in $(seq 1 20); do vivo || break; sleep 0.25; done
+        else
+            echo "AVISO: el servidor encendido es de una versión anterior y hay una sesión abierta ($sesion_e)."
+            echo "       Cierre la sesión en la aplicación y ejecute: soarm-app --parar && soarm-app"
+        fi
+    fi
 fi
 
 if ! vivo; then

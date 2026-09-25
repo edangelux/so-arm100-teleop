@@ -734,10 +734,10 @@ const seccion = {
         pausa: async () => { avisos.add('Stop: al ejecutar, el programa se pausará ahí hasta pulsar Continuar.'); },
       }, { override: this.override, maxPasos: 20000 });
     } catch (e) {
-      this.mensaje(`Línea ${e.linea ?? '?'}: ${e.message}`, 'l-error');
+      this.mensaje(`${e.linea != null ? `Línea ${e.linea}: ` : ''}${e.message}`, 'l-error');
       if (e.linea) { this.seleccion = e.linea; this.marcarLinea(null); this.pintarLista(); }
       this.estado.textContent = 'La verificación encontró un problema.';
-      if (!silencioso) aviso(`Línea ${e.linea ?? '?'}: ${e.message}`, 'mal');
+      if (!silencioso) aviso(`${e.linea != null ? `Línea ${e.linea}: ` : ''}${e.message}`, 'mal');
       return false;
     }
     avisos.forEach((a) => this.mensaje(a, 'l-aviso'));
@@ -791,9 +791,9 @@ const seccion = {
     } catch (e) {
       if (e instanceof Detenido) { this.mensaje('Programa detenido.', 'l-aviso'); this.estado.textContent = 'Detenido.'; }
       else {
-        this.mensaje(`Línea ${e.linea ?? '?'}: ${e.message}`, 'l-error');
+        this.mensaje(`${e.linea != null ? `Línea ${e.linea}: ` : ''}${e.message}`, 'l-error');
         this.estado.textContent = 'Se detuvo por un error.';
-        aviso(`Línea ${e.linea ?? '?'}: ${e.message}`, 'mal');
+        aviso(`${e.linea != null ? `Línea ${e.linea}: ` : ''}${e.message}`, 'mal');
       }
     } finally {
       this.corriendo = false;

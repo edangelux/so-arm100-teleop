@@ -27,6 +27,7 @@ from estudio import puente_ros                    # noqa: E402
 from estudio.eventos import difusor               # noqa: E402
 from estudio.modelo import cargar_modelo          # noqa: E402
 from estudio.procesos import sesion, tarea        # noqa: E402
+from estudio.version import huella                # noqa: E402
 from estudio.rutas import (ENSAYOS, LECCIONES, MALLAS, PROGRAMAS, REPO,  # noqa: E402
                            RESULTADOS, SCRIPTS, WEB)
 
@@ -34,12 +35,14 @@ mimetypes.add_type('text/javascript', '.js')
 mimetypes.add_type('application/json', '.json')
 mimetypes.add_type('model/stl', '.stl')
 MODELO = cargar_modelo()
+VERSION = huella()          # código con el que arrancó este proceso
 PUENTE = None
 
 
 def estado_general():
     conf = ent.leer_conf()
     return {
+        'version': VERSION,
         'entorno': ent.entorno(),
         'software_gl': ent.software_gl(conf),
         'ros': PUENTE.estado() if PUENTE else {'disponible': False, 'motivo': 'sin iniciar'},
@@ -372,6 +375,11 @@ class Manejador(BaseHTTPRequestHandler):
             if p == '/api/conf':
                 ent.guardar_conf({k: v for k, v in d.items() if k.startswith('SOARM_')})
                 return self._json({'ok': True})
+            if huella() != VERSION:
+                return self._json({'error': 'El servidor de la aplicación sigue con una versión anterior del código: '
+                                   'el repositorio se actualizó con el servidor encendido. Cierre la sesión, '
+                                   'ejecute «soarm-app --parar» y abra otra vez con «soarm-app».',
+                                   'desactualizado': True}, 409)
             return self._json({'error': 'Ruta desconocida.'}, 404)
         except (RuntimeError, KeyError, ValueError) as e:
             return self._json({'error': str(e)}, 409)

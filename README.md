@@ -157,6 +157,7 @@ source ~/.bashrc
 | `La instalación requiere Ubuntu 22.04` | La versión de Ubuntu es otra | Instalar Ubuntu 22.04 (paso 1) |
 | `El servidor no arrancó` | Algo falló al iniciar | Ver `~/.local/state/soarm/estudio.log`; `soarm-diagnostico` |
 | La ventana no se abre | No se encontró navegador | Abrir **http://127.0.0.1:8642** a mano |
+| `Ruta desconocida` o «el servidor es de una versión anterior» al ejecutar | Se actualizó el repositorio con el servidor de la aplicación encendido | Cerrar la sesión en la aplicación y ejecutar `soarm-app --parar` y luego `soarm-app`. Desde esta versión, `soarm-app` lo detecta y reinicia el servidor solo cuando no hay sesión abierta |
 | La página dice «Sin ROS» | Falta la instalación del paso 2 | Las lecciones y el robot virtual funcionan igual; para el brazo, completar el paso 2 |
 
 <details>

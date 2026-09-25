@@ -414,6 +414,7 @@ Cada fase se prueba antes de empezar la siguiente.
 | «Sin ROS» aunque ROS está instalado | El servidor se arrancó sin cargar ROS | `soarm-app --parar` y abrir otra vez con el icono, que carga ROS |
 | Mover dice que no llegan estados | La sesión está arrancando o el lanzador cayó | Esperar al estado `menu`; revisar el registro de la sección Sesión |
 | El puerto 8642 está ocupado | Otro programa lo usa | `SOARM_APP_PUERTO=8650 soarm-app` |
+| Al ejecutar un programa o mover: «Ruta desconocida» | El servidor se había arrancado antes de actualizar el repositorio (`git pull`) y sigue con el código viejo, que no conoce las rutas nuevas | Cerrar la sesión y ejecutar `soarm-app --parar` y `soarm-app`. `abrir.sh` compara la huella del código del servidor encendido (`app/estudio/version.py`) con la del disco y, si difieren y no hay sesión abierta, lo reinicia solo; con una sesión abierta sólo avisa |
 
 ---
 
