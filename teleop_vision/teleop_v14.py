@@ -549,6 +549,12 @@ def main(args=None):
 
     except KeyboardInterrupt:
         pass
+    except Exception:
+        # Al cerrar con SIGINT (Q desde la aplicación o Ctrl+C) rclpy apaga su
+        # contexto y la siguiente llamada a spin_once falla con RCLError: es un
+        # cierre normal, no un error. Cualquier otra excepción se muestra.
+        if rclpy.ok():
+            raise
     finally:
         cap.release()
         cv2.destroyAllWindows()

@@ -75,6 +75,8 @@ cd ~/so-arm100-teleop
 bash scripts/soarm.sh instalar
 ```
 
+Una vez instalado, si el sistema ya estaba instalado antes del 29/09/2026, se agrega la protección contra saltos del brazo con `bash scripts/proteger_brazo.sh` ([docs/20](docs/20-protecciones-del-brazo.md)).
+
 Pide la contraseña de Ubuntu y tarda un buen rato: instala ROS 2 Humble, Gazebo, MoveIt, MediaPipe y el workspace del brazo, y al final crea los atajos de una palabra y los iconos. Termina con el mensaje **«Instalación completa»**. Si se corta (por ejemplo, por la red), se vuelve a ejecutar la última línea: continúa sin romper nada.
 
 ### Paso 3 — Activar los atajos
@@ -296,6 +298,7 @@ Después de instalar, basta escribir **`teleop`**, o abrir el icono **SO-ARM100 
 | 17 | [**Ensayos de rendimiento**](docs/17-ensayos-de-rendimiento.md) | Precisión, respuesta, repetibilidad, carga, temperatura y fidelidad del espejo, con los resultados del 25/09/2026 |
 | 18 | [**SO-ARM100 Estudio**](docs/18-aplicacion-estudio.md) | Aplicación con botones y brazo en 3D: sesión, movimiento, ensayos, diagnóstico y 18 lecciones de robótica |
 | 19 | [**Programar**](docs/19-programar.md) | Programación tipo robot industrial: MoveJ, MoveL, MoveC, pinza, señales, bucles, celda virtual, ejemplos y retos |
+| 20 | [**Protecciones del brazo físico**](docs/20-protecciones-del-brazo.md) | Limitador de saltos, comprobación de fuente y servos, centrado suave y reglas de encendido |
 | — | [**Modelo cinemático completo**](analisis/cinematica/ANALISIS_CINEMATICO.md) | Tabla D-H, cinemática directa e inversa, jacobiano, singularidades, verificación cruzada |
 | — | [**Documentos entregados**](docs/entregables/README.md) | Documento técnico, formulación y evaluación, y las dos presentaciones |
 

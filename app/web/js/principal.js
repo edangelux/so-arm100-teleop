@@ -87,7 +87,12 @@ class Aplicacion {
     }
     if (!this.fuenteViva()) {
       const topico = s.modo === 'sim' ? '/joint_states' : '/real/joint_states';
-      return { listo: false, motivo: `El lanzador está en su menú (brazo en init) y hay ROS 2, pero no llegan las posiciones del ${planta} (${topico}). Compruebe en una terminal «ros2 topic hz ${topico}». Si publica, apague la sesión, ejecute «soarm-app --parar» y «soarm-app», e inicie la sesión otra vez.` };
+      const clave = s.modo === 'sim' ? 'sim' : 'real';
+      const n = e.ros.mensajes?.[clave] ?? 0, malos = e.ros.descartados?.[clave] ?? 0;
+      const detalle = n === 0 ? 'el servidor no ha recibido ningún mensaje de ese tema'
+        : malos >= n ? `llegaron ${n} mensajes, pero ninguno trae las cinco articulaciones del brazo`
+          : 'llegaban mensajes, pero hace más de un segundo que no llega ninguno';
+      return { listo: false, motivo: `El lanzador está en su menú (brazo en init) y hay ROS 2, pero no llegan las posiciones del ${planta} (${topico}): ${detalle}. Compruebe en una terminal «ros2 topic hz ${topico}». Si publica, apague la sesión con Home y apagar, ejecute «soarm-app --parar» y «soarm-app», e inicie la sesión otra vez.` };
     }
     return { listo: true, motivo: `Se moverá el ${planta}.` };
   }

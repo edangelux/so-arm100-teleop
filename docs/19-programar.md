@@ -1,6 +1,6 @@
 # 19 — Programar: el robot con instrucciones de robot industrial
 
-[← Anterior: SO-ARM100 Estudio](18-aplicacion-estudio.md) · [Volver al inicio](../README.md)
+[← Anterior: SO-ARM100 Estudio](18-aplicacion-estudio.md) · [Volver al inicio](../README.md) · [Siguiente: protecciones del brazo →](20-protecciones-del-brazo.md)
 
 ---
 
@@ -176,7 +176,7 @@ La lección 15 de Aprender («Programación de robots») recorre estos conceptos
 3. **Verificar** el programa. Empezar con el control de velocidad al 25–50 %.
 4. **Ejecutar** con la mano cerca del interruptor de la fuente. **Detener** envía una parada al controlador.
 
-Por dentro, el programa se planifica completo en la aplicación y cada grupo de movimientos se envía como **una trayectoria articular** (puntos cada 50 ms o más) a `/api/trayectoria`, que la publica en el controlador de ROS 2 del modo elegido. El servidor rechaza la trayectoria si algún punto sale de los límites articulares, si los tiempos no crecen o si alguna articulación pasaría de 2,5 rad/s. La pinza se mueve con `/api/pinza`. En la celda real no hay sensor ni luces: `WaitDI` espera a que se pulse la entrada en la tarjeta de la celda y `SetDO` sólo enciende la luz virtual.
+Por dentro, el programa se planifica completo en la aplicación y cada grupo de movimientos se envía como **una trayectoria articular** (puntos cada 50 ms o más) a `/api/trayectoria`, que la publica en el controlador de ROS 2 del modo elegido. El servidor rechaza la trayectoria si algún punto sale de los límites articulares, si los tiempos no crecen o si alguna articulación pasaría de 1,6 rad/s. La pinza se mueve con `/api/pinza`. En la celda real no hay sensor ni luces: `WaitDI` espera a que se pulse la entrada en la tarjeta de la celda y `SetDO` sólo enciende la luz virtual.
 
 > **La celda virtual no existe en la mesa.** Antes de ejecutar un programa de tomar y colocar sobre el brazo real, hay que colocar piezas reales donde el programa las espera, o quitar las instrucciones de pinza. El brazo no detecta choques.
 

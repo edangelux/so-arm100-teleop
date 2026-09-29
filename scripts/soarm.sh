@@ -160,6 +160,8 @@ if [[ "$ACTION" == instalar ]]; then
     cd "$WS"
     rosdep install --from-paths src --ignore-src -r -y --rosdistro humble
     colcon build --symlink-install
+    # Protección contra saltos del brazo real (brazo-fisico/proteccion, docs/20).
+    bash "$REPO/scripts/proteger_brazo.sh" || die 'No se pudo instalar la protección contra saltos del brazo.'
     bash "$REPO/scripts/instalar_atajos.sh" || true
     printf '\nInstalación completa. Si se agregaron grupos al usuario, cierre sesión y vuelva a entrar.\n'
     exit 0
@@ -187,6 +189,20 @@ else
 fi
 if [[ "$ACTION" != sim ]]; then
     [[ -c "$PORT" && -r "$PORT" && -w "$PORT" ]] || die "Puerto inaccesible: $PORT. Revise la conexión USB (o USB/IP en WSL2) y el grupo dialout."
+    # Antes de dar par al brazo real (docs/20):
+    # 1) el controlador debe tener la protección contra saltos;
+    python3 "$REPO/brazo-fisico/proteccion/aplicar.py" --comprobar "$WS/src/so_arm_100_hardware" ||
+        die 'El controlador del brazo no tiene la protección contra saltos. Ejecute una vez: bash scripts/proteger_brazo.sh'
+    # 2) los seis servos deben responder, con la fuente a 6,8 V o más y a 55 °C o menos.
+    comprobador="$HOME/.local/bin/soarm_comprobar_brazo"
+    fuente_c="$REPO/brazo-fisico/proteccion/comprobar_brazo.cpp"
+    scs="$WS/src/so_arm_100_hardware/include/SCServo_Linux"
+    if [[ ! -x "$comprobador" || "$fuente_c" -nt "$comprobador" ]]; then
+        mkdir -p "$HOME/.local/bin"
+        g++ -std=c++14 -O2 -I "$scs" "$fuente_c" "$scs"/*.cpp -o "$comprobador" 2>/dev/null || die 'No compiló la comprobación del brazo.'
+    fi
+    printf 'Comprobando el brazo antes de darle par...\n'
+    "$comprobador" "$PORT" || die 'El brazo no pasó la comprobación; no se le da par.'
 fi
 for command in setsid timeout flock; do command -v "$command" >/dev/null || die "Falta el programa $command"; done
 RUN_BASE="${XDG_STATE_HOME:-$HOME/.local/state}/soarm"
@@ -286,7 +302,8 @@ start_vision() {
 }
 session_menu() {
     local answer
-    printf '\n[Enter] reabrir la teleoperación   [h] llevar a home y apagar   [x] apagar sin mover\n> '
+    printf '\n[Enter] reabrir la teleoperación   [h] llevar a home y apagar   [x] apagar sin mover\n'
+    printf 'No apague ni encienda la fuente del brazo con la sesión abierta: cierre antes con [h].\n> '
     while true; do
         alive
         check_aux

@@ -26,6 +26,8 @@ class Puente:
         self.motivo = ''
         self.q = {'sim': None, 'real': None}
         self.t = {'sim': 0.0, 'real': 0.0}
+        self.mensajes = {'sim': 0, 'real': 0}      # recibidos, para el diagnóstico
+        self.descartados = {'sim': 0, 'real': 0}   # sin las cinco articulaciones del brazo
         try:
             import rclpy  # noqa: F401  (sólo comprueba que exista)
         except Exception as e:           # sin ROS: modo aprendizaje
@@ -54,17 +56,33 @@ class Puente:
 
         def cb(planta):
             def f(msg):
+                self.mensajes[planta] += 1
                 idx = {n: i for i, n in enumerate(msg.name)}
-                if all(n in idx for n in ART):
-                    q = [float(msg.position[idx[n]]) for n in ART]
-                    q.append(float(msg.position[idx['Gripper']]) if 'Gripper' in idx else 0.0)
-                    self.q[planta], self.t[planta] = q, time.time()
+                if not all(n in idx for n in ART) or len(msg.position) < len(msg.name):
+                    self.descartados[planta] += 1
+                    return
+                q = [float(msg.position[idx[n]]) for n in ART]
+                q.append(float(msg.position[idx['Gripper']]) if 'Gripper' in idx else 0.0)
+                self.q[planta], self.t[planta] = q, time.time()
             return f
 
         self.nodo.create_subscription(JointState, '/joint_states', cb('sim'), 20)
         self.nodo.create_subscription(JointState, '/real/joint_states', cb('real'), 20)
-        threading.Thread(target=rclpy.spin, args=(self.nodo,), daemon=True).start()
+        threading.Thread(target=self._girar, args=(rclpy,), daemon=True).start()
         threading.Thread(target=self._difundir, daemon=True).start()
+
+    def _girar(self, rclpy):
+        """Atiende las suscripciones. Si una llamada falla, lo anota en el registro del
+        servidor y sigue: un error aislado no debe dejar a la aplicación sin datos."""
+        import traceback
+        while rclpy.ok():
+            try:
+                rclpy.spin_once(self.nodo, timeout_sec=0.1)
+            except Exception:
+                if not rclpy.ok():
+                    break
+                traceback.print_exc()
+                time.sleep(0.5)
 
     def _difundir(self):
         while True:
@@ -77,7 +95,20 @@ class Puente:
     def estado(self):
         ahora = time.time()
         return {'disponible': self.disponible, 'motivo': self.motivo,
-                'sim': ahora - self.t['sim'] < 1.0, 'real': ahora - self.t['real'] < 1.0}
+                'sim': ahora - self.t['sim'] < 1.0, 'real': ahora - self.t['real'] < 1.0,
+                'mensajes': dict(getattr(self, 'mensajes', {})), 'descartados': dict(getattr(self, 'descartados', {}))}
+
+    def cerrar(self):
+        """Cierra el nodo de ROS al apagar el servidor, para no dejar restos de DDS."""
+        if not self.disponible:
+            return
+        try:
+            import rclpy
+            self.nodo.destroy_node()
+            if rclpy.ok():
+                rclpy.shutdown()
+        except Exception:
+            pass
 
     def mover(self, modo, objetivo, velocidad=0.5):
         if not self.disponible:
@@ -137,8 +168,8 @@ class Puente:
                 if not lo - 1e-3 <= v <= hi + 1e-3:
                     raise RuntimeError('Un punto de la trayectoria sale de los límites de las articulaciones.')
             vel = max(abs(a - b) for a, b in zip(q, previo_q)) / (t - previo_t)
-            if vel > 2.5:
-                raise RuntimeError(f'La trayectoria pide {vel:.1f} rad/s en una articulación; el máximo es 2,5 rad/s.')
+            if vel > 1.6:          # el planificador de Programar usa 1,5 rad/s; margen numérico
+                raise RuntimeError(f'La trayectoria pide {vel:.1f} rad/s en una articulación; el máximo es 1,5 rad/s.')
             jp = JointTrajectoryPoint()
             jp.positions = q
             jp.time_from_start = Duration(sec=int(t), nanosec=int((t % 1) * 1e9))

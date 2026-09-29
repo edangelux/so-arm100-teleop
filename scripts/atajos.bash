@@ -185,10 +185,11 @@ centrar() {
     _soarm_ros_abierto && { echo "El lanzador tiene el puerto abierto; ciérrelo antes (x en su menú)." >&2; return 1; }
     soarm-conectar || return 1
     local bin
-    bin="$(_soarm_compilar centrar "$SOARM_REPO/brazo-fisico/utilidades/originales/center_servos.cpp" | tail -1)" || return 1
+    # Centrado suave (docs/09): los seis llegan juntos a unos 26°/s y antes se comprueba el voltaje.
+    bin="$(_soarm_compilar centrar_suave "$SOARM_REPO/brazo-fisico/utilidades/metodologicas/centrar_suave.cpp" | tail -1)" || return 1
     [[ -x "$bin" ]] || return 1
-    echo "Centrando los seis servos en 2048. Sostenga el brazo."
-    "$bin"
+    echo "Centrando los seis servos en 2048 (postura init), despacio. Sostenga el brazo."
+    "$bin" "$SOARM_PUERTO"
 }
 
 servos() {

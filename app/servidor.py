@@ -15,6 +15,7 @@ import mimetypes
 import os
 import re
 import shlex
+import signal
 import sys
 import time
 import urllib.parse
@@ -154,8 +155,13 @@ def accion_tarea(d):
         puerto, msg = ent.conectar_brazo(conf)
         if not puerto:
             raise RuntimeError(msg)
-        fuente = REPO / 'brazo-fisico' / 'utilidades' / 'originales' / ('center_servos.cpp' if nombre == 'centrar' else 'list_servos.cpp')
-        tarea.iniciar('Centrar servos' if nombre == 'centrar' else 'Listar servos', [compilar(nombre, fuente)])
+        if nombre == 'centrar':
+            # Centrado suave: todos llegan a la vez, a unos 26°/s; comprueba antes el voltaje.
+            fuente = REPO / 'brazo-fisico' / 'utilidades' / 'metodologicas' / 'centrar_suave.cpp'
+            tarea.iniciar('Centrar servos', [compilar('centrar_suave', fuente), puerto])
+        else:
+            fuente = REPO / 'brazo-fisico' / 'utilidades' / 'originales' / 'list_servos.cpp'
+            tarea.iniciar('Listar servos', [compilar(nombre, fuente)])
     elif nombre in ENSAYOS_DEF:
         if sesion.estado != 'menu':
             raise RuntimeError('Los ensayos se ejecutan con la sesión abierta y la teleoperación cerrada (el lanzador en su menú).')
@@ -403,12 +409,18 @@ def main():
     servidor.daemon_threads = True
     servidor.nombre = 'localhost'
     print(f'SO-ARM100 Estudio en http://127.0.0.1:{args.puerto}  (ROS: {"sí" if PUENTE.disponible else "no — " + PUENTE.motivo})', flush=True)
+    # «soarm-app --parar» envía SIGTERM: se trata como Ctrl+C para cerrar el nodo de ROS en orden.
+    def terminar(*_):
+        raise KeyboardInterrupt
+    signal.signal(signal.SIGTERM, terminar)
     try:
         servidor.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
         sesion.detener()
+        if hasattr(PUENTE, 'cerrar'):
+            PUENTE.cerrar()
 
 
 if __name__ == '__main__':
