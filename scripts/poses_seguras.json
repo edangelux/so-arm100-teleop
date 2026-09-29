@@ -1,17 +1,5 @@
 {
-  "_nota": "Posturas en radianes, en el orden Shoulder_Rotation, Shoulder_Pitch, Elbow, Wrist_Pitch, Wrist_Roll. init es la del so_arm_100.srdf. home es la postura en que el brazo real queda apoyado por su peso (medida con los codificadores el 28/09/2026: hombro -98,8°, codo 80,9°, muñeca 70,1°), un poco por encima, para que al quitar el par no caiga: con la home anterior del SRDF (hombro -1,4) el brazo caía unos 19° al apagar.",
-  "init": [
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0
-  ],
-  "home": [
-    0.0,
-    -1.7,
-    1.41,
-    1.22,
-    0.0
-  ]
+  "_nota": "Posturas en radianes, en el orden Shoulder_Rotation, Shoulder_Pitch, Elbow, Wrist_Pitch, Wrist_Roll. init y home son las mismas que declara so_arm_100.srdf. home debe comprobarse primero en Gazebo: es la postura de reposo en la que el brazo puede quedar sin par al apagar.",
+  "init": [0.0, 0.0, 0.0, 0.0, 0.0],
+  "home": [0.0, -1.4, 1.4, 1.0, 1.5708]
 }
