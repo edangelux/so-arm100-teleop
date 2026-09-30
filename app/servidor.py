@@ -81,10 +81,10 @@ def accion_iniciar(d):
         opciones.append('--moveit')
     camara = str(d.get('camara') or conf['SOARM_CAM'])
     if camara == URL_VIDEO:
-        # Cámara de Windows: se asegura de que esté enviando antes de arrancar.
-        r = camwin.asegurar(conf.get('SOARM_CAM_WIN', '0'), conf.get('SOARM_CAM_WIN_NOMBRE', ''))
-        if not r.get('ok'):
-            raise RuntimeError(r.get('mensaje', 'La cámara de Windows no entrega video.'))
+        # Cámara de Windows: la envía la ventana de la aplicación; tiene que estar enviando ya.
+        if not camwin.enviando():
+            raise RuntimeError('La cámara de Windows no está enviando imagen. En Sesión elija la cámara '
+                               'y deje abierta la ventana de la aplicación (puede minimizarla).')
     opciones += ['--camara', camara]
     vel = d.get('velocidad') or conf['SOARM_VELOCIDAD']
     if vel:
@@ -278,9 +278,7 @@ class Manejador(BaseHTTPRequestHandler):
             return self._json(MODELO)
         if p == '/api/camaras':
             return self._json({'locales': ent.camaras_locales(), 'conf': ent.leer_conf(),
-                               'windows': ent.entorno() == 'wsl' and camwin.disponible(), 'camwin': camwin.estado()})
-        if p == '/api/camwin/listar':
-            return self._json(camwin.listar())
+                               'windows': ent.entorno() == 'wsl', 'camwin': camwin.estado()})
         if p == '/camara/foto':
             datos = camwin.foto()
             if not datos:
@@ -341,7 +339,7 @@ class Manejador(BaseHTTPRequestHandler):
             difusor.retirar(cola)
 
     def _video(self):
-        if not camwin.cuadros:
+        if not camwin.enviando():
             return self._json({'error': 'La cámara de Windows no está enviando imágenes.'}, 503)
         self.send_response(200)
         self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=cuadro')
@@ -365,12 +363,13 @@ class Manejador(BaseHTTPRequestHandler):
         largo = int(self.headers.get('Content-Length') or 0)
         u = urllib.parse.urlparse(self.path)
         if u.path == '/api/camwin/cuadro':
-            # Imágenes del programa de Windows (sin Origin, desde 127.0.0.1). Máximo 2 MB.
+            # Imágenes JPEG de la cámara que abre la ventana de la aplicación. Máximo 2 MB.
             if largo <= 0 or largo > 2_000_000:
                 return self._json({'error': 'Tamaño no válido'}, 400)
             token = urllib.parse.parse_qs(u.query).get('token', [''])[0]
             codigo = camwin.recibir(token, self.rfile.read(largo))
             self.send_response(codigo)
+            self.send_header('X-Lectores', str(camwin.lectores))   # la página decide su ritmo con esto
             self.send_header('Content-Length', '0')
             self.end_headers()
             return
@@ -395,18 +394,18 @@ class Manejador(BaseHTTPRequestHandler):
                 return self._json(accion_camara_probar(d))
             if p == '/api/camaras/buscar':
                 return self._json(ent.buscar_telefonos())
+            if p == '/api/camwin/emisor':
+                # La ventana de la aplicación abrió una cámara y va a enviarla.
+                return self._json({'token': camwin.nuevo_emisor(str(d.get('nombre', '')))})
             if p == '/api/camwin/usar':
-                r = camwin.usar(int(d.get('indice', 0)), str(d.get('nombre', '')))
-                if r.get('ok'):
-                    nombre = str(d.get('nombre', '')).replace('\\', ' ')
-                    ent.guardar_conf({'SOARM_CAM': URL_VIDEO, 'SOARM_CAM_WIN': int(d.get('indice', 0)),
-                                      'SOARM_CAM_WIN_NOMBRE': nombre, 'SOARM_CAM_TIPO': f'Windows: {nombre}'})
-                return self._json(r)
-            if p == '/api/camwin/preparar':
-                tarea.iniciar('Preparar la cámara de Windows', camwin.orden_preparar())
-                return self._json({'ok': True})
+                # Se guarda la cámara elegida para abrirla sola la próxima vez.
+                nombre = re.sub(r'[^\w ().:+-]', ' ', str(d.get('nombre', '')))[:80]
+                dispositivo = re.sub(r'[^A-Za-z0-9+/=_-]', '', str(d.get('id', '')))[:200]
+                ent.guardar_conf({'SOARM_CAM': URL_VIDEO, 'SOARM_CAM_WIN_ID': dispositivo,
+                                  'SOARM_CAM_WIN_NOMBRE': nombre, 'SOARM_CAM_TIPO': f'Windows: {nombre}'})
+                return self._json({'ok': True, 'camara': URL_VIDEO})
             if p == '/api/camwin/detener':
-                camwin.detener()
+                camwin.detener(d.get('token'))
                 return self._json({'ok': True})
             if p == '/api/brazo/conectar':
                 puerto, msg = ent.conectar_brazo()

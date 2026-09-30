@@ -64,6 +64,7 @@ flowchart LR
     UI["Paneles y botones<br/>js/secciones/*.js"]
     E3D["Escena 3D<br/>three.js + mallas STL"]
     CIN["Cinemática en el navegador<br/>FK, IK y manipulabilidad"]
+    WIN["Cámara de Windows<br/>camara_navegador.js<br/>integrada, USB, OBS"]
   end
   subgraph Servidor["app/servidor.py (127.0.0.1:8642)"]
     API["API HTTP<br/>GET estado · POST acciones"]
@@ -74,7 +75,6 @@ flowchart LR
     CW["Cámara de Windows<br/>camwin.py · /camara/video"]
   end
   NP["Nodo ROS aparte<br/>nodo_puente.py (rclpy)"]
-  WIN["Python de Windows<br/>app/windows/camara_windows.py<br/>DirectShow: integrada, USB, OBS"]
   subgraph Robot["Lo que ya existía"]
     SH["scripts/soarm.sh<br/>Gazebo · MoveIt · teleop v13–v15"]
     ROS["ROS 2 Humble<br/>/joint_states · controladores"]
@@ -91,7 +91,7 @@ flowchart LR
   WIN -- "POST JPEG" --> CW -- "MJPEG" --> SH
 ```
 
-*Figura 18.2. Arquitectura. Las flechas indican quién llama a quién. La aplicación no reemplaza a `soarm.sh`: lo ejecuta y lee su salida. El nodo de ROS y el programa de cámara de Windows corren en procesos aparte del servidor.*
+*Figura 18.2. Arquitectura. Las flechas indican quién llama a quién. La aplicación no reemplaza a `soarm.sh`: lo ejecuta y lee su salida. El nodo de ROS corre en un proceso aparte del servidor; la cámara de Windows la abre la propia ventana de la aplicación.*
 
 ### El servidor
 
@@ -103,7 +103,7 @@ Está escrito sólo con la biblioteca estándar de Python (`http.server`, `subpr
 | `procesos.py` | Arranca `soarm.sh` con las opciones elegidas, lee su salida línea a línea y deduce el estado: `detenida`, `arrancando`, `teleop`, `moviendo`, `menu`, `cerrando`. Las respuestas del menú (Enter, `h`, `x`) se escriben en la entrada estándar del proceso, igual que al teclearlas |
 | `puente_ros.py` | Arranca `nodo_puente.py` en un proceso aparte, con ROS 2 y el workspace cargados (igual que los ensayos), y conversa con él por líneas JSON. Recibe las posiciones de `/joint_states` (simulación) y `/real/joint_states` (brazo) 20 veces por segundo y las pasa a la página; comprueba límites y velocidades antes de enviar trayectorias u órdenes a la pinza. Si el nodo se cae, o si con una sesión abierta pasan 8 s sin articulaciones, lo reinicia solo (como mucho cada 20 s). Lo que el nodo escribe en su salida de errores queda en `~/.local/state/soarm/nodo_ros.log` |
 | `nodo_puente.py` | El nodo `soarm_estudio` de ROS 2. Todo lo de `rclpy` ocurre en su hilo: las suscripciones, los publicadores de trayectorias (creados al arrancar) y los clientes de la acción de la pinza |
-| `camwin.py` | Cámaras de Windows en WSL2: lista las cámaras con el Python de Windows, arranca `app/windows/camara_windows.py`, recibe sus imágenes y las publica como MJPEG en `/camara/video` |
+| `camwin.py` | Cámara de Windows en WSL2: recibe las imágenes JPEG que envía la ventana de la aplicación y las publica como MJPEG en `/camara/video`; cuenta los lectores para que la ventana ajuste su ritmo |
 | `eventos.py` | Reparte los eventos en vivo a todas las ventanas abiertas (Server-Sent Events) |
 | `modelo.py` | Lee el URDF, quita la parte de xacro y entrega articulaciones, orígenes, ejes y mallas a la página |
 
@@ -117,8 +117,8 @@ La tabla siguiente relaciona cada ruta de la API con la orden que sustituye.
 | `/api/sesion/menu` | POST | Responder Enter, `h` o `x` en el menú final |
 | `/api/sesion/detener` | POST | Ctrl+C en la terminal del lanzador |
 | `/api/camaras`, `/api/camaras/probar`, `/api/camaras/buscar` | GET, POST | `soarm-camara` |
-| `/api/camwin/listar`, `/api/camwin/usar`, `/api/camwin/preparar`, `/api/camwin/detener` | GET, POST | Listar, abrir o cerrar una cámara de Windows; instalar OpenCV y pygrabber en el Python de Windows |
-| `/api/camwin/cuadro` | POST | Recibe cada imagen JPEG del programa de Windows (con una clave que cambia en cada apertura) |
+| `/api/camwin/emisor`, `/api/camwin/usar`, `/api/camwin/detener` | POST | La ventana empieza a enviar una cámara (recibe una clave), guarda la cámara elegida, deja de enviar |
+| `/api/camwin/cuadro` | POST | Recibe cada imagen JPEG de la ventana (con la clave); responde `X-Lectores` |
 | `/camara/video`, `/camara/foto` | GET | Vídeo MJPEG de la cámara de Windows para la teleoperación, e imagen suelta para la vista previa |
 | `/api/brazo/conectar` | POST | `usbipd attach` en WSL2 |
 | `/api/mover`, `/api/pinza` | POST | `ros2 topic pub` de una trayectoria o `ir_a_pose.py` |
@@ -147,22 +147,47 @@ La sección Sesión sustituye a la orden `teleop`. Antes de arrancar se eligen:
 
 ### Cámaras de Windows en WSL2
 
-WSL2 no ve las cámaras de Windows: `/dev/video*` no existe en Ubuntu aunque el portátil tenga cámara, y la OBS Virtual Camera es un filtro de DirectShow que sólo existe para los programas de Windows. Pasar la cámara integrada con `usbipd` funciona en pocos equipos, porque el núcleo de WSL2 no trae el controlador `uvcvideo`. Por eso la aplicación abre la cámara del lado de Windows y la recibe:
+WSL2 no ve las cámaras de Windows: `/dev/video*` no existe en Ubuntu aunque el portátil tenga cámara, y la OBS Virtual Camera sólo existe para los programas de Windows. Pasar la cámara integrada con `usbipd` funciona en pocos equipos, porque el núcleo de WSL2 no trae el controlador `uvcvideo`, y el vídeo por USB/IP llega entrecortado.
 
-1. `camwin.py` busca el Python de Windows (`py.exe -3` o `python.exe`) y ejecuta `app/windows/camara_windows.py --listar`. Ese programa enumera las cámaras con DirectShow; los nombres salen de `pygrabber`, que usa la misma enumeración que OpenCV, así el nombre corresponde al índice. Por cada cámara devuelve si entregó imagen, su resolución y una miniatura.
-2. Al tocar una cámara, el servidor arranca `camara_windows.py --indice N --token T`. Cada imagen se reduce a 640 px de ancho, se comprime a JPEG y se envía con `POST /api/camwin/cuadro?token=T` a `127.0.0.1:8642`, que Windows alcanza dentro de WSL por el reenvío de `localhost`. No se abre ningún puerto en Windows.
-3. El servidor guarda la última imagen y la publica como `multipart/x-mixed-replace` en `http://127.0.0.1:8642/camara/video`. Para la teleoperación es lo mismo que un teléfono con DroidCam: `soarm.sh` comprueba el tipo de contenido y `teleop_v1x.py` lo lee con el mismo lector MJPEG.
-4. Al elegir otra cámara cambia la clave: el servidor responde 410 a la anterior y su programa termina. Si nadie mira la imagen durante un minuto, el servidor lo detiene; al iniciar una sesión con esa cámara, `accion_iniciar` la vuelve a abrir y espera la primera imagen.
+Lo que sí ve las cámaras de Windows es el navegador donde corre la aplicación. Edge y Chrome las abren de forma nativa con `getUserMedia`, con los controladores de Windows, y la página se sirve desde `http://127.0.0.1:8642`, que el navegador trata como origen seguro. Así que es la propia ventana la que abre la cámara y se la pasa a la teleoperación:
 
-La primera vez hace falta Python en Windows (`winget install Python.Python.3.12` en PowerShell) y el botón *Preparar Windows*, que instala `opencv-python` y `pygrabber` con `pip install --user`. Para OBS se pulsa *Iniciar cámara virtual* en OBS antes de buscar. La vista previa se refresca cada 0,7 s con `/camara/foto`.
+```mermaid
+sequenceDiagram
+  participant C as Cámara (integrada, USB u OBS)
+  participant V as Ventana de la aplicación<br/>camara_navegador.js
+  participant T as Trabajador<br/>camara_trabajador.js
+  participant S as Servidor<br/>camwin.py
+  participant L as Teleoperación<br/>camara_red.py
+  C->>V: VideoFrame (MediaStreamTrackProcessor)
+  V->>T: sólo si no hay otra en vuelo
+  T->>T: recorte 4:3 → 640×480 → JPEG 0,8
+  T->>S: POST /api/camwin/cuadro?token
+  S-->>T: 204 + X-Lectores
+  L->>S: GET /camara/video
+  S-->>L: multipart/x-mixed-replace (la más reciente)
+```
 
-| Síntoma en la lista | Causa | Qué hacer |
+*Figura 18.2b. Camino de una imagen de la cámara de Windows hasta la teleoperación.*
+
+1. *Buscar cámaras* pide permiso a la cámara (una sola vez; el navegador lo recuerda para `127.0.0.1:8642`) y lista las cámaras con su nombre real, con `enumerateDevices`.
+2. Al tocar una, la ventana la abre con 640×480 a 30 imágenes/s como ideal y pide al servidor una clave (`/api/camwin/emisor`). La cámara elegida se guarda en `~/.soarm.conf` (`SOARM_CAM_WIN_ID` y `SOARM_CAM_WIN_NOMBRE`), y al abrir la aplicación otra vez se vuelve a abrir sola.
+3. Cada imagen llega como `VideoFrame` por `MediaStreamTrackProcessor`, que sigue entregando imágenes con la ventana minimizada. El trabajador la recorta al centro a 4:3 (la mano no se deforma aunque la cámara sea 16:9), la escala a 640×480, la comprime a JPEG y la envía. Todo eso ocurre fuera del hilo de la escena 3D.
+4. Nunca hay más de una imagen en vuelo: mientras una se envía, las que llegan se descartan y la siguiente que sale es la más reciente. Así el retraso no crece aunque algo vaya lento, que es lo que pasaba con OpenCV y DirectShow cuando la cámara se leía más despacio de lo que entregaba.
+5. La respuesta dice cuántos lectores tiene `/camara/video` (`X-Lectores`). Sin lectores se envía una imagen por segundo (para la vista previa del servidor y la comprobación de `soarm.sh`); con la teleoperación leyendo, todas las de la cámara.
+6. El servidor publica la última imagen como `multipart/x-mixed-replace` en `http://127.0.0.1:8642/camara/video`. Para la teleoperación es lo mismo que un teléfono con DroidCam: `soarm.sh` comprueba el tipo de contenido y `camara_red.py` la lee con el mismo lector MJPEG, en un hilo que conserva sólo la imagen más reciente.
+7. Si se abre una segunda ventana de la aplicación, la nueva toma la cámara: el servidor responde 410 a la anterior, que la suelta.
+
+La vista previa de la sección Sesión es el propio vídeo de la ventana (sin ida y vuelta al servidor) y debajo indica cuántas imágenes por segundo se envían y si la teleoperación está leyendo. `accion_iniciar` no arranca una sesión con la cámara de Windows si la ventana no está enviando.
+
+> **La ventana de la aplicación debe quedar abierta durante la teleoperación.** Puede minimizarse o quedar detrás de la ventana de la cámara; si se cierra, la teleoperación deja de recibir imagen y se cierra a los pocos segundos, como con un teléfono que se desconecta.
+
+| Síntoma | Causa | Qué hacer |
 |---|---|---|
-| «No se encontró Python en Windows» | No hay Python de Windows | `winget install Python.Python.3.12` en PowerShell, cerrar y abrir Ubuntu, `soarm-app --parar`, `soarm-app` |
-| «Falta OpenCV» | Primera vez | *Preparar Windows* y buscar de nuevo |
-| Cámaras llamadas «Cámara 0», «Cámara 1» | Falta `pygrabber` | *Preparar Windows*; mientras, se reconocen por la miniatura |
-| «no entregó imagen» | Otro programa la usa (Zoom, Teams, el navegador) o, en OBS, falta *Iniciar cámara virtual* | Cerrar ese programa o iniciar la cámara virtual y buscar de nuevo |
-| «Windows no alcanza la aplicación» | El reenvío de `localhost` de WSL2 está desactivado | Quitar `localhostForwarding=false` de `%UserProfile%\.wslconfig` y `wsl --shutdown` |
+| «El navegador no tiene permiso para la cámara» | Se pulsó *Bloquear* | Candado junto a `127.0.0.1:8642` → Cámara → Permitir; *Buscar cámaras* otra vez |
+| «Windows no dejó abrir la cámara» | Otro programa la usa (Zoom, Teams, la app Cámara, OBS con esa misma cámara) | Cerrar ese programa. Para usar la cámara en OBS y en la teleoperación a la vez, elegir *OBS Virtual Camera* |
+| «La cámara abrió pero no entregó imágenes» | En OBS falta *Iniciar cámara virtual* | Iniciarla en OBS y elegirla otra vez |
+| Pocas imágenes por segundo con la teleoperación leyendo | El equipo va cargado (Gazebo con renderizado por software) o la cámara entrega pocas con poca luz | Cerrar otros programas, dar más luz, probar el modo Brazo (sin Gazebo) |
+| «Otra ventana de la aplicación tomó la cámara» | Hay dos ventanas de la aplicación abiertas | Dejar una sola |
 
 Al pulsar **Iniciar**, el servidor arma la orden de `soarm.sh` y la ejecuta. El registro aparece en el recuadro de la parte baja y el estado cambia solo:
 

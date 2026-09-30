@@ -1,6 +1,7 @@
 // Sesión: arrancar y cerrar la teleoperación, elegir la cámara y el modo.
 import { obtener, enviar } from '../api.js';
 import { el, aviso, confirmar, linea } from '../ui.js';
+import { camaraNavegador } from '../camara_navegador.js';
 
 const MODOS = [
   ['auto', 'Auto', 'Brazo conectado → ambos; si no, simulación.'],
@@ -63,6 +64,7 @@ const seccion = {
       this._cargado = true;
       this.pintarFormulario();
       this.pintarCamara();
+      if (e.entorno === 'wsl') this.abrirCamaraGuardada(c);
     }
     if (this._ultimoEstado === s.estado && this._ultimaTarea === e.tarea.activa) return;
     this._ultimoEstado = s.estado;
@@ -198,63 +200,72 @@ const seccion = {
 
   pintarCamaraWindows(detalle) {
     const e = this.eleccion;
+    const cam = camaraNavegador;
     const lista = el('div', { class: 'opciones', style: 'margin-top:8px' });
-    const foto = el('img', { class: 'foto-camara oculto', alt: 'Vista de la cámara' });
-    foto.onerror = () => {       // la cámara de Windows dejó de enviar (se apaga sola tras un minuto sin uso)
-      clearInterval(this._fotoTimer);
-      foto.classList.add('oculto');
-      this.mensajeCam('aviso', 'La cámara de Windows está apagada. Se abre sola al iniciar la sesión; para verla ahora, búsquela y tóquela.');
+    // Vista previa local: el mismo video que abre el navegador, sin ida y vuelta al servidor.
+    const video = el('video', { class: 'foto-camara oculto', autoplay: true, muted: true, playsinline: true });
+    const datos = el('p', { class: 'nota' });
+    const apagar = el('button', { class: 'boton ancho oculto', style: 'margin-top:8px', html: 'Apagar la cámara', onclick: () => cam.cerrar() });
+    const timer = setInterval(() => pintarVista(), 1000);
+    const pintarVista = () => {
+      // Hasta que la tarjeta entra en la página el video no está en el documento;
+      // cuando la tarjeta se vuelve a dibujar, este temporizador se retira solo.
+      if (!document.body.contains(video)) { if (video.dataset.montado) clearInterval(timer); return; }
+      video.dataset.montado = '1';
+      const activa = cam.activa;
+      video.classList.toggle('oculto', !activa);
+      apagar.classList.toggle('oculto', !activa);
+      if (activa && video.srcObject !== cam.stream) { video.srcObject = cam.stream; video.play().catch(() => {}); }
+      if (!activa) video.srcObject = null;
+      datos.textContent = activa ? `Enviando «${cam.nombre}» · ${cam.fps.toFixed(0)} imágenes/s${cam._lectores ? ' (teleoperación leyendo)' : ' (en espera: 1 por segundo)'}`
+        : cam.error ? cam.error : '';
     };
-    const verFoto = () => {
-      foto.classList.remove('oculto');
-      clearInterval(this._fotoTimer);
-      this._fotoTimer = setInterval(() => { if (document.body.contains(foto)) foto.src = `/camara/foto?t=${Date.now()}`; else clearInterval(this._fotoTimer); }, 700);
-    };
-    const preparar = el('button', { class: 'boton ancho oculto', style: 'margin-top:8px', html: 'Preparar Windows (instala OpenCV y pygrabber, una sola vez)', onclick: async () => {
-      try { await enviar('/api/camwin/preparar'); this.mensajeCam('aviso', 'Instalando OpenCV y pygrabber en el Python de Windows (unos minutos). El avance aparece en el Registro, abajo. Al terminar, pulse «Buscar cámaras de Windows».'); } catch (err) { this.mensajeCam('mal', err.message); }
-    } });
-    const buscar = el('button', { class: 'boton primario ancho', html: 'Buscar cámaras de Windows', onclick: async (ev) => {
+    clearInterval(this._fotoTimer);
+    this._fotoTimer = timer;
+    const buscar = el('button', { class: 'boton primario ancho', html: 'Buscar cámaras', onclick: async (ev) => {
       ev.target.disabled = true;
-      this.mensajeCam('aviso', 'Buscando las cámaras de Windows… (unos segundos; la luz de la cámara puede encenderse)');
+      this.mensajeCam('aviso', 'Buscando cámaras… Si el navegador pregunta, pulse «Permitir».');
       try {
-        const r = await obtener('/api/camwin/listar');
-        preparar.classList.toggle('oculto', r.falta !== 'opencv' && !r.sin_nombres);
-        if (!r.ok) this.mensajeCam('mal', r.mensaje);
-        else if (!r.camaras.length) this.mensajeCam('mal', 'Windows no encontró ninguna cámara. Si es OBS, pulse «Iniciar cámara virtual» en OBS y busque de nuevo. Cierre Zoom, Teams o el navegador si usan la cámara.');
+        const camaras = await cam.listar();
+        if (!camaras.length) this.mensajeCam('mal', 'Windows no tiene ninguna cámara disponible para el navegador. Si es OBS, pulse «Iniciar cámara virtual» en OBS y busque de nuevo.');
         else {
-          const activa = (c) => String(conf().SOARM_CAM_WIN) === String(c.indice) && String(e.camara).includes('/camara/video');
-          lista.replaceChildren(...r.camaras.map((c) => el('button', { class: `opcion opcion-camara ${activa(c) ? 'activa' : ''}`, onclick: (ev) => this.usarCamaraWindows(c, verFoto, ev.currentTarget) },
-            c.miniatura ? el('img', { class: 'mini-camara', alt: '', src: `data:image/jpeg;base64,${c.miniatura}` }) : el('div', { class: 'mini-camara vacia' }, 'sin imagen'),
-            el('div', {}, el('strong', {}, c.nombre), el('span', {}, `${c.clase === 'virtual' ? 'Virtual' : 'Física'} · ${c.entrega ? `entrega ${c.ancho}×${c.alto}` : 'no entregó imagen: la usa otro programa o, si es OBS, falta «Iniciar cámara virtual»'}`)))));
-          this.mensajeCam('ok', `Windows tiene ${r.camaras.length} cámara(s). Reconózcala por la miniatura y tóquela.`
-            + (r.sin_nombres ? ' (Para ver sus nombres, pulse «Preparar Windows» una vez.)' : ''));
+          const activa = (c) => cam.activa && c.id === cam.id;
+          lista.replaceChildren(...camaras.map((c) => el('button', { class: `opcion ${activa(c) ? 'activa' : ''}`, onclick: (ev2) => this.usarCamaraWindows(c, ev2.currentTarget, pintarVista) },
+            el('div', {}, el('strong', {}, c.nombre), el('span', {}, c.clase === 'virtual' ? 'Virtual (OBS u otra)' : 'Física: integrada o USB')))));
+          this.mensajeCam('ok', `Hay ${camaras.length} cámara(s). Toque la que quiere usar.`);
         }
       } catch (err) { this.mensajeCam('mal', err.message); }
       ev.target.disabled = false;
     } });
-    const conf = () => this.app.estado?.conf || {};
     detalle.append(
-      el('p', { class: 'nota' }, 'Ubuntu (WSL2) no ve las cámaras de Windows. La aplicación abre la cámara en Windows y la recibe aquí. Para OBS: en OBS pulse «Iniciar cámara virtual» antes de buscar.'),
-      buscar, preparar, lista, foto);
-    if (String(e.camara || '').includes('/camara/video')) {
-      obtener('/api/camaras').then((r) => { if (r.camwin?.activa) verFoto(); }).catch(() => {});
-    }
+      el('p', { class: 'nota' }, 'Ubuntu (WSL2) no ve las cámaras de Windows; esta ventana las abre directamente y se las pasa a la teleoperación. Déjela abierta durante la sesión (puede minimizarla). Para OBS: pulse antes «Iniciar cámara virtual» en OBS.'),
+      buscar, lista, video, datos, apagar);
+    setTimeout(pintarVista, 0);
   },
 
-  async usarCamaraWindows(c, verFoto, boton) {
-    this.mensajeCam('aviso', `Abriendo «${c.nombre}» en Windows…`);
+  async usarCamaraWindows(c, boton, pintarVista) {
+    this.mensajeCam('aviso', `Abriendo «${c.nombre}»…`);
     try {
-      const r = await enviar('/api/camwin/usar', { indice: c.indice, nombre: c.nombre });
-      if (r.ok) {
-        this.eleccion.camara = r.camara;
-        this.mensajeCam('ok', r.mensaje);
-        verFoto();
-        this.camActual.textContent = `Cámara elegida: Windows · ${c.nombre}`;
-        boton?.parentNode?.querySelectorAll('.opcion-camara').forEach((b) => b.classList.toggle('activa', b === boton));
-        this.app.refrescar();
-      }
-      else this.mensajeCam('mal', r.mensaje);
-    } catch (err) { this.mensajeCam('mal', err.message); }
+      await camaraNavegador.abrir(c.id, c.nombre);
+      const r = await enviar('/api/camwin/usar', { id: camaraNavegador.id, nombre: camaraNavegador.nombre });
+      this.eleccion.camara = r.camara;
+      this.mensajeCam('ok', `«${camaraNavegador.nombre}» lista.`);
+      this.camActual.textContent = `Cámara elegida: Windows · ${camaraNavegador.nombre}`;
+      boton?.parentNode?.querySelectorAll('.opcion').forEach((b) => b.classList.toggle('activa', b === boton));
+      pintarVista();
+      this.app.refrescar();
+    } catch (err) { this.mensajeCam('mal', err.message); pintarVista(); }
+  },
+
+  // Con la cámara de Windows guardada, se abre sola al cargar la página (el permiso ya está dado).
+  async abrirCamaraGuardada(conf) {
+    if (!String(conf.SOARM_CAM || '').includes('/camara/video') || camaraNavegador.activa) return;
+    try {
+      const camaras = await camaraNavegador.listar();
+      const c = camaras.find((x) => x.id === conf.SOARM_CAM_WIN_ID) || camaras.find((x) => x.nombre === conf.SOARM_CAM_WIN_NOMBRE);
+      if (!c) { this.mensajeCam?.('mal', `No está la cámara «${conf.SOARM_CAM_WIN_NOMBRE || ''}». Pulse «Buscar cámaras» y elija otra.`); return; }
+      await camaraNavegador.abrir(c.id, c.nombre);
+    } catch (err) { this.mensajeCam?.('mal', err.message); }
   },
 
   mensajeCam(tipo, texto) { this.msgCam.replaceChildren(el('div', { class: `mensaje ${tipo}` }, texto)); },
@@ -272,6 +283,11 @@ const seccion = {
     if (!e.camara) { aviso('Elija y pruebe una cámara primero.', 'mal'); return; }
     if (e.modo !== 'sim' && e.version === '13' && !await confirmar('Versión 13 con el brazo',
       'La v13 arranca ordenando cero a todas las articulaciones. Centre antes los servos (botón «Centrar servos») y sostenga el brazo la primera vez.', { aceptar: 'Ya está centrado' })) return;
+    if (String(e.camara).includes('/camara/video') && !camaraNavegador.activa) {
+      // La cámara de Windows la envía esta ventana: se abre antes de arrancar.
+      await this.abrirCamaraGuardada(this.app.estado?.conf || {});
+      if (!camaraNavegador.activa) { aviso('Abra la cámara de Windows en «Cámara» antes de iniciar.', 'mal'); return; }
+    }
     try {
       const r = await enviar('/api/sesion/iniciar', { modo: e.modo, version: e.version, moveit: e.moveit, velocidad: e.velocidad, camara: e.camara });
       aviso(`Arrancando en modo ${r.modo}.`, 'ok');

@@ -161,7 +161,7 @@ source ~/.bashrc
 | La ventana no se abre | No se encontró navegador | Abrir **http://127.0.0.1:8642** a mano |
 | `Ruta desconocida` o «el servidor es de una versión anterior» al ejecutar | Se actualizó el repositorio con el servidor de la aplicación encendido | Cerrar la sesión en la aplicación y ejecutar `soarm-app --parar` y luego `soarm-app`. Desde esta versión, `soarm-app` lo detecta y reinicia el servidor solo cuando no hay sesión abierta |
 | La página dice «Sin ROS» | Falta la instalación del paso 2 | Las lecciones y el robot virtual funcionan igual; para el brazo, completar el paso 2 |
-| En Sesión no aparece la cámara del portátil, la USB ni la de OBS (WSL2) | Ubuntu en WSL2 no ve las cámaras de Windows | Elegir **Cámara de Windows** → *Buscar cámaras de Windows*. La primera vez: `winget install Python.Python.3.12` en PowerShell y el botón *Preparar Windows*. Para OBS, antes pulsar *Iniciar cámara virtual* en OBS |
+| En Sesión no aparece la cámara del portátil, la USB ni la de OBS (WSL2) | Ubuntu en WSL2 no ve las cámaras de Windows | Elegir **Cámara de Windows** → *Buscar cámaras* → *Permitir* en el navegador → tocar la cámara. La abre la propia ventana de la aplicación, que debe quedar abierta (puede minimizarse). Para OBS, antes pulsar *Iniciar cámara virtual* en OBS |
 | El brazo 3D no se mueve durante la teleoperación | No llegan articulaciones al nodo de ROS de la aplicación | Se reinicia solo en unos segundos; si no, ver `~/.local/state/soarm/nodo_ros.log` y `soarm-app --parar`, `soarm-app` |
 
 <details>
