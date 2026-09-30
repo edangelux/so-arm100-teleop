@@ -44,6 +44,9 @@ export default {
     'Casiez, G., Roussel, N. y Vogel, D. (2012). «1€ Filter: a simple speed-based low-pass filter for noisy input in interactive systems», CHI.',
     'Lugaresi, C. et al. (2019). «MediaPipe: a framework for building perception pipelines».',
     'docs/07 del repositorio: cómo funciona el sistema; pruebas/README.md: cómo se midieron los indicadores.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 10, «Visual Servoing».',
+    'Chaumette, F. y Hutchinson, S. (2006). Visual servo control, Part I: Basic approaches. <i>IEEE Robotics & Automation Magazine</i>, 13(4), 82-90.',
+    'Corke, P. (2017). <i>Robotics, Vision and Control</i> (2.ª ed.). Springer. Partes IV y V (visión y control basado en visión).',
   ],
   pasos: [
     {

@@ -29,6 +29,8 @@ export default {
   referencias: [
     'analisis/cinematica/ANALISIS_CINEMATICO.md: espacio de trabajo y alcance radial de 431,70 mm.',
     'Siciliano, B. et al. <i>Robotics: Modelling, Planning and Control</i>, sección 2.11 (espacio de trabajo).',
+    'Lynch, K. M. y Park, F. C. (2017). <i>Modern Robotics: Mechanics, Planning, and Control</i>. Cambridge University Press. Cap. 2 (espacio de configuraciones y espacio de trabajo).',
+    'Craig, J. J. (2005). <i>Introduction to Robotics: Mechanics and Control</i> (3.ª ed.). Pearson Prentice Hall. Cap. 4, «Inverse Manipulator Kinematics» (espacio de trabajo y existencia de soluciones).',
   ],
   pasos: [
     {

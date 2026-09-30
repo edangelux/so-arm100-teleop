@@ -64,6 +64,7 @@ export default {
     'Craig, J. J. (2018). <i>Introduction to Robotics: Mechanics and Control</i>, 4.ª ed. Pearson. Capítulo 1.',
     'Lynch, K. M. y Park, F. C. (2017). <i>Modern Robotics</i>. Cambridge University Press. Capítulo 2 (grados de libertad y fórmula de Grübler).',
     'TheRobotStudio, <i>SO-ARM100</i>, repositorio del diseño mecánico (Apache 2.0).',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 1, «Introduction» (estructura mecánica de un manipulador, grados de libertad).',
   ],
   pasos: [
     {

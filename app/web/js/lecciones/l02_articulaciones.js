@@ -65,6 +65,8 @@ export default {
     'Craig, J. J. <i>Introduction to Robotics: Mechanics and Control</i>, cap. 3 (tipos de articulación y cadenas cinemáticas).',
     'Hoja de datos del fabricante: Feetech STS3215, servomotor de bus serie con codificador magnético de 12 bits.',
     'docs/09 del repositorio: cómo se fijó el cero de cada servo en 2048 pasos.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 5, «Actuators and Sensors» (accionamientos y sensores de posición de las articulaciones).',
+    'Craig, J. J. (2005). <i>Introduction to Robotics: Mechanics and Control</i> (3.ª ed.). Pearson Prentice Hall. Cap. 8, «Manipulator-Mechanism Design».',
   ],
   pasos: [
     {

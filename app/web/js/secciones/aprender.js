@@ -22,6 +22,7 @@ import l15 from '../lecciones/l15_programacion.js';
 import l16 from '../lecciones/l16_calibracion.js';
 import l17 from '../lecciones/l17_seguridad.js';
 import l18 from '../lecciones/l18_celda.js';
+import { taller1, taller2, taller3, taller4, taller5, taller6 } from '../lecciones/taller_rapid.js';
 
 const PLAN = [
   ['basico', 'Básico', [
@@ -50,6 +51,14 @@ const PLAN = [
     ['17', 'Seguridad y normas', 'ISO 10218, ISO/TS 15066, ISO 9283 y categorías de parada', l17],
     ['18', 'Integración de celda y gemelo digital', 'Señales, PLC, OPC UA, ciclo de trabajo y OEE', l18],
   ]],
+  ['taller', 'Taller de programación RAPID (se aprende escribiendo)', [
+    ['19', 'Taller 1 · Mover el robot', 'Estructura de un programa, robtarget, MoveAbsJ, MoveJ, MoveL, velocidad y orientación: 7 programas', taller1],
+    ['20', 'Taller 2 · Offs, RelTool y tomar y dejar', 'Puntos relativos, aproximación y retirada, pick and place: 6 programas', taller2],
+    ['21', 'Taller 3 · Zonas y tiempo de ciclo', 'fine contra zN, velocidades por tramo, VelSet: 4 programas contra reloj', taller3],
+    ['22', 'Taller 4 · Variables y bucles', 'num, FOR, WHILE, IF/ELSE, Sin y Cos, contadores: 7 programas', taller4],
+    ['23', 'Taller 5 · Procedimientos', 'PROC, main, variables compartidas y refactorizar: 4 programas', taller5],
+    ['24', 'Taller 6 · Señales y lógica de celda', 'SetDO, WaitDI, IF con sensores, escenarios y proyecto final: 5 programas', taller6],
+  ]],
 ];
 
 const CLAVE = 'soarm-lecciones-hechas';
@@ -73,7 +82,7 @@ const seccion = {
     const h = hechas();
     const partes = [
       el('h2', {}, 'Aprender robótica'),
-      el('p', { class: 'sub' }, 'Dieciocho lecciones sobre este mismo brazo, desde qué es un grado de libertad hasta una celda industrial. Cada una tiene pasos que se tocan en 3D, una explicación detallada con fórmulas y preguntas. Funcionan sin ROS y sin el robot.'),
+      el('p', { class: 'sub' }, 'Dieciocho lecciones sobre este mismo brazo, desde qué es un grado de libertad hasta una celda industrial, y un taller de seis lecciones en el que se aprende a programar escribiendo 33 programas que se corrigen solos. Cada lección tiene pasos que se tocan en 3D, una explicación detallada con fórmulas y preguntas. Funcionan sin ROS y sin el robot.'),
     ];
     for (const [, titulo, modulos] of PLAN) {
       partes.push(el('div', { class: 'nivel' }, titulo));
@@ -189,6 +198,7 @@ const seccion = {
     this.nodo.replaceChildren(...[
       el('h2', {}, leccion.titulo),
       el('p', { class: 'sub', html: mate(leccion.resumen) }),
+      paso.ejercicio ? this.app.tarjetaPaso : null,
       paso.detalle ? el('div', { class: 'tarjeta explicacion' }, el('h3', {}, `Paso ${actual + 1}: ${paso.titulo}`), el('div', { class: 'texto-largo', html: mate(typeof paso.detalle === 'function' ? paso.detalle(this.app) : paso.detalle) })) : null,
       el('div', { class: 'tarjeta' }, el('h3', {}, 'Pasos'),
         ...leccion.pasos.map((p, k) => el('div', { class: 'fila', style: `opacity:${k === actual ? 1 : 0.55};padding:4px 0` },

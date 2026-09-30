@@ -33,6 +33,9 @@ export default {
     'Tsai, R. y Lenz, R. (1989). «A new technique for fully autonomous and efficient 3D robotics hand/eye calibration», IEEE T-RA.',
     'Daniilidis, K. (1999). «Hand-eye calibration using dual quaternions», IJRR.',
     'docs/09 del repositorio: el cero de 2048 pasos y cómo se centró cada servo antes de montarlo.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 2 (calibración cinemática).',
+    'Tsai, R. Y. y Lenz, R. K. (1989). A new technique for fully autonomous and efficient 3D robotics hand/eye calibration. <i>IEEE Transactions on Robotics and Automation</i>, 5(3), 345-358.',
+    'Khalil, W. y Dombre, E. (2002). <i>Modeling, Identification and Control of Robots</i>. Hermes Penton Science (calibración geométrica).',
   ],
   pasos: [
     {

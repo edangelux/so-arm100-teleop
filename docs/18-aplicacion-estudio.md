@@ -232,7 +232,7 @@ La sección tiene cinco bloques:
 
 Mientras hay una sesión en marcha, el modelo 3D sigue al brazo real o a la simulación con los datos de `/joint_states`. La postura que se prepara con los deslizadores aparece como una silueta verde transparente, de modo que se ve a dónde va a ir el brazo antes de moverlo.
 
-## Aprender: el plan de 18 lecciones
+## Aprender: 18 lecciones y un taller de programación
 
 ![Lista de lecciones](img/estudio_3_aprender.png)
 
@@ -289,6 +289,34 @@ Los niveles básico e intermedio siguen el orden de un curso universitario de ro
 | 16 | Industrial | Calibración | Cinemática, TCP y mano-ojo (cámara-robot) |
 | 17 | Industrial | Seguridad y normas | ISO 10218, ISO/TS 15066 para cobots, ISO 9283 para desempeño, categorías de parada 0, 1 y 2 |
 | 18 | Industrial | Integración de celda y gemelo digital | Apretón de manos con señales, PLC y escalera, Modbus y OPC UA, OEE, gemelo digital y retardo |
+| 19–24 | Taller | Taller de programación RAPID | 33 programas que se escriben y se corrigen solos (sección siguiente) |
+
+Cada lección cierra con **Para seguir leyendo**: el capítulo correspondiente de Siciliano, Sciavicco, Villani y Oriolo (*Robotics: Modelling, Planning and Control*, 2009), texto de referencia del curso, y los trabajos clásicos de su entorno bibliográfico: Craig, Spong, Lynch y Park, Murray–Li–Sastry, Corke, Featherstone, LaValle, Denavit–Hartenberg, Yoshikawa, Hogan, Khatib, Kavraki, Chaumette–Hutchinson y Tsai–Lenz, cada uno donde corresponde.
+
+### Taller de programación RAPID (lecciones 19 a 24)
+
+La lección 15 explica cómo se programa un robot industrial; el taller obliga a hacerlo. Casi cada paso es un **ejercicio**: un enunciado en la tarjeta de la lección, un editor igual al de la pestaña Programar en el panel derecho y una lista de comprobaciones. «Siguiente» no se habilita hasta que el programa las cumple todas.
+
+![Ejercicio del taller con comprobaciones fallidas y una pista](img/estudio_13_taller.png)
+
+*Figura 18.6b. Taller 1, ejercicio 2. A la izquierda, el enunciado y las comprobaciones (lima, cumplida; rosa, no cumplida y por qué); a la derecha, el programa. El movimiento usa coordenadas sueltas y el punto queda 10 mm abajo: fallan dos comprobaciones.*
+
+| Lección | Tema | Ejercicios |
+|---|---|---|
+| 19. Taller 1 | Estructura de un programa, `robtarget`, `MoveAbsJ`, `MoveJ`, `MoveL`, velocidad, orientación | 7 |
+| 20. Taller 2 | `Offs`, `RelTool`, aproximación y retirada, tomar y dejar | 6 |
+| 21. Taller 3 | `fine` contra `zN`, velocidades por tramo, `VelSet`, tiempo de ciclo | 4 |
+| 22. Taller 4 | Variables, `FOR`, `WHILE`, `IF/ELSE`, `Sin`/`Cos`, contadores | 7 |
+| 23. Taller 5 | `PROC`, `main`, variables compartidas, refactorizar | 4 |
+| 24. Taller 6 | `SetDO`, `WaitDI`, decisiones con sensores, escenarios, proyecto final | 5 |
+
+**Cómo se corrige** (`app/web/js/lecciones/taller.js`). El programa se ejecuta con el mismo intérprete y planificador de Programar, sobre el robot virtual y la celda, y se registra todo: la trayectoria de la punta, dónde se detuvo el robot y con qué cabeceo, la duración de cada tramo, las piezas tomadas y soltadas, las señales y los mensajes. Además se analiza el texto: cuántos `MoveL`, `FOR` o `PROC` tiene, si hay coordenadas sueltas, cuántas líneas ocupa. Las comprobaciones combinan las dos cosas, por ejemplo «se detiene en las 9 esquinas de la escalera» con «dos `MoveL` escritos como mucho» (no se resuelve copiando), o «la punta va en línea recta de a a b» (se mide la distancia de cada muestra a la recta).
+
+**Escenarios.** Los ejercicios con decisiones se ejecutan en varias situaciones de la celda: con cubo1 sobre el sensor y sin él, o con un operador simulado que pulsa `di2` a los 1,5 s. El programa tiene que cumplir en todas, así que un `IF` no se puede adivinar.
+
+**Ayudas.** Pistas que se abren de a una y una solución de referencia que se desbloquea después de tres intentos. El programa de cada ejercicio, los intentos y los ejercicios resueltos se guardan en el navegador.
+
+**Verificación.** Las 33 soluciones de referencia se ejecutaron con la corrección automática y cumplen todas las comprobaciones; los 33 programas iniciales no las cumplen (ninguno se resuelve sin escribir).
 
 ### La lección de cuaterniones duales
 

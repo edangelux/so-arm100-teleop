@@ -34,6 +34,9 @@ export default {
     'Yoshikawa, T. (1985). «Manipulability of robotic mechanisms», International Journal of Robotics Research.',
     'analisis/cinematica: singularidad en $q_3 = -73{,}825^\\circ$ y por qué $\\det(J J^\\top)$ con $J$ de 6×5 siempre es 0.',
     'README del proyecto: el nodo de teleoperación muestra la manipulabilidad en pantalla.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 3, «Differential Kinematics and Statics» (Jacobiano geométrico, singularidades, redundancia, elipsoides de manipulabilidad).',
+    'Nakamura, Y. (1991). <i>Advanced Robotics: Redundancy and Optimization</i>. Addison-Wesley.',
+    'Wampler, C. W. (1986). Manipulator inverse kinematic solutions based on vector formulations and damped least-squares methods. <i>IEEE Transactions on Systems, Man, and Cybernetics</i>, 16(1), 93-101.',
   ],
   pasos: [
     {

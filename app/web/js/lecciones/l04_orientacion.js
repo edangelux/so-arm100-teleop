@@ -35,6 +35,9 @@ export default {
     'Lynch, K. y Park, F. <i>Modern Robotics</i>, cap. 3 (movimientos rígidos, rotaciones y exponenciales).',
     'Shoemake, K. (1985). «Animating rotation with quaternion curves», SIGGRAPH: origen de SLERP.',
     'docs/08 del repositorio: por qué el proyecto no usa cuaterniones como objetivo de control con 5 GDL.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 2, «Kinematics» (matriz de rotación, ángulos de Euler, eje y ángulo, cuaternión unitario).',
+    'Shoemake, K. (1985). Animating rotation with quaternion curves. <i>SIGGRAPH Computer Graphics</i>, 19(3), 245-254 (SLERP).',
+    'Lynch, K. M. y Park, F. C. (2017). <i>Modern Robotics: Mechanics, Planning, and Control</i>. Cambridge University Press. Cap. 3, «Rigid-Body Motions».',
   ],
   pasos: [
     {

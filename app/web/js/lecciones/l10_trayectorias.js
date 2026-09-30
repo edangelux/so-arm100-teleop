@@ -63,6 +63,7 @@ export default {
   referencias: [
     'Biagiotti, L. y Melchiorri, C. (2008). <i>Trajectory Planning for Automatic Machines and Robots</i>, Springer.',
     'app/web/js/programa/movimiento.js: el planificador de la pestaña Programar (perfil con límites de velocidad y aceleración, zonas por Bézier).',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 4, «Trajectory Planning».',
   ],
   pasos: [
     {

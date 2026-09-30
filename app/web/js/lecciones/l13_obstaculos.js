@@ -118,6 +118,9 @@ export default {
     'LaValle, S. M. (2006). <i>Planning Algorithms</i>, Cambridge University Press (libre acceso en línea).',
     'Kuffner, J. y LaValle, S. (2000). «RRT-Connect: an efficient approach to single-query path planning».',
     'docs/15 del repositorio: configuración de MoveIt 2 para el SO-ARM100.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 12, «Motion Planning» (espacio de configuraciones, planificación probabilística, potenciales artificiales).',
+    'Kavraki, L. E., Švestka, P., Latombe, J.-C. y Overmars, M. H. (1996). Probabilistic roadmaps for path planning in high-dimensional configuration spaces. <i>IEEE Transactions on Robotics and Automation</i>, 12(4), 566-580.',
+    'Kuffner, J. J. y LaValle, S. M. (2000). RRT-Connect: An efficient approach to single-query path planning. <i>IEEE ICRA</i>.',
   ],
   pasos: [
     {

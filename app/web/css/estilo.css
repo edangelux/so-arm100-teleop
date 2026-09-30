@@ -547,3 +547,21 @@ body.panel-ancho { grid-template-columns: 1fr 640px; }
 .tabla-celda td { padding: 8px; border-bottom: 1px solid var(--linea); vertical-align: top; color: #d7d0f0; }
 .tabla-celda td:first-child { color: #fff; font-weight: 600; white-space: nowrap; }
 .tabla-celda code, .modal-caja code { font-family: var(--mono); font-size: 12px; background: var(--noche); padding: 1px 5px; border-radius: 4px; }
+
+/* Taller de programación (Aprender) */
+.chip-ejercicio { display: inline-block; margin-right: 6px; padding: 2px 8px; border-radius: 4px; background: var(--fucsia); color: #150f23; font: 700 11px/1.5 var(--mono); text-transform: uppercase; letter-spacing: .05em; vertical-align: 2px; }
+.editor.editor-taller { height: 360px; }
+.tarjeta-taller { box-shadow: inset 4px 0 0 var(--fucsia); }
+.comprobaciones { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 8px; }
+.comprobaciones .escenario { margin-top: 6px; font: 700 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--texto-2); }
+.comp { display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: start; font-size: 14px; line-height: 1.45; color: #d7d0f0; }
+.comp i { width: 14px; height: 14px; margin-top: 3px; border-radius: 50%; border: 2px solid var(--linea); }
+.comp.bien i { background: var(--lima); border-color: var(--lima); }
+.comp.mal i { background: var(--fucsia); border-color: var(--fucsia); }
+.comp.mal span { color: #fff; }
+.comp small { display: block; font-size: 12px; color: var(--rosa); margin-top: 2px; }
+.pista-ejercicio { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: rgba(117, 83, 255, .12); }
+.pista-ejercicio p { font-size: 14px !important; margin: 0 0 6px !important; }
+.boton.bloqueado { opacity: .5; }
+pre.codigo { margin: 10px 0 14px; padding: 12px 14px; border-radius: 8px; background: var(--noche); font: 12.5px/1.6 var(--mono); white-space: pre; overflow-x: auto; color: #e6e3ea; }
+.tarjeta-taller { padding-left: 16px; }

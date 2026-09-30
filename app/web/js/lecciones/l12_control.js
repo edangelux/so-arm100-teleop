@@ -53,6 +53,9 @@ export default {
     'Åström, K. J. y Murray, R. M. <i>Feedback Systems</i> (PID y respuesta al escalón). Libro de libre acceso.',
     'Hogan, N. (1985). «Impedance control: an approach to manipulation», J. Dynamic Systems, Measurement and Control.',
     'pruebas/resultados/2026-09-25/resumen.md: ensayos A1 (precisión) y A5 (escalón) del brazo real.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 8, «Motion Control» y cap. 9, «Force Control» (control de impedancia).',
+    'Khatib, O. (1987). A unified approach for motion and force control of robot manipulators: The operational space formulation. <i>IEEE Journal on Robotics and Automation</i>, 3(1), 43-53.',
+    'Åström, K. J. y Hägglund, T. (2006). <i>Advanced PID Control</i>. ISA.',
   ],
   pasos: [
     {

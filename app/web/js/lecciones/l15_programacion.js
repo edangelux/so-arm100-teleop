@@ -28,6 +28,9 @@ export default {
     'ABB. <i>Technical reference manual — RAPID Instructions, Functions and Data types</i> (MoveJ, MoveL, MoveC, Offs, speeddata, zonedata).',
     'KUKA. <i>KUKA System Software — Operating and Programming Instructions</i> (PTP, LIN, CIRC).',
     'Pestaña Programar de esta aplicación y app/web/js/programa/lenguaje.js (el subconjunto de RAPID implementado).',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 6, «Control Architecture» (niveles funcionales y programación de un robot).',
+    'Pan, Z., Polden, J., Larkin, N., Van Duin, S. y Norrish, J. (2012). Recent progress on programming methods for industrial robots. <i>Robotics and Computer-Integrated Manufacturing</i>, 28(2), 87-94.',
+    'Taller de programación RAPID de esta aplicación (lecciones 19 a 24): 33 programas que se corrigen solos.',
   ],
   pasos: [
     {

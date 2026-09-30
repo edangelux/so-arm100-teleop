@@ -47,6 +47,9 @@ export default {
     'Hoja de datos Feetech STS3215 (7,4 V): par de bloqueo 19 kg·cm.',
     'pruebas/resultados/2026-09-25/resumen.md: ensayo A3 con 0, 50 y 227 g.',
     'docs/12 del repositorio: el balance de par de diseño y la especificación de 80 g a 0,30 m.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 7, «Dynamics» (formulación de Lagrange, propiedades del modelo, Newton-Euler).',
+    'Featherstone, R. (2008). <i>Rigid Body Dynamics Algorithms</i>. Springer.',
+    'Khalil, W. y Dombre, E. (2002). <i>Modeling, Identification and Control of Robots</i>. Hermes Penton Science (identificación de parámetros dinámicos).',
   ],
   pasos: [
     {

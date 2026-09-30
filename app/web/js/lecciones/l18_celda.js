@@ -45,6 +45,9 @@ export default {
     'IEC 62541, <i>OPC Unified Architecture</i>.',
     'Nakajima, S. (1988). <i>Introduction to TPM: Total Productive Maintenance</i>. Productivity Press (origen del OEE).',
     'Modbus Organization, <i>Modbus Application Protocol Specification V1.1b3</i>.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 6, «Control Architecture».',
+    'IEC 61131-3:2013. Programmable controllers — Part 3: Programming languages.',
+    'Siciliano, B. y Khatib, O. (eds.) (2016). <i>Springer Handbook of Robotics</i> (2.ª ed.). Springer. Parte sobre robótica industrial y celdas de trabajo.',
   ],
   pasos: [
     {

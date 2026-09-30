@@ -38,6 +38,8 @@ export default {
   referencias: [
     'analisis/cinematica/ANALISIS_CINEMATICO.md: cinemática directa verificada contra el URDF con error de $10^{-15}$.',
     'Siciliano, B. et al. <i>Robotics</i>, sección 2.9 (cinemática directa de manipuladores planos).',
+    'Spong, M. W., Hutchinson, S. y Vidyasagar, M. (2006). <i>Robot Modeling and Control</i>. Wiley. Cap. 3, «Forward and Inverse Kinematics».',
+    'Lynch, K. M. y Park, F. C. (2017). <i>Modern Robotics: Mechanics, Planning, and Control</i>. Cambridge University Press. Cap. 4, «Forward Kinematics» (producto de exponenciales).',
   ],
   pasos: [
     {

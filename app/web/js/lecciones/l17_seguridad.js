@@ -20,6 +20,7 @@ export default {
     'IEC 60204-1, <i>Safety of machinery — Electrical equipment of machines</i> (categorías de parada 0, 1 y 2).',
     'ISO 9283:1998, <i>Manipulating industrial robots — Performance criteria and related test methods</i>.',
     'Association for Advancing Automation (A3), «Updated ISO 10218: FAQ» (2025).',
+    'Siciliano, B. y Khatib, O. (eds.) (2016). <i>Springer Handbook of Robotics</i> (2.ª ed.). Springer. Cap. «Safety for Physical Human-Robot Interaction».',
   ],
   pasos: [
     {

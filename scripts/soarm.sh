@@ -235,8 +235,11 @@ restart_ros2_daemon() {
     # que queda vivo entre sesiones. Tras suspender el equipo o cerrar una sesión a la
     # fuerza puede quedar roto y responder «!rclpy.ok()» a todo: entonces el lanzamiento
     # no puede cargar los controladores. Se reinicia al empezar cada sesión.
-    timeout 15 ros2 daemon stop >/dev/null 2>&1 || pkill -u "$USER" -f '_ros2_daemon' 2>/dev/null || true
-    timeout 15 ros2 daemon start >/dev/null 2>&1 || true
+    # setsid: el daemon nuevo queda en su propia sesión y no recibe el Ctrl+C
+    # que se manda al grupo de procesos de la sesión al cerrarla.
+    timeout 15 ros2 daemon stop >/dev/null 2>&1 || true
+    pkill -u "$USER" -f '_ros2_daemon' 2>/dev/null || true
+    timeout 15 setsid ros2 daemon start >/dev/null 2>&1 || true
 }
 wait_controllers() {
     local manager="$1" result deadline=$((SECONDS+120)) reiniciado=0

@@ -918,12 +918,22 @@ const seccion = {
 
   async moverRobot(tr) {
     // Se envía una muestra cada 50 ms como mínimo; el controlador interpola entre ellas.
+    // Los tiempos deben crecer estrictamente (el servidor rechaza dos puntos con el mismo
+    // tiempo): cada punto va al menos 20 ms después del anterior.
     const puntos = [];
-    let ultimo = -1;
+    let ultimo = -1, tPrevio = 0;
     for (let i = 1; i < tr.t.length; i++) {
-      if (tr.t[i] - ultimo >= 0.05 || i === tr.t.length - 1) { puntos.push({ q: tr.q[i], t: Math.max(tr.t[i], 0.02) }); ultimo = tr.t[i]; }
+      if (tr.t[i] - ultimo >= 0.05 || i === tr.t.length - 1) {
+        const t = Math.max(tr.t[i], tPrevio + 0.02);
+        puntos.push({ q: Array.from(tr.q[i]).slice(0, 5), t });
+        tPrevio = t;
+        ultimo = tr.t[i];
+      }
     }
-    await enviar('/api/trayectoria', { puntos });
+    // Un movimiento que no mueve nada (p. ej. MoveAbsJ init estando ya en init) no se envía.
+    const q0 = tr.q[0], qf = tr.q[tr.q.length - 1];
+    const mueve = q0 && qf && q0.slice(0, 5).some((v, j) => Math.abs(v - qf[j]) > 1e-3);
+    if (puntos.length && mueve) await enviar('/api/trayectoria', { puntos });
     const t0 = performance.now();
     await new Promise((resolver, rechazar) => {
       const paso = () => {

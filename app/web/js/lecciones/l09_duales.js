@@ -58,6 +58,8 @@ export default {
     'Lynch, K. y Park, F. (2017). <i>Modern Robotics: Mechanics, Planning, and Control</i>, cap. 3 y 4 (tornillos y producto de exponenciales).',
     'Kavan, L. et al. (2008). «Geometric skinning with approximate dual quaternion blending», ACM TOG: ScLERP y DLB.',
     'Brockett, R. (1984). «Robotic manipulators and the product of exponentials formula».',
+    'Murray, R. M., Li, Z. y Sastry, S. S. (1994). <i>A Mathematical Introduction to Robotic Manipulation</i>. CRC Press. Cap. 2 (teoría de tornillos, giros y torsores).',
+    'Lynch, K. M. y Park, F. C. (2017). <i>Modern Robotics: Mechanics, Planning, and Control</i>. Cambridge University Press. Cap. 3 y 4 (coordenadas exponenciales y producto de exponenciales).',
   ],
   pasos: [
     {

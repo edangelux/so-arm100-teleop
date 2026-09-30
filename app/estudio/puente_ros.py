@@ -190,11 +190,29 @@ class Puente:
         if ahora - self.t[planta] > SIN_DATOS and ahora - self._ultimo_arranque > ENTRE_REINICIOS:
             self.reiniciar('No llegaban las articulaciones: reiniciando el nodo de ROS…')
 
-    def _referencia(self, modo):
+    def _referencia(self, modo, reconectar=True):
+        """Postura medida de la planta que se opera. Si no llegan datos, reinicia el
+        nodo una vez (un nodo de larga vida puede quedar sin enlace de DDS, por
+        ejemplo tras suspender el equipo) y espera hasta 10 s a que vuelvan."""
         planta = 'real' if modo in ('real', 'ambos') else 'sim'
-        if self.q[planta] is None or time.time() - self.t[planta] > 1.0:
+        fresco = lambda: self.disponible and self.q[planta] is not None and time.time() - self.t[planta] <= 1.0
+        if fresco():
+            return self.q[planta]
+        if not reconectar:
             raise RuntimeError('No llegan estados articulares de esa planta.')
-        return self.q[planta]
+        if time.time() - self._ultimo_arranque > 5:
+            self.reiniciar('No llegaban las articulaciones: reconectando con ROS…')
+        limite = time.time() + 10
+        while time.time() < limite:
+            if fresco():
+                return self.q[planta]
+            time.sleep(0.2)
+        topico = '/joint_states' if planta == 'sim' else '/real/joint_states'
+        nombre = 'Gazebo' if planta == 'sim' else 'el brazo'
+        n, d = self.mensajes.get(planta, 0), self.descartados.get(planta, 0)
+        raise RuntimeError(f'No llegan estados articulares de {nombre} ({topico}). El nodo de la aplicación se reconectó y recibió '
+                           f'{n} mensajes ({d} descartados por incompletos). Compruebe en una terminal: ros2 topic hz {topico}. '
+                           f'Si ahí llegan, ejecute soarm-app --parar y soarm-app; si no, la sesión no está publicando (vea su registro).')
 
     # ------------------------------------------------------------ órdenes
     def mover(self, modo, objetivo, velocidad=0.5):
@@ -222,7 +240,13 @@ class Puente:
             for v, (lo, hi) in zip(q, LIM):
                 if not lo - 1e-3 <= v <= hi + 1e-3:
                     raise RuntimeError('Un punto de la trayectoria sale de los límites de las articulaciones.')
-            vel = max(abs(a - b) for a, b in zip(q, previo_q)) / (t - previo_t)
+            salto = max(abs(a - b) for a, b in zip(q, previo_q))
+            vel = salto / (t - previo_t)
+            # El primer punto se compara con la postura medida, que difiere un poco de la
+            # planificada (error de seguimiento del servo o de Gazebo): una corrección de
+            # hasta 0,05 rad se acepta aunque el primer punto llegue a los 20 ms.
+            if not limpios and salto <= 0.05:
+                vel = 0.0
             if vel > 1.6:          # el planificador de Programar usa 1,5 rad/s; margen numérico
                 raise RuntimeError(f'La trayectoria pide {vel:.1f} rad/s en una articulación; el máximo es 1,5 rad/s.')
             limpios.append({'q': q, 't': t})
@@ -233,7 +257,7 @@ class Puente:
     def parar(self, modo):
         """Detiene el movimiento en curso: nueva trayectoria que se queda donde está."""
         try:
-            ref = self._referencia(modo)
+            ref = self._referencia(modo, reconectar=False)
             self._orden({'op': 'trayectoria', 'modo': modo, 'puntos': [{'q': ref[:5], 't': 0.2}]})
         except RuntimeError:
             pass

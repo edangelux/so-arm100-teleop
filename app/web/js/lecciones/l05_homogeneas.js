@@ -40,6 +40,8 @@ export default {
     'Denavit, J. y Hartenberg, R. S. (1955). «A kinematic notation for lower-pair mechanisms based on matrices», J. Applied Mechanics.',
     'Craig, J. J. <i>Introduction to Robotics</i>, cap. 3 (convención D-H modificada).',
     'analisis/cinematica/Capitulo_analisis_cinematico.md: tabla D-H del SO-ARM100 derivada del URDF.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 2, «Kinematics» (transformaciones homogéneas y convención de Denavit-Hartenberg).',
+    'Craig, J. J. (2005). <i>Introduction to Robotics: Mechanics and Control</i> (3.ª ed.). Pearson Prentice Hall. Cap. 3 (D-H modificado, la variante que usa Craig).',
   ],
   pasos: [
     {

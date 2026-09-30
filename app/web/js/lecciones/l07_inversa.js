@@ -28,6 +28,9 @@ export default {
     'analisis/cinematica: cinemática inversa en forma cerrada, 3000 de 3000 casos con error de $10^{-16}$ m.',
     'Buss, S. (2004). «Introduction to inverse kinematics with Jacobian transpose, pseudoinverse and damped least squares methods».',
     'Wampler, C. (1986). Mínimos cuadrados amortiguados aplicados a manipuladores.',
+    'Siciliano, B., Sciavicco, L., Villani, L. y Oriolo, G. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer. Cap. 2 (problema de cinemática inversa) y cap. 3 (algoritmos numéricos de cinemática inversa).',
+    'Buss, S. R. (2004). Introduction to inverse kinematics with Jacobian transpose, pseudoinverse and damped least squares methods. University of California, San Diego.',
+    'Pieper, D. L. (1968). <i>The Kinematics of Manipulators under Computer Control</i>. Tesis doctoral, Stanford University.',
   ],
   pasos: [
     {
