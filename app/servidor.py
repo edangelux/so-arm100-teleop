@@ -25,6 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from estudio import entorno as ent               # noqa: E402
 from estudio import puente_ros                    # noqa: E402
+from estudio.camwin import URL_VIDEO, camara as camwin  # noqa: E402
 from estudio.eventos import difusor               # noqa: E402
 from estudio.modelo import cargar_modelo          # noqa: E402
 from estudio.procesos import sesion, tarea        # noqa: E402
@@ -42,6 +43,9 @@ PUENTE = None
 
 def estado_general():
     conf = ent.leer_conf()
+    # Con una sesión abierta, si el nodo de ROS dejó de recibir articulaciones, se reinicia solo.
+    if PUENTE and sesion.estado in ('teleop', 'menu', 'moviendo') and hasattr(PUENTE, 'vigilar_datos'):
+        PUENTE.vigilar_datos(sesion.modo)
     return {
         'version': VERSION,
         'entorno': ent.entorno(),
@@ -76,6 +80,11 @@ def accion_iniciar(d):
     if d.get('moveit', conf['SOARM_MOVEIT'] == '1'):
         opciones.append('--moveit')
     camara = str(d.get('camara') or conf['SOARM_CAM'])
+    if camara == URL_VIDEO:
+        # Cámara de Windows: se asegura de que esté enviando antes de arrancar.
+        r = camwin.asegurar(conf.get('SOARM_CAM_WIN', '0'), conf.get('SOARM_CAM_WIN_NOMBRE', ''))
+        if not r.get('ok'):
+            raise RuntimeError(r.get('mensaje', 'La cámara de Windows no entrega video.'))
     opciones += ['--camara', camara]
     vel = d.get('velocidad') or conf['SOARM_VELOCIDAD']
     if vel:
@@ -268,7 +277,23 @@ class Manejador(BaseHTTPRequestHandler):
         if p == '/api/modelo':
             return self._json(MODELO)
         if p == '/api/camaras':
-            return self._json({'locales': ent.camaras_locales(), 'conf': ent.leer_conf()})
+            return self._json({'locales': ent.camaras_locales(), 'conf': ent.leer_conf(),
+                               'windows': ent.entorno() == 'wsl' and camwin.disponible(), 'camwin': camwin.estado()})
+        if p == '/api/camwin/listar':
+            return self._json(camwin.listar())
+        if p == '/camara/foto':
+            datos = camwin.foto()
+            if not datos:
+                return self._json({'error': 'Sin imagen'}, 404)
+            self.send_response(200)
+            self.send_header('Content-Type', 'image/jpeg')
+            self.send_header('Content-Length', str(len(datos)))
+            self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            self.wfile.write(datos)
+            return
+        if p == '/camara/video':
+            return self._video()
         if p == '/api/resultados':
             return self._json(resultados())
         if p == '/api/eventos':
@@ -315,6 +340,22 @@ class Manejador(BaseHTTPRequestHandler):
         finally:
             difusor.retirar(cola)
 
+    def _video(self):
+        if not camwin.cuadros:
+            return self._json({'error': 'La cámara de Windows no está enviando imágenes.'}, 503)
+        self.send_response(200)
+        self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=cuadro')
+        self.send_header('Cache-Control', 'no-cache')
+        self.end_headers()
+
+        def escribir(b):
+            self.wfile.write(b)
+            self.wfile.flush()
+        try:
+            camwin.flujo(escribir)
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            pass
+
     def do_POST(self):
         # Una página de otro sitio abierta en el navegador no debe poder mover el brazo.
         origen = self.headers.get('Origin')
@@ -322,6 +363,17 @@ class Manejador(BaseHTTPRequestHandler):
         if origen and urllib.parse.urlparse(origen).netloc != self.headers.get('Host', ''):
             return self._json({'error': 'Origen no permitido.'}, 403)
         largo = int(self.headers.get('Content-Length') or 0)
+        u = urllib.parse.urlparse(self.path)
+        if u.path == '/api/camwin/cuadro':
+            # Imágenes del programa de Windows (sin Origin, desde 127.0.0.1). Máximo 2 MB.
+            if largo <= 0 or largo > 2_000_000:
+                return self._json({'error': 'Tamaño no válido'}, 400)
+            token = urllib.parse.parse_qs(u.query).get('token', [''])[0]
+            codigo = camwin.recibir(token, self.rfile.read(largo))
+            self.send_response(codigo)
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+            return
         try:
             d = json.loads(self.rfile.read(largo) or b'{}')
         except json.JSONDecodeError:
@@ -343,6 +395,19 @@ class Manejador(BaseHTTPRequestHandler):
                 return self._json(accion_camara_probar(d))
             if p == '/api/camaras/buscar':
                 return self._json(ent.buscar_telefonos())
+            if p == '/api/camwin/usar':
+                r = camwin.usar(int(d.get('indice', 0)), str(d.get('nombre', '')))
+                if r.get('ok'):
+                    nombre = str(d.get('nombre', '')).replace('\\', ' ')
+                    ent.guardar_conf({'SOARM_CAM': URL_VIDEO, 'SOARM_CAM_WIN': int(d.get('indice', 0)),
+                                      'SOARM_CAM_WIN_NOMBRE': nombre, 'SOARM_CAM_TIPO': f'Windows: {nombre}'})
+                return self._json(r)
+            if p == '/api/camwin/preparar':
+                tarea.iniciar('Preparar la cámara de Windows', camwin.orden_preparar())
+                return self._json({'ok': True})
+            if p == '/api/camwin/detener':
+                camwin.detener()
+                return self._json({'ok': True})
             if p == '/api/brazo/conectar':
                 puerto, msg = ent.conectar_brazo()
                 return self._json({'ok': bool(puerto), 'puerto': puerto, 'mensaje': msg})
@@ -398,17 +463,15 @@ def main():
     a.add_argument('--red', action='store_true', help='Aceptar conexiones de otros equipos de la red (con cuidado)')
     a.add_argument('--sin-ros', action='store_true', help='No conectar con ROS aunque esté disponible')
     args = a.parse_args()
-    PUENTE = puente_ros.Puente.__new__(puente_ros.Puente)
     if args.sin_ros:
-        PUENTE.disponible, PUENTE.motivo = False, 'Desactivado con --sin-ros.'
-        PUENTE.q, PUENTE.t = {'sim': None, 'real': None}, {'sim': 0.0, 'real': 0.0}
+        PUENTE = puente_ros.Puente.desactivado('Desactivado con --sin-ros.')
     else:
-        PUENTE = puente_ros.iniciar()
+        PUENTE = puente_ros.iniciar()        # el nodo de ROS arranca aparte, en segundo plano
     anfitrion = '0.0.0.0' if args.red else '127.0.0.1'
     servidor = ThreadingHTTPServer((anfitrion, args.puerto), Manejador)
     servidor.daemon_threads = True
     servidor.nombre = 'localhost'
-    print(f'SO-ARM100 Estudio en http://127.0.0.1:{args.puerto}  (ROS: {"sí" if PUENTE.disponible else "no — " + PUENTE.motivo})', flush=True)
+    print(f'SO-ARM100 Estudio en http://127.0.0.1:{args.puerto}  (ROS: {"desactivado" if args.sin_ros else "nodo aparte"})', flush=True)
     # «soarm-app --parar» envía SIGTERM: se trata como Ctrl+C para cerrar el nodo de ROS en orden.
     def terminar(*_):
         raise KeyboardInterrupt

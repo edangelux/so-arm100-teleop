@@ -141,7 +141,8 @@ class Aplicacion {
       ind('ok', nombreEnt, 'Entorno de ejecución'),
       ind(e.ros.disponible ? 'ok' : 'aviso', e.ros.disponible ? 'ROS 2' : 'Sin ROS', e.ros.motivo || ''),
       ind(e.brazo.puertos.length ? 'ok' : '', e.brazo.puertos.length ? `Brazo ${e.brazo.puertos[0]}` : 'Brazo no conectado'),
-      ind(cam.startsWith('http') ? 'ok' : '', cam.startsWith('http') ? `Cámara ${cam.replace(/^https?:\/\//, '').replace(/\/video$/, '')}` : `Cámara /dev/video${cam}`),
+      ind(cam.startsWith('http') ? 'ok' : '', cam.includes('/camara/video') ? `Cámara Windows · ${e.conf.SOARM_CAM_WIN_NOMBRE || e.conf.SOARM_CAM_WIN || 0}`
+        : cam.startsWith('http') ? `Cámara ${cam.replace(/^https?:\/\//, '').replace(/\/video$/, '')}` : `Cámara /dev/video${cam}`),
       ind(est === 'detenida' ? '' : est === 'teleop' ? 'ok vivo' : 'aviso vivo', txtSesion),
     );
   }

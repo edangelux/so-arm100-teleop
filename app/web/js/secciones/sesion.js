@@ -57,7 +57,8 @@ const seccion = {
     if (!this._cargado) {
       const c = e.conf;
       Object.assign(this.eleccion, { version: c.SOARM_VERSION || '14', moveit: c.SOARM_MOVEIT !== '0', velocidad: c.SOARM_VELOCIDAD || '',
-        camara: c.SOARM_CAM, tipoCam: (c.SOARM_CAM || '').startsWith('http') ? 'telefono' : (c.SOARM_CAM_TIPO || '').includes('virtual') ? 'virtual' : 'local' });
+        camara: c.SOARM_CAM, tipoCam: (c.SOARM_CAM || '').includes('/camara/video') ? 'windows' : (c.SOARM_CAM || '').startsWith('http') ? 'telefono'
+          : (c.SOARM_CAM_TIPO || '').includes('virtual') ? 'virtual' : e.entorno === 'wsl' ? 'windows' : 'local' });
       for (const l of s.log) this.agregarLinea({ fuente: 'sesion', linea: l });
       this._cargado = true;
       this.pintarFormulario();
@@ -134,17 +135,28 @@ const seccion = {
   async pintarCamara() {
     const e = this.eleccion;
     const conf = this.app.estado?.conf || {};
-    const tipos = [
+    clearInterval(this._fotoTimer);
+    const wsl = this.app.estado?.entorno === 'wsl';
+    // En WSL2 Ubuntu no ve las cámaras de Windows: la opción recomendada es «Cámara de Windows»,
+    // que las envía a la aplicación (integrada, USB u OBS Virtual Camera) sin usbipd.
+    const tipos = wsl ? [
+      ['windows', 'camara', 'Cámara de Windows', 'Integrada del portátil, webcam USB u OBS Virtual Camera'],
+      ['telefono', 'telefono', 'Teléfono por Wi-Fi', 'DroidCam o IP Webcam, con su IP'],
+      ['local', 'camara', 'USB pasada a Ubuntu', 'Con usbipd (avanzado)'],
+    ] : [
       ['local', 'camara', 'Integrada o USB', 'La cámara del portátil o una webcam'],
       ['virtual', 'virtual', 'Virtual', 'OBS, cliente de DroidCam para Linux'],
       ['telefono', 'telefono', 'Teléfono por Wi-Fi', 'DroidCam o IP Webcam, con su IP'],
     ];
+    if (!tipos.some((t) => t[0] === e.tipoCam)) e.tipoCam = tipos[0][0];
     const opciones = el('div', { class: 'opciones' }, ...tipos.map(([id, i, t, d]) =>
       el('button', { class: `opcion ${e.tipoCam === id ? 'activa' : ''}`, onclick: () => { e.tipoCam = id; this.pintarCamara(); } },
         el('div', {}, el('strong', {}, t), el('span', {}, d)))));
     const detalle = el('div', { style: 'margin-top:12px' });
     this.msgCam = el('div');
-    if (e.tipoCam === 'telefono') {
+    if (e.tipoCam === 'windows') {
+      this.pintarCamaraWindows(detalle);
+    } else if (e.tipoCam === 'telefono') {
       const ip = el('input', { class: 'campo', placeholder: 'IP que muestra la app, p. ej. 192.168.1.38', value: conf.SOARM_CAM_IP || '' });
       const encontrados = el('div', { class: 'opciones', style: 'margin-top:8px' });
       detalle.append(
@@ -178,8 +190,71 @@ const seccion = {
             el('div', {}, el('strong', {}, c.nombre), el('span', {}, c.dev))))));
       }
     }
-    const actual = e.camara ? el('p', { class: 'nota' }, `Cámara elegida: ${String(e.camara).startsWith('http') ? e.camara : '/dev/video' + e.camara}`) : null;
-    this.camNodo.replaceChildren(el('div', { class: 'tarjeta' }, el('h3', { html: `Cámara` }), opciones, detalle, this.msgCam, actual));
+    const nombreCam = String(e.camara || '').includes('/camara/video') ? `Windows · ${conf.SOARM_CAM_WIN_NOMBRE || 'cámara ' + (conf.SOARM_CAM_WIN || 0)}`
+      : String(e.camara).startsWith('http') ? e.camara : '/dev/video' + e.camara;
+    this.camActual = el('p', { class: 'nota' }, e.camara ? `Cámara elegida: ${nombreCam}` : '');
+    this.camNodo.replaceChildren(el('div', { class: 'tarjeta' }, el('h3', { html: `Cámara` }), opciones, detalle, this.msgCam, this.camActual));
+  },
+
+  pintarCamaraWindows(detalle) {
+    const e = this.eleccion;
+    const lista = el('div', { class: 'opciones', style: 'margin-top:8px' });
+    const foto = el('img', { class: 'foto-camara oculto', alt: 'Vista de la cámara' });
+    foto.onerror = () => {       // la cámara de Windows dejó de enviar (se apaga sola tras un minuto sin uso)
+      clearInterval(this._fotoTimer);
+      foto.classList.add('oculto');
+      this.mensajeCam('aviso', 'La cámara de Windows está apagada. Se abre sola al iniciar la sesión; para verla ahora, búsquela y tóquela.');
+    };
+    const verFoto = () => {
+      foto.classList.remove('oculto');
+      clearInterval(this._fotoTimer);
+      this._fotoTimer = setInterval(() => { if (document.body.contains(foto)) foto.src = `/camara/foto?t=${Date.now()}`; else clearInterval(this._fotoTimer); }, 700);
+    };
+    const preparar = el('button', { class: 'boton ancho oculto', style: 'margin-top:8px', html: 'Preparar Windows (instala OpenCV y pygrabber, una sola vez)', onclick: async () => {
+      try { await enviar('/api/camwin/preparar'); this.mensajeCam('aviso', 'Instalando OpenCV y pygrabber en el Python de Windows (unos minutos). El avance aparece en el Registro, abajo. Al terminar, pulse «Buscar cámaras de Windows».'); } catch (err) { this.mensajeCam('mal', err.message); }
+    } });
+    const buscar = el('button', { class: 'boton primario ancho', html: 'Buscar cámaras de Windows', onclick: async (ev) => {
+      ev.target.disabled = true;
+      this.mensajeCam('aviso', 'Buscando las cámaras de Windows… (unos segundos; la luz de la cámara puede encenderse)');
+      try {
+        const r = await obtener('/api/camwin/listar');
+        preparar.classList.toggle('oculto', r.falta !== 'opencv' && !r.sin_nombres);
+        if (!r.ok) this.mensajeCam('mal', r.mensaje);
+        else if (!r.camaras.length) this.mensajeCam('mal', 'Windows no encontró ninguna cámara. Si es OBS, pulse «Iniciar cámara virtual» en OBS y busque de nuevo. Cierre Zoom, Teams o el navegador si usan la cámara.');
+        else {
+          const activa = (c) => String(conf().SOARM_CAM_WIN) === String(c.indice) && String(e.camara).includes('/camara/video');
+          lista.replaceChildren(...r.camaras.map((c) => el('button', { class: `opcion opcion-camara ${activa(c) ? 'activa' : ''}`, onclick: (ev) => this.usarCamaraWindows(c, verFoto, ev.currentTarget) },
+            c.miniatura ? el('img', { class: 'mini-camara', alt: '', src: `data:image/jpeg;base64,${c.miniatura}` }) : el('div', { class: 'mini-camara vacia' }, 'sin imagen'),
+            el('div', {}, el('strong', {}, c.nombre), el('span', {}, `${c.clase === 'virtual' ? 'Virtual' : 'Física'} · ${c.entrega ? `entrega ${c.ancho}×${c.alto}` : 'no entregó imagen: la usa otro programa o, si es OBS, falta «Iniciar cámara virtual»'}`)))));
+          this.mensajeCam('ok', `Windows tiene ${r.camaras.length} cámara(s). Reconózcala por la miniatura y tóquela.`
+            + (r.sin_nombres ? ' (Para ver sus nombres, pulse «Preparar Windows» una vez.)' : ''));
+        }
+      } catch (err) { this.mensajeCam('mal', err.message); }
+      ev.target.disabled = false;
+    } });
+    const conf = () => this.app.estado?.conf || {};
+    detalle.append(
+      el('p', { class: 'nota' }, 'Ubuntu (WSL2) no ve las cámaras de Windows. La aplicación abre la cámara en Windows y la recibe aquí. Para OBS: en OBS pulse «Iniciar cámara virtual» antes de buscar.'),
+      buscar, preparar, lista, foto);
+    if (String(e.camara || '').includes('/camara/video')) {
+      obtener('/api/camaras').then((r) => { if (r.camwin?.activa) verFoto(); }).catch(() => {});
+    }
+  },
+
+  async usarCamaraWindows(c, verFoto, boton) {
+    this.mensajeCam('aviso', `Abriendo «${c.nombre}» en Windows…`);
+    try {
+      const r = await enviar('/api/camwin/usar', { indice: c.indice, nombre: c.nombre });
+      if (r.ok) {
+        this.eleccion.camara = r.camara;
+        this.mensajeCam('ok', r.mensaje);
+        verFoto();
+        this.camActual.textContent = `Cámara elegida: Windows · ${c.nombre}`;
+        boton?.parentNode?.querySelectorAll('.opcion-camara').forEach((b) => b.classList.toggle('activa', b === boton));
+        this.app.refrescar();
+      }
+      else this.mensajeCam('mal', r.mensaje);
+    } catch (err) { this.mensajeCam('mal', err.message); }
   },
 
   mensajeCam(tipo, texto) { this.msgCam.replaceChildren(el('div', { class: `mensaje ${tipo}` }, texto)); },

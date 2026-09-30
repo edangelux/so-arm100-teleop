@@ -495,3 +495,10 @@ body.panel-ancho { grid-template-columns: 1fr 640px; }
 
 /* La fila de Atrás / Siguiente queda siempre visible aunque el paso sea largo. */
 .capa-leccion .pie-leccion { position: sticky; bottom: -24px; z-index: 1; margin: 12px 0 -12px; padding: 12px 0; background: var(--noche); }
+
+/* Vista de la cámara de Windows en Sesión */
+.foto-camara { display: block; width: 100%; max-width: 420px; aspect-ratio: 4 / 3; object-fit: contain; margin-top: 12px; border-radius: 8px; background: #150f23; }
+.foto-camara.oculto { display: none; }
+.opcion.opcion-camara { display: flex; align-items: center; gap: 14px; }
+.mini-camara { flex: none; width: 96px; aspect-ratio: 4 / 3; object-fit: contain; border-radius: 6px; background: #150f23; }
+.mini-camara.vacia { display: flex; align-items: center; justify-content: center; font-size: 11px; color: #8a80a0; }

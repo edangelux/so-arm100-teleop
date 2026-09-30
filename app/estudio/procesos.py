@@ -66,7 +66,7 @@ class Sesion:
             self._linea('→ ' + ' '.join(orden[1:]))
             entorno = dict(os.environ, PYTHONUNBUFFERED='1')
             self.proc = subprocess.Popen(orden, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                         stderr=subprocess.STDOUT, text=True, bufsize=1,
+                                         stderr=subprocess.STDOUT, text=True, errors='replace', bufsize=1,
                                          start_new_session=True, env=entorno, cwd=str(REPO))
             self._estado('arrancando')
             threading.Thread(target=self._leer, args=(self.proc,), daemon=True).start()
@@ -120,7 +120,7 @@ class Tarea:
         self.nombre, self.codigo = nombre, None
         self.log.clear()
         self.proc = subprocess.Popen(orden, stdin=subprocess.PIPE if entrada else subprocess.DEVNULL,
-                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1,
+                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors='replace', bufsize=1,
                                      start_new_session=True, cwd=str(REPO),
                                      env=dict(os.environ, PYTHONUNBUFFERED='1', SOARM_UI='terminal'))
         if entrada:

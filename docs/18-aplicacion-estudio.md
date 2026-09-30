@@ -70,8 +70,11 @@ flowchart LR
     SSE["Eventos en vivo (SSE)<br/>registro, estados, articulaciones"]
     SES["Sesión<br/>lanza y lee scripts/soarm.sh"]
     TAR["Tareas<br/>diagnóstico, centrar, servos, ensayos"]
-    PR["Puente ROS (opcional)<br/>rclpy"]
+    PR["Puente ROS (opcional)<br/>puente_ros.py"]
+    CW["Cámara de Windows<br/>camwin.py · /camara/video"]
   end
+  NP["Nodo ROS aparte<br/>nodo_puente.py (rclpy)"]
+  WIN["Python de Windows<br/>app/windows/camara_windows.py<br/>DirectShow: integrada, USB, OBS"]
   subgraph Robot["Lo que ya existía"]
     SH["scripts/soarm.sh<br/>Gazebo · MoveIt · teleop v13–v15"]
     ROS["ROS 2 Humble<br/>/joint_states · controladores"]
@@ -82,12 +85,13 @@ flowchart LR
   SSE --> E3D
   API --> SES --> SH
   API --> TAR
-  API --> PR --> ROS
+  API --> PR -- "órdenes JSON por stdin" --> NP --> ROS
   SH --> ROS --> BRAZO
-  ROS -- "estados articulares" --> PR
+  ROS -- "estados articulares" --> NP -- "20 Hz por stdout" --> PR
+  WIN -- "POST JPEG" --> CW -- "MJPEG" --> SH
 ```
 
-*Figura 18.2. Arquitectura. Las flechas indican quién llama a quién. La aplicación no reemplaza a `soarm.sh`: lo ejecuta y lee su salida.*
+*Figura 18.2. Arquitectura. Las flechas indican quién llama a quién. La aplicación no reemplaza a `soarm.sh`: lo ejecuta y lee su salida. El nodo de ROS y el programa de cámara de Windows corren en procesos aparte del servidor.*
 
 ### El servidor
 
@@ -97,7 +101,9 @@ Está escrito sólo con la biblioteca estándar de Python (`http.server`, `subpr
 |---|---|
 | `entorno.py` | Detecta si el equipo es WSL2, máquina virtual o Ubuntu nativo; lee y guarda `~/.soarm.conf`; busca el puerto del brazo y lo conecta con `usbipd` en WSL2; lista las cámaras locales y busca teléfonos con DroidCam en la red |
 | `procesos.py` | Arranca `soarm.sh` con las opciones elegidas, lee su salida línea a línea y deduce el estado: `detenida`, `arrancando`, `teleop`, `moviendo`, `menu`, `cerrando`. Las respuestas del menú (Enter, `h`, `x`) se escriben en la entrada estándar del proceso, igual que al teclearlas |
-| `puente_ros.py` | Si `rclpy` está disponible, se suscribe a `/joint_states` (simulación) y `/real/joint_states` (brazo) y publica las posiciones a la página 20 veces por segundo. También envía trayectorias y órdenes a la pinza |
+| `puente_ros.py` | Arranca `nodo_puente.py` en un proceso aparte, con ROS 2 y el workspace cargados (igual que los ensayos), y conversa con él por líneas JSON. Recibe las posiciones de `/joint_states` (simulación) y `/real/joint_states` (brazo) 20 veces por segundo y las pasa a la página; comprueba límites y velocidades antes de enviar trayectorias u órdenes a la pinza. Si el nodo se cae, o si con una sesión abierta pasan 8 s sin articulaciones, lo reinicia solo (como mucho cada 20 s). Lo que el nodo escribe en su salida de errores queda en `~/.local/state/soarm/nodo_ros.log` |
+| `nodo_puente.py` | El nodo `soarm_estudio` de ROS 2. Todo lo de `rclpy` ocurre en su hilo: las suscripciones, los publicadores de trayectorias (creados al arrancar) y los clientes de la acción de la pinza |
+| `camwin.py` | Cámaras de Windows en WSL2: lista las cámaras con el Python de Windows, arranca `app/windows/camara_windows.py`, recibe sus imágenes y las publica como MJPEG en `/camara/video` |
 | `eventos.py` | Reparte los eventos en vivo a todas las ventanas abiertas (Server-Sent Events) |
 | `modelo.py` | Lee el URDF, quita la parte de xacro y entrega articulaciones, orígenes, ejes y mallas a la página |
 
@@ -111,6 +117,9 @@ La tabla siguiente relaciona cada ruta de la API con la orden que sustituye.
 | `/api/sesion/menu` | POST | Responder Enter, `h` o `x` en el menú final |
 | `/api/sesion/detener` | POST | Ctrl+C en la terminal del lanzador |
 | `/api/camaras`, `/api/camaras/probar`, `/api/camaras/buscar` | GET, POST | `soarm-camara` |
+| `/api/camwin/listar`, `/api/camwin/usar`, `/api/camwin/preparar`, `/api/camwin/detener` | GET, POST | Listar, abrir o cerrar una cámara de Windows; instalar OpenCV y pygrabber en el Python de Windows |
+| `/api/camwin/cuadro` | POST | Recibe cada imagen JPEG del programa de Windows (con una clave que cambia en cada apertura) |
+| `/camara/video`, `/camara/foto` | GET | Vídeo MJPEG de la cámara de Windows para la teleoperación, e imagen suelta para la vista previa |
 | `/api/brazo/conectar` | POST | `usbipd attach` en WSL2 |
 | `/api/mover`, `/api/pinza` | POST | `ros2 topic pub` de una trayectoria o `ir_a_pose.py` |
 | `/api/trayectoria`, `/api/parar` | POST | Trayectoria articular completa de un programa de la pestaña Programar, y su parada |
@@ -134,7 +143,26 @@ La sección Sesión sustituye a la orden `teleop`. Antes de arrancar se eligen:
 - **Versión de la teleoperación.** v13 (la defendida), v14 (se sincroniza con el brazo al abrir) o v15 (confianza por articulación, ganancia por postura de referencia y giro de muñeca en 3D).
 - **MoveIt y RViz.** Si se abren junto con la teleoperación (capítulo 15).
 - **Velocidad máxima** del espejo en rad/s.
-- **Cámara.** Integrada o USB, virtual (OBS, cliente de DroidCam) o teléfono por Wi-Fi. Para el teléfono se escribe la IP o se pulsa *Buscar el teléfono en la red*. La cámara se prueba antes de arrancar, con la misma comprobación de tipo de contenido del capítulo 14, de modo que una página de «DroidCam ocupado» ya no pasa por vídeo.
+- **Cámara.** En Ubuntu nativo o en una máquina virtual: integrada o USB, virtual (OBS, cliente de DroidCam) o teléfono por Wi-Fi. En WSL2: *Cámara de Windows* (integrada del portátil, webcam USB u OBS Virtual Camera), teléfono por Wi-Fi o *USB pasada a Ubuntu* con `usbipd`. Para el teléfono se escribe la IP o se pulsa *Buscar el teléfono en la red*. La cámara se prueba antes de arrancar, con la misma comprobación de tipo de contenido del capítulo 14, de modo que una página de «DroidCam ocupado» ya no pasa por vídeo.
+
+### Cámaras de Windows en WSL2
+
+WSL2 no ve las cámaras de Windows: `/dev/video*` no existe en Ubuntu aunque el portátil tenga cámara, y la OBS Virtual Camera es un filtro de DirectShow que sólo existe para los programas de Windows. Pasar la cámara integrada con `usbipd` funciona en pocos equipos, porque el núcleo de WSL2 no trae el controlador `uvcvideo`. Por eso la aplicación abre la cámara del lado de Windows y la recibe:
+
+1. `camwin.py` busca el Python de Windows (`py.exe -3` o `python.exe`) y ejecuta `app/windows/camara_windows.py --listar`. Ese programa enumera las cámaras con DirectShow; los nombres salen de `pygrabber`, que usa la misma enumeración que OpenCV, así el nombre corresponde al índice. Por cada cámara devuelve si entregó imagen, su resolución y una miniatura.
+2. Al tocar una cámara, el servidor arranca `camara_windows.py --indice N --token T`. Cada imagen se reduce a 640 px de ancho, se comprime a JPEG y se envía con `POST /api/camwin/cuadro?token=T` a `127.0.0.1:8642`, que Windows alcanza dentro de WSL por el reenvío de `localhost`. No se abre ningún puerto en Windows.
+3. El servidor guarda la última imagen y la publica como `multipart/x-mixed-replace` en `http://127.0.0.1:8642/camara/video`. Para la teleoperación es lo mismo que un teléfono con DroidCam: `soarm.sh` comprueba el tipo de contenido y `teleop_v1x.py` lo lee con el mismo lector MJPEG.
+4. Al elegir otra cámara cambia la clave: el servidor responde 410 a la anterior y su programa termina. Si nadie mira la imagen durante un minuto, el servidor lo detiene; al iniciar una sesión con esa cámara, `accion_iniciar` la vuelve a abrir y espera la primera imagen.
+
+La primera vez hace falta Python en Windows (`winget install Python.Python.3.12` en PowerShell) y el botón *Preparar Windows*, que instala `opencv-python` y `pygrabber` con `pip install --user`. Para OBS se pulsa *Iniciar cámara virtual* en OBS antes de buscar. La vista previa se refresca cada 0,7 s con `/camara/foto`.
+
+| Síntoma en la lista | Causa | Qué hacer |
+|---|---|---|
+| «No se encontró Python en Windows» | No hay Python de Windows | `winget install Python.Python.3.12` en PowerShell, cerrar y abrir Ubuntu, `soarm-app --parar`, `soarm-app` |
+| «Falta OpenCV» | Primera vez | *Preparar Windows* y buscar de nuevo |
+| Cámaras llamadas «Cámara 0», «Cámara 1» | Falta `pygrabber` | *Preparar Windows*; mientras, se reconocen por la miniatura |
+| «no entregó imagen» | Otro programa la usa (Zoom, Teams, el navegador) o, en OBS, falta *Iniciar cámara virtual* | Cerrar ese programa o iniciar la cámara virtual y buscar de nuevo |
+| «Windows no alcanza la aplicación» | El reenvío de `localhost` de WSL2 está desactivado | Quitar `localhostForwarding=false` de `%UserProfile%\.wslconfig` y `wsl --shutdown` |
 
 Al pulsar **Iniciar**, el servidor arma la orden de `soarm.sh` y la ejecuta. El registro aparece en el recuadro de la parte baja y el estado cambia solo:
 
@@ -411,7 +439,9 @@ Cada fase se prueba antes de empezar la siguiente.
 | El icono no hace nada | El servidor no arrancó | Ver `~/.local/state/soarm/estudio.log`; ejecutar `bash app/abrir.sh` en una terminal para ver el error |
 | En WSL2 no se abre ninguna ventana | Edge no está o `cmd.exe` no está en el PATH | Abrir `http://127.0.0.1:8642` en cualquier navegador de Windows |
 | La ventana abre en blanco | El navegador no tiene WebGL | En la máquina virtual, activar la aceleración 3D (capítulo 1, figura vm-19) o probar con Chrome |
-| «Sin ROS» aunque ROS está instalado | El servidor se arrancó sin cargar ROS | `soarm-app --parar` y abrir otra vez con el icono, que carga ROS |
+| «Sin ROS» aunque ROS está instalado | El nodo de ROS no pudo arrancar | Ver el motivo en la página y `~/.local/state/soarm/nodo_ros.log`; `soarm-app --parar` y `soarm-app` |
+| «Simulación interna (sin ROS en marcha)» con la teleoperación abierta | No llegan articulaciones al nodo de la aplicación | El nodo se reinicia solo a los 8 s. Si sigue: `ros2 topic hz /real/joint_states` debe dar unos 40 Hz; `ros2 node list` debe mostrar `/soarm_estudio`; revisar `~/.local/state/soarm/nodo_ros.log` |
+| La sección Sesión no muestra la cámara del portátil ni la de OBS (WSL2) | WSL2 no ve las cámaras de Windows | Elegir *Cámara de Windows* (ver «Cámaras de Windows en WSL2») |
 | Mover dice que no llegan estados | La sesión está arrancando o el lanzador cayó | Esperar al estado `menu`; revisar el registro de la sección Sesión |
 | El puerto 8642 está ocupado | Otro programa lo usa | `SOARM_APP_PUERTO=8650 soarm-app` |
 | Mover o Programar no dejan mover el brazo aunque la sesión esté en init | Falta una de tres condiciones: el lanzador en su menú, ROS 2 cargado en el servidor de la aplicación y posiciones del brazo llegando (`/real/joint_states` o `/joint_states`) | El aviso de Mover y de Programar dice cuál falla y qué hacer. Lo más común: el servidor se abrió sin ROS o se reinició con una sesión abierta; se apaga la sesión, `soarm-app --parar`, `soarm-app` y se inicia la sesión otra vez |
