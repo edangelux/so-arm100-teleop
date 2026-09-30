@@ -418,6 +418,23 @@ Los errores que aparecieron durante el desarrollo están documentados con su cau
 
 ---
 
+## Calidad del código
+
+El repositorio se revisa solo en cada push (GitHub Actions, `.github/workflows/calidad.yml`):
+
+| Revisión | Herramienta | Comando local |
+|---|---|---|
+| Errores y malas prácticas en JavaScript | ESLint 10 (`eslint.config.js`) | `npm run lint` |
+| Archivos y exports que nadie usa | knip (`knip.json`) | `npm run knip` |
+| Código duplicado | jscpd (`.jscpd.json`) | `npm run duplicados` |
+| Pruebas del lenguaje RAPID, el intérprete y las trayectorias al brazo | `node --test` (`pruebas/js/`) | `npm test` |
+| Pruebas del servidor, el puente de ROS y la cámara | pytest y ruff (`pruebas/py/`, `pyproject.toml`) | `pytest` · `ruff check app pruebas/py` |
+| La aplicación como la usa una persona: pestañas, cámara, retos y los 33 ejercicios del taller | Playwright (`e2e/`) | `npm run e2e` |
+| ¿Las pruebas detectan errores? (mutación, semanal) | StrykerJS (`stryker.config.mjs`) | `npm run mutacion` |
+| Dependencias vulnerables | `npm audit`, `pip-audit`, Dependabot | — |
+
+La primera vez: `npm ci`, `npx playwright install --with-deps chromium` y `pip install ruff pytest`. Ninguna de estas herramientas hace falta para usar la aplicación.
+
 ## Autores
 
 - Cristhian Eduardo Guido Meléndez

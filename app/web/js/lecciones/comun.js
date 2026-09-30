@@ -10,7 +10,7 @@ import { COLORES } from '../escena.js';
 
 export const BRAZO = ['Shoulder_Rotation', 'Shoulder_Pitch', 'Elbow', 'Wrist_Pitch', 'Wrist_Roll'];
 export const NOMBRE = { Shoulder_Rotation: 'Giro de la base', Shoulder_Pitch: 'Hombro', Elbow: 'Codo', Wrist_Pitch: 'Flexión de muñeca', Wrist_Roll: 'Giro de muñeca', Gripper: 'Pinza' };
-export const EJES = { x: 0xfd44b0, y: 0xc2ef4e, z: 0x7553ff };     // x rojo-fucsia, y verde-lima, z azul-violeta
+const EJES = { x: 0xfd44b0, y: 0xc2ef4e, z: 0x7553ff };     // x rojo-fucsia, y verde-lima, z azul-violeta
 export const GRADO = Math.PI / 180;
 export { grados };
 
@@ -22,9 +22,6 @@ export function animar(f) {
   paso();
   return () => { vivo = false; };
 }
-
-// Junta varias funciones de limpieza en una.
-export const juntar = (...fs) => () => fs.forEach((f) => f && f());
 
 // ------------------------------------------------------------ fórmulas
 // Sustituye $$…$$ (bloque) y $…$ (en línea) por KaTeX.
@@ -157,8 +154,6 @@ export function caja(app, pos, tam, color = 0xfd44b0, opacidad = 0.5) {
   return m;
 }
 
-// Marco de la pinza (efector) para q, en el marco de la base.
-export const marcoEfector = (app, q) => app.cadena.fk(q).efector;
 
 // ------------------------------------------------------------ gráficas SVG
 // grafica({ ancho, alto, x: [min, max], y: [min, max], xEtq, yEtq, series: [{ color, puntos: [[x, y]], ancho, punteada }] })
@@ -202,16 +197,7 @@ export function matriz(filas, { decimales = 3, clases = null } = {}) {
 // Matriz 4×4 de three.js a filas.
 export const filas4 = (M) => { const e = M.elements; return [0, 1, 2, 3].map((r) => [0, 1, 2, 3].map((c) => e[c * 4 + r])); };
 
-// ------------------------------------------------------------ vistas
-export function vista(app, posicion, objetivo) {
-  app.escena._animarCamara(new THREE.Vector3(...posicion), new THREE.Vector3(...objetivo));
-}
 
-// Convierte un punto del marco de la base (URDF) a coordenadas de la escena, para la cámara.
-export function aEscena(app, p) {
-  app.escena.soporte.updateMatrixWorld(true);
-  return p.clone().applyMatrix4(app.escena.raiz.matrixWorld);
-}
 
 // Barras horizontales: [{ etq, frac (0 a 1), texto }]. fijar(nuevas) las actualiza.
 export function barras(filas) {

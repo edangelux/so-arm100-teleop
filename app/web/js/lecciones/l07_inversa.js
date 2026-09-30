@@ -1,7 +1,6 @@
 // Lección 7: cinemática inversa. Solución geométrica (dos soluciones o
 // ninguna) y método numérico por mínimos cuadrados amortiguados.
 import * as THREE from 'three';
-import { el } from '../ui.js';
 import { deslizador, lectura, figura, grafica, esfera, linea, geometriaPlana, GRADO, grados } from './comun.js';
 
 const COSENOS = `<svg viewBox="0 0 520 210" xmlns="http://www.w3.org/2000/svg" font-family="Rubik, sans-serif" font-size="13">

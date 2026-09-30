@@ -3,7 +3,7 @@
 // ensayos reales y una evaluación de riesgos del SO-ARM100.
 import * as THREE from 'three';
 import { el } from '../ui.js';
-import { animar, grafica, lectura, botones, deslizador, figura, grados } from './comun.js';
+import { animar, grafica, lectura, botones, deslizador } from './comun.js';
 
 export default {
   titulo: 'Seguridad y normas',

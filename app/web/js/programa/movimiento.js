@@ -5,8 +5,8 @@
 import * as THREE from 'three';
 
 export const GRADO = Math.PI / 180;
-export const EJE_BASE = new THREE.Vector2(0, -0.0452);   // eje vertical del giro de la base (URDF)
-export const LIMITES = {
+const EJE_BASE = new THREE.Vector2(0, -0.0452);   // eje vertical del giro de la base (URDF)
+const LIMITES = {
   omega: 1.5,          // rad/s por articulación
   acel: 0.6,           // m/s² equivalentes sobre el camino
   metrica: 0.25,       // m por rad: convierte giros de articulación en «distancia» del camino
@@ -211,4 +211,24 @@ export function muestrear(tr, t) {
   while (hi - lo > 1) { const m = (lo + hi) >> 1; if (ts[m] <= t) lo = m; else hi = m; }
   const s = (t - ts[lo]) / Math.max(ts[hi] - ts[lo], 1e-9);
   return { q: q[lo].map((v, k) => v + (q[hi][k] - v) * s), i: lo };
+}
+
+// Muestras de un tramo planificado para enviarlas al robot (ROS): una cada 50 ms
+// como mínimo, más la última; el controlador interpola entre ellas. Los tiempos
+// crecen estrictamente (al menos 20 ms entre puntos) y sólo van los 5 ángulos
+// del brazo. mueve = false si el tramo no cambia la postura (no hace falta enviarlo).
+export function puntosParaRobot(tr) {
+  const puntos = [];
+  let ultimo = -1, tPrevio = 0;
+  for (let i = 1; i < tr.t.length; i++) {
+    if (tr.t[i] - ultimo >= 0.05 || i === tr.t.length - 1) {
+      const t = Math.max(tr.t[i], tPrevio + 0.02);
+      puntos.push({ q: Array.from(tr.q[i]).slice(0, 5), t });
+      tPrevio = t;
+      ultimo = tr.t[i];
+    }
+  }
+  const q0 = tr.q[0], qf = tr.q[tr.q.length - 1];
+  const mueve = Boolean(q0 && qf) && Array.from(q0).slice(0, 5).some((v, j) => Math.abs(v - qf[j]) > 1e-3);
+  return { puntos, mueve };
 }

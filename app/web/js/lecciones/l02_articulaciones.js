@@ -1,7 +1,7 @@
 // Lección 2: tipos de articulación, límites y cómo mide un servo su ángulo.
 import * as THREE from 'three';
 import { el } from '../ui.js';
-import { animar, deslizador, linea, esfera, etiqueta, figura, BRAZO, NOMBRE, GRADO, grados } from './comun.js';
+import { animar, deslizador, linea, esfera, figura, BRAZO, NOMBRE, grados } from './comun.js';
 import { COLORES } from '../escena.js';
 
 const POSE = [0.3, 0.25, -0.45, 0.4, 0, 0.5];

@@ -1,8 +1,7 @@
 // Lección 16: calibración. Cero de los servos, efecto de un error angular en
 // la pinza, calibración del TCP por cuatro puntos y calibración cámara-robot.
 import * as THREE from 'three';
-import { el } from '../ui.js';
-import { deslizador, lectura, botones, linea, esfera, marco, figura, grafica, BRAZO, NOMBRE, GRADO, grados } from './comun.js';
+import { deslizador, lectura, botones, linea, esfera, marco, figura, grafica, BRAZO, NOMBRE, GRADO } from './comun.js';
 import { resolver } from '../cinematica.js';
 
 const DIENTE = 360 / 25;       // grados por diente del estriado de 25 dientes

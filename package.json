@@ -1,0 +1,31 @@
+{
+  "name": "so-arm100-teleop",
+  "private": true,
+  "type": "module",
+  "description": "Herramientas de calidad de SO-ARM100 Estudio: linter, código muerto, duplicados, pruebas y mutación. La aplicación no las necesita para funcionar.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "eslint app/web/js pruebas/js e2e",
+    "knip": "knip",
+    "duplicados": "jscpd",
+    "test": "node --test \"pruebas/js/*.test.js\"",
+    "e2e": "playwright test",
+    "mutacion": "stryker run",
+    "calidad": "npm run lint && npm run knip && npm run duplicados && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@stryker-mutator/core": "^10.0.0",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "jscpd": "^5.3.3",
+    "knip": "^6.38.0",
+    "three": "^0.169.0"
+  },
+  "overrides": {
+    "qs": "^6.15.4"
+  }
+}

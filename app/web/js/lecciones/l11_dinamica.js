@@ -2,7 +2,7 @@
 // en cada postura, carga útil y comparación con el ensayo A3.
 import * as THREE from 'three';
 import { el } from '../ui.js';
-import { mini, esfera, etiqueta, barras, deslizador, lectura, formula, BRAZO, NOMBRE, grados } from './comun.js';
+import { mini, esfera, etiqueta, barras, deslizador, lectura, formula, BRAZO, NOMBRE } from './comun.js';
 
 const PAR_MAX = 1.86;          // N·m: par de bloqueo del STS3215 de 7,4 V según el fabricante (19 kg·cm)
 const G = new THREE.Vector3(0, 0, -9.81);
@@ -16,7 +16,7 @@ const MEDIDO = {   // esfuerzo medido en el ensayo A3 (resultados del 25 de sept
 };
 
 // Par que cada articulación debe hacer para sostener el brazo (y una masa en la punta).
-export function paresGravedad(app, q, carga = 0) {
+function paresGravedad(app, q, carga = 0) {
   const M = app.cadena.marcosEslabones([...q.slice(0, 5), q[5] ?? 0.5]);
   const f = app.cadena.fk(q);
   const cdm = ESLABONES.map((n) => ({ n, m: app.modelo.eslabones[n].masa, c: new THREE.Vector3(...app.modelo.eslabones[n].cdm).applyMatrix4(M[n]) }));

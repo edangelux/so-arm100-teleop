@@ -1,8 +1,7 @@
 // Lección 14: visión y teleoperación. Cómo funciona este proyecto: de la
 // imagen a los ángulos, el filtro One Euro y la cadena de tiempos.
-import * as THREE from 'three';
 import { el } from '../ui.js';
-import { animar, grafica, deslizador, lectura, figura, barras, botones, grados } from './comun.js';
+import { animar, grafica, deslizador, lectura, figura, barras, grados } from './comun.js';
 
 const TUBERIA = `<svg viewBox="0 0 660 170" xmlns="http://www.w3.org/2000/svg" font-family="Rubik, sans-serif" font-size="12">
 <defs><marker id="t14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bdb8c0"/></marker></defs>

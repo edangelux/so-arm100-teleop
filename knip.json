@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "app/web/js/principal.js",
+    "app/web/js/camara_trabajador.js",
+    "pruebas/js/*.test.js",
+    "*.config.js"
+  ],
+  "project": [
+    "app/web/js/**/*.js",
+    "pruebas/js/**/*.js"
+  ],
+  "ignore": [
+    "e2e/**"
+  ],
+  "ignoreDependencies": [
+    "@stryker-mutator/command-runner"
+  ]
+}

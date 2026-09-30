@@ -2,7 +2,7 @@
 // zonas, Offs, señales, y retos que se resuelven en la pestaña Programar.
 import * as THREE from 'three';
 import { el } from '../ui.js';
-import { animar, marco, linea, lectura, botones, esfera, etiqueta, figura, GRADO, grados } from './comun.js';
+import { animar, marco, linea, lectura, botones, esfera, etiqueta, GRADO, grados } from './comun.js';
 import { Planificador, muestrear, marcoHerramienta } from '../programa/movimiento.js';
 
 const LENGUAJES = `<table>

@@ -21,7 +21,7 @@ const DH_SVG = `<svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" fo
 </svg>`;
 
 // T de D-H: Rot_z(θ) · Trans_z(d) · Trans_x(a) · Rot_x(α)
-export function dh(theta, d, a, alfa) {
+function dh(theta, d, a, alfa) {
   const ct = Math.cos(theta), st = Math.sin(theta), ca = Math.cos(alfa), sa = Math.sin(alfa);
   return new THREE.Matrix4().set(ct, -st * ca, st * sa, a * ct, st, ct * ca, -ct * sa, a * st, 0, sa, ca, d, 0, 0, 0, 1);
 }

@@ -80,4 +80,3 @@ export function linea(texto) {
 }
 
 export const grados = (r) => (r * 180 / Math.PI);
-export const fmt = (v, d = 1) => (v >= 0 ? '+' : '') + v.toFixed(d);

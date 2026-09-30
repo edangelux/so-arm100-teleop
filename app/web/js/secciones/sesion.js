@@ -199,7 +199,6 @@ const seccion = {
   },
 
   pintarCamaraWindows(detalle) {
-    const e = this.eleccion;
     const cam = camaraNavegador;
     const lista = el('div', { class: 'opciones', style: 'margin-top:8px' });
     // Vista previa local: el mismo video que abre el navegador, sin ida y vuelta al servidor.

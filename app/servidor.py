@@ -80,11 +80,10 @@ def accion_iniciar(d):
     if d.get('moveit', conf['SOARM_MOVEIT'] == '1'):
         opciones.append('--moveit')
     camara = str(d.get('camara') or conf['SOARM_CAM'])
-    if camara == URL_VIDEO:
-        # Cámara de Windows: la envía la ventana de la aplicación; tiene que estar enviando ya.
-        if not camwin.enviando():
-            raise RuntimeError('La cámara de Windows no está enviando imagen. En Sesión elija la cámara '
-                               'y deje abierta la ventana de la aplicación (puede minimizarla).')
+    # Cámara de Windows: la envía la ventana de la aplicación; tiene que estar enviando ya.
+    if camara == URL_VIDEO and not camwin.enviando():
+        raise RuntimeError('La cámara de Windows no está enviando imagen. En Sesión elija la cámara '
+                           'y deje abierta la ventana de la aplicación (puede minimizarla).')
     opciones += ['--camara', camara]
     vel = d.get('velocidad') or conf['SOARM_VELOCIDAD']
     if vel:

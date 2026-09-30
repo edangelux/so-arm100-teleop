@@ -167,7 +167,7 @@ export class Cadena {
     q[4] = Math.max(lo4, Math.min(hi4, giro));
     const tarea = (qq) => { const ps = this.pose(qq); return [ps.p.x, ps.p.y, ps.p.z, W * ps.cab]; };
     const meta = [p.x, p.y, p.z, W * cab];
-    let e = [0, 0, 0, 0], err = Infinity, errCab = Infinity;
+    let e, err = Infinity, errCab = Infinity;
     for (let it = 0; it < iteraciones; it++) {
       const f = tarea(q);
       e = meta.map((m, i) => m - f[i]);

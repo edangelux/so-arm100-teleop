@@ -11,6 +11,7 @@ parar, pinza, cerrar) y hace aquí las comprobaciones de límites y velocidades,
 antes de enviar nada al nodo.
 """
 import json
+import math
 import os
 import subprocess
 import threading
@@ -136,7 +137,7 @@ class Puente:
         try:
             REGISTRO.parent.mkdir(parents=True, exist_ok=True)
             grande = REGISTRO.exists() and REGISTRO.stat().st_size > 1_000_000
-            registro = open(REGISTRO, 'w' if grande else 'a', encoding='utf-8')
+            registro = open(REGISTRO, 'w' if grande else 'a', encoding='utf-8')  # noqa: SIM115 (vive lo que el nodo)
             registro.write(f'--- nodo arrancado {time.strftime("%Y-%m-%d %H:%M:%S")}\n')
             registro.flush()
         except OSError:
@@ -167,8 +168,8 @@ class Puente:
                 raise RuntimeError('El nodo de ROS no respondió a la orden.')
             if not ev['r'].get('ok'):
                 raise RuntimeError(ev['r'].get('error') or 'La orden falló.')
-        except (BrokenPipeError, OSError, ValueError):
-            raise RuntimeError('El nodo de ROS se cerró; se reinicia solo en unos segundos.')
+        except (BrokenPipeError, OSError, ValueError) as e:
+            raise RuntimeError('El nodo de ROS se cerró; se reinicia solo en unos segundos.') from e
         finally:
             with self._cerrojo:
                 self._esperas.pop(obj['id'], None)
@@ -195,7 +196,9 @@ class Puente:
         nodo una vez (un nodo de larga vida puede quedar sin enlace de DDS, por
         ejemplo tras suspender el equipo) y espera hasta 10 s a que vuelvan."""
         planta = 'real' if modo in ('real', 'ambos') else 'sim'
-        fresco = lambda: self.disponible and self.q[planta] is not None and time.time() - self.t[planta] <= 1.0
+
+        def fresco():
+            return self.disponible and self.q[planta] is not None and time.time() - self.t[planta] <= 1.0
         if fresco():
             return self.q[planta]
         if not reconectar:
@@ -226,28 +229,42 @@ class Puente:
     def trayectoria(self, modo, puntos):
         """Trayectoria de varios puntos [{'q': [5 rad], 't': s desde el inicio}], ya
         planificada por la aplicación (programas con MoveJ, MoveL y MoveC). Se
-        comprueban límites, orden de los tiempos y velocidad entre puntos."""
+        comprueban límites, orden de los tiempos y velocidad entre puntos.
+
+        El primer punto se compara con la postura MEDIDA, que nunca coincide del todo
+        con la planificada: el servo real se queda unas centésimas de radián atrás y
+        Gazebo con renderizado por software va más lento que el tiempo real. En vez
+        de rechazar esa diferencia, se retrasa toda la trayectoria lo necesario para
+        cubrirla a 1 rad/s como mucho. Si la diferencia pasa de 0,35 rad (20°), el
+        robot no está donde el programa cree y se rechaza."""
         ref = self._referencia(modo)
         if not puntos or len(puntos) > 5000:
             raise RuntimeError('La trayectoria debe tener entre 1 y 5000 puntos.')
-        limpios = []
-        previo_q, previo_t = ref[:5], 0.0
+        qs, ts = [], []
         for p in puntos:
             q = [float(v) for v in p['q']][:5]
-            t = float(p['t'])
-            if len(q) != 5 or t <= previo_t:
-                raise RuntimeError('Trayectoria mal formada: cada punto lleva 5 ángulos y un tiempo creciente.')
+            if len(q) != 5:
+                raise RuntimeError('Trayectoria mal formada: cada punto lleva 5 ángulos.')
             for v, (lo, hi) in zip(q, LIM):
                 if not lo - 1e-3 <= v <= hi + 1e-3:
                     raise RuntimeError('Un punto de la trayectoria sale de los límites de las articulaciones.')
-            salto = max(abs(a - b) for a, b in zip(q, previo_q))
-            vel = salto / (t - previo_t)
-            # El primer punto se compara con la postura medida, que difiere un poco de la
-            # planificada (error de seguimiento del servo o de Gazebo): una corrección de
-            # hasta 0,05 rad se acepta aunque el primer punto llegue a los 20 ms.
-            if not limpios and salto <= 0.05:
-                vel = 0.0
-            if vel > 1.6:          # el planificador de Programar usa 1,5 rad/s; margen numérico
+            qs.append(q)
+            ts.append(float(p['t']))
+        salto = max(abs(a - b) for a, b in zip(qs[0], ref[:5]))
+        # Un primer punto lejano con tiempo suficiente (p. ej. «Mover a esta postura») es
+        # válido tal cual; sólo se corrige o se rechaza si llegar a él exigiría ir rápido.
+        if salto / max(ts[0], 1e-6) > 1.6 and salto > 0.35:
+            raise RuntimeError(f'El robot está a {math.degrees(salto):.0f}° de donde empieza el movimiento: no está donde el '
+                               'programa cree. Espere a que termine el movimiento anterior o vuelva a ejecutar desde init.')
+        desfase = max(0.0, salto / 1.0 - ts[0]) if salto / max(ts[0], 1e-6) > 1.6 else 0.0
+        limpios = []
+        previo_q, previo_t = ref[:5], 0.0
+        for k, (q, t) in enumerate(zip(qs, ts)):
+            t += desfase
+            if t <= previo_t:
+                raise RuntimeError('Trayectoria mal formada: los tiempos deben crecer.')
+            vel = max(abs(a - b) for a, b in zip(q, previo_q)) / (t - previo_t)
+            if k > 0 and vel > 1.6:          # el planificador de Programar usa 1,5 rad/s; margen numérico
                 raise RuntimeError(f'La trayectoria pide {vel:.1f} rad/s en una articulación; el máximo es 1,5 rad/s.')
             limpios.append({'q': q, 't': t})
             previo_q, previo_t = q, t

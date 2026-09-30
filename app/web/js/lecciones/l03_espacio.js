@@ -1,7 +1,7 @@
 // Lección 3: espacio de trabajo alcanzable y diestro.
 import * as THREE from 'three';
 import { el } from '../ui.js';
-import { animar, nube, esfera, etiqueta, grafica, figura, GRADO } from './comun.js';
+import { animar, nube, esfera, etiqueta, grafica, GRADO } from './comun.js';
 
 // Nube de puntos de la punta con ángulos al azar dentro de los límites.
 function muestras(app, n, fijar = null) {

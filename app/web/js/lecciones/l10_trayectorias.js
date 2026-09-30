@@ -1,8 +1,7 @@
 // Lección 10: planificación de trayectorias. Perfiles de velocidad,
 // movimiento articular contra cartesiano y zonas de aproximación.
 import * as THREE from 'three';
-import { el } from '../ui.js';
-import { animar, grafica, lectura, botones, linea, esfera, GRADO, grados } from './comun.js';
+import { animar, grafica, lectura, botones, linea, esfera } from './comun.js';
 import { Planificador, muestrear } from '../programa/movimiento.js';
 
 // Perfiles de una articulación que recorre D radianes. Devuelven muestras [t, pos, vel, acel].

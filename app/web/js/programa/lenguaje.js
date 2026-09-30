@@ -32,8 +32,6 @@ export const INSTRUCCIONES = {
   Stop: 'Pausa el programa hasta pulsar Continuar.',
 };
 
-export const SENALES = ['di1', 'di2', 'di3', 'di4', 'do1', 'do2', 'do3', 'do4'];
-export const CONSTANTES = { home: 'jointtarget', init: 'jointtarget' };
 
 const PALABRAS = ['MODULE', 'ENDMODULE', 'PROC', 'ENDPROC', 'FOR', 'FROM', 'TO', 'STEP', 'DO', 'ENDFOR',
   'WHILE', 'ENDWHILE', 'IF', 'THEN', 'ELSEIF', 'ELSE', 'ENDIF', 'AND', 'OR', 'NOT', 'TRUE', 'FALSE',
@@ -436,7 +434,7 @@ const DAT = /^(v\d+|vmax|fine|z\d+|tool0|wobj0|home|init|di[1-4]|do[1-4])$/i;
 
 export function resaltar(linea) {
   const c = linea.search(/[!#]/);
-  let codigo = c >= 0 ? linea.slice(0, c) : linea;
+  const codigo = c >= 0 ? linea.slice(0, c) : linea;
   const comentario = c >= 0 ? linea.slice(c) : '';
   let html = '';
   const re = /("[^"]*"?)|(\d+(?:\.\d+)?)|([A-Za-z_áéíóúñÁÉÍÓÚÑ][\wáéíóúñÁÉÍÓÚÑ]*)|(\s+)|(.)/g;

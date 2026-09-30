@@ -24,7 +24,6 @@ const leerCodigo = (id) => { try { return localStorage.getItem(`soarm-taller-${i
 const guardarCodigo = (id, t) => { try { localStorage.setItem(`soarm-taller-${id}`, t); } catch { /* sin almacenamiento */ } };
 const leerIntentos = (id) => { try { return Number(localStorage.getItem(`soarm-taller-int-${id}`) || 0); } catch { return 0; } };
 const guardarIntentos = (id, n) => { try { localStorage.setItem(`soarm-taller-int-${id}`, String(n)); } catch { /* sin almacenamiento */ } };
-export const tallerHechos = hechos;
 
 const mm = (v) => v.toArray ? v.toArray().map((x) => x * 1000) : v;
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
@@ -33,7 +32,7 @@ export const SIN_CUBO1 = DISPOSICION.piezas.filter((p) => p.nombre !== 'cubo1');
 
 // ---------------------------------------------------------------- análisis estático
 // Cuenta lo que el texto usa, sin ejecutarlo.
-export function estructura(a, texto) {
+function estructura(a, texto) {
   const c = { MoveJ: 0, MoveL: 0, MoveC: 0, MoveAbsJ: 0, for: 0, while: 0, if: 0, else: 0, proc: 0, llamada: 0, tpwrite: 0,
     setdo: 0, waitdi: 0, velset: 0, incr: 0, asig: 0, espera: 0, pinza: 0, robtarget: 0, jointtarget: 0, num: 0, lineas: 0, literales: 0, zonas: 0, fines: 0 };
   for (const ln of a.lineas) {
@@ -57,7 +56,7 @@ export function estructura(a, texto) {
 // ---------------------------------------------------------------- ejecución
 // Ejecuta el programa en el robot virtual con la celda. animar: se ve moverse;
 // si no, sólo se calcula. Devuelve un registro de todo lo que pasó.
-export async function correr(app, texto, { animar = false, escenario = {}, q0 = null, dibujar = animar, alLinea = null, alDetener = null } = {}) {
+async function correr(app, texto, { animar = false, escenario = {}, q0 = null, dibujar = animar, alLinea = null, alDetener = null } = {}) {
   const a = analizar(texto);
   const r = { poses: app.modelo.poses, a, error: null, tramos: [], tcp: [], paradas: [], eventos: [], mensajes: [], tiempo: 0, final: null, piezas: {}, senales: {}, movs: { MoveJ: 0, MoveL: 0, MoveC: 0, MoveAbsJ: 0 } };
   if (a.errores.length) { r.error = { linea: a.errores[0].linea, mensaje: a.errores[0].mensaje }; return r; }
@@ -243,11 +242,12 @@ const NOMBRES = { MoveJ: 'MoveJ', MoveL: 'MoveL', MoveC: 'MoveC', MoveAbsJ: 'Mov
   jointtarget: 'jointtarget declarados', num: 'variables num', offs: 'Offs', reltool: 'RelTool', literales: 'puntos escritos entre corchetes dentro de un movimiento', zonas: 'movimientos con zona (z1, z10…)', fines: 'movimientos con fine' };
 const nombreClave = (k) => NOMBRES[k] || k;
 const B = DISPOSICION.bandeja;
-export const enBandeja = (p) => p && !p.sujeta && Math.abs(p.x - B.x) < B.ancho / 2 - 4 && Math.abs(p.y - B.y) < B.largo / 2 - 4;
-export const cerca = (p, x, y, tol = 10) => p && !p.sujeta && Math.hypot(p.x - x, p.y - y) < tol;
+const enBandeja = (p) => p && !p.sujeta && Math.abs(p.x - B.x) < B.ancho / 2 - 4 && Math.abs(p.y - B.y) < B.largo / 2 - 4;
+const cerca = (p, x, y, tol = 10) => p && !p.sujeta && Math.hypot(p.x - x, p.y - y) < tol;
 const donde = (p) => (!p ? 'no está en la celda' : p.sujeta ? 'sigue en la pinza' : `está en [${Math.round(p.x)}, ${Math.round(p.y)}, ${Math.round(p.z)}]`);
 
 // Corrige: ejecuta en cada escenario y evalúa cada comprobación.
+/** @public Lo usan las pruebas e2e. */
 export async function corregir(app, ej, texto, { animar = false, alLinea, alDetener } = {}) {
   const escenarios = ej.escenarios || [{ nombre: '' }];
   const resultados = [];

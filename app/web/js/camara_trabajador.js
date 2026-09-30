@@ -11,7 +11,7 @@ let token = null;
 self.onmessage = async ({ data }) => {
   if ('token' in data) { token = data.token; return; }
   const cuadro = data.cuadro;
-  let respuesta = { listo: true };
+  let respuesta;
   try {
     const w = cuadro.displayWidth, h = cuadro.displayHeight;
     // Recorte central a 4:3 y escala a 640×480: la mano no se deforma.

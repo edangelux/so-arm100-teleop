@@ -4,7 +4,6 @@
 import { DISPOSICION } from './celda.js';
 
 const COLOR = { cubo1: '#fd44b0', cubo2: '#c2ef4e', cubo3: '#ffb287' };
-export const NOMBRE_COLOR = { cubo1: 'fucsia', cubo2: 'lima', cubo3: 'durazno' };
 const NS = 'http://www.w3.org/2000/svg';
 
 // Ventana del dibujo en mm: x de −180 a 250, y de +60 a −340.

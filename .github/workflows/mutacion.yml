@@ -1,0 +1,25 @@
+# Pruebas de mutación del intérprete RAPID (Stryker). Tardan: una vez por semana
+# o a mano desde la pestaña Actions.
+name: Mutación
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stryker:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run mutacion
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: informe-mutacion, path: reports/mutacion, retention-days: 30 }

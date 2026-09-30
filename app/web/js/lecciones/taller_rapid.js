@@ -18,7 +18,7 @@ const A = [-100, -200, 80], Bp = [100, -200, 80];
 const TRI = [[-60, -160, 60], [60, -160, 60], [0, -260, 60]];
 const ESQ = [-40, -170, 70];
 const CUAD = [ESQ, [40, -170, 70], [40, -250, 70], [-40, -250, 70], ESQ];
-const TOMA1 = [-110, -150, 10], TOMA2 = [-110, -200, 10], TOMA3 = [-110, -250, 10], BANDEJA = [110, -200, 13];
+const TOMA1 = [-110, -150, 10];
 const ARRIBA = (p, dz = 60) => [p[0], p[1], p[2] + dz];
 const PR = [0, -220, 60];
 const PR_ATRAS = aLoLargoDeHerramienta(PR, -60, 0, -50);
@@ -519,4 +519,5 @@ ENDIF</pre>
   ],
 };
 
+/** @public Lo usan las pruebas e2e. */
 export const TALLERES = [taller1, taller2, taller3, taller4, taller5, taller6];

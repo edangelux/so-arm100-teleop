@@ -1,7 +1,6 @@
 // Lección 6: cinemática directa. Del ángulo de cada articulación a la pose de la pinza.
 import * as THREE from 'three';
-import { el } from '../ui.js';
-import { mini, marco, esfera, linea, formula, figura, lectura, botones, geometriaPlana, GRADO, grados } from './comun.js';
+import { mini, marco, esfera, linea, formula, figura, lectura, botones, geometriaPlana, grados } from './comun.js';
 
 const POSE = [0.3, 0.35, -0.6, 0.55, 0, 0.5];
 

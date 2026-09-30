@@ -6,13 +6,13 @@
 import * as THREE from 'three';
 import { enviar, obtener } from '../api.js';
 import { el, aviso, confirmar, preguntar, ventana } from '../ui.js';
-import { analizar, instruccionTexto, resaltar, INSTRUCCIONES, destinoTexto, exprTexto } from '../programa/lenguaje.js';
+import { analizar, resaltar, INSTRUCCIONES, destinoTexto, exprTexto } from '../programa/lenguaje.js';
 import { Ejecutor, Detenido, PINZA } from '../programa/ejecutor.js';
-import { muestrear, GRADO } from '../programa/movimiento.js';
+import { muestrear, GRADO, puntosParaRobot } from '../programa/movimiento.js';
 import { Celda } from '../programa/celda.js';
 import { EJEMPLOS, NUEVO } from '../programa/ejemplos.js';
 import { RETOS, plantilla, retosHechos, marcarHecho } from '../programa/retos.js';
-import { planta, NOMBRE_COLOR } from '../programa/planta.js';
+import { planta } from '../programa/planta.js';
 
 const GUARDADO = 'soarm-programa-borrador';
 const VELOCIDADES = [20, 50, 80, 100, 150, 200, 300, 500, 1000];
@@ -72,7 +72,6 @@ const seccion = {
 
   // ------------------------------------------------------------ interfaz
   construir() {
-    const app = this.app;
     const b = (texto, f, clase = '', titulo = '') => el('button', { class: `boton ${clase}`, onclick: f, title: titulo || null }, texto);
 
     this.selEjemplo = el('select', { class: 'campo', onchange: (e) => { const ej = EJEMPLOS.find((x) => x.id === e.target.value); if (ej) this.abrirTexto(ej.texto, null); e.target.value = ''; } },
@@ -372,7 +371,7 @@ const seccion = {
       const ln = a.lineas[this.seleccion - 1];
       const n = ln.nodo;
       const abre = ['for', 'while', 'if', 'proc'].includes(n?.tipo);
-      let fin = this.seleccion;
+      const fin = this.seleccion;
       return { despues: fin, nivel: ln.nivel + (abre ? 1 : 0) };
     }
     if (a.procs.main?.fin) return { despues: a.procs.main.fin - 1, nivel: 1 };
@@ -794,7 +793,7 @@ const seccion = {
     this.consola.replaceChildren();
     this.limpiarCamino();
     const instrs = this.instrPorLinea();
-    let tiempo = 0, largo = 0, movs = 0, esperas = 0;
+    let tiempo = 0, largo = 0, movs = 0;
     const avisos = new Set();
     const senales = { ...this.celda.senales };
     const { q0, pinza0 } = this.estadoInicial();
@@ -804,7 +803,7 @@ const seccion = {
         mover: async (tr) => { tiempo += tr.duracion; largo += tr.largo; movs++; this.dibujarCamino(tr, instrs); },
         pinza: async () => { tiempo += 0.5; },
         esperar: async (s) => { tiempo += s; },
-        esperarEntrada: async (s, v) => { esperas++; if (senales[s] !== v) avisos.add(`WaitDI ${s}, ${v}: al verificar se supuso que la señal ya vale ${v}.`); senales[s] = v; },
+        esperarEntrada: async (s, v) => { if (senales[s] !== v) avisos.add(`WaitDI ${s}, ${v}: al verificar se supuso que la señal ya vale ${v}.`); senales[s] = v; },
         salida: (s, v) => { senales[s] = v; },
         escribir: (t) => this.mensaje(`TPWrite: ${t}`),
         pausa: async () => { avisos.add('Stop: al ejecutar, el programa se pausará ahí hasta pulsar Continuar.'); },
@@ -917,32 +916,32 @@ const seccion = {
   },
 
   async moverRobot(tr) {
-    // Se envía una muestra cada 50 ms como mínimo; el controlador interpola entre ellas.
-    // Los tiempos deben crecer estrictamente (el servidor rechaza dos puntos con el mismo
-    // tiempo): cada punto va al menos 20 ms después del anterior.
-    const puntos = [];
-    let ultimo = -1, tPrevio = 0;
-    for (let i = 1; i < tr.t.length; i++) {
-      if (tr.t[i] - ultimo >= 0.05 || i === tr.t.length - 1) {
-        const t = Math.max(tr.t[i], tPrevio + 0.02);
-        puntos.push({ q: Array.from(tr.q[i]).slice(0, 5), t });
-        tPrevio = t;
-        ultimo = tr.t[i];
-      }
-    }
-    // Un movimiento que no mueve nada (p. ej. MoveAbsJ init estando ya en init) no se envía.
-    const q0 = tr.q[0], qf = tr.q[tr.q.length - 1];
-    const mueve = q0 && qf && q0.slice(0, 5).some((v, j) => Math.abs(v - qf[j]) > 1e-3);
-    if (puntos.length && mueve) await enviar('/api/trayectoria', { puntos });
+    const { puntos, mueve } = puntosParaRobot(tr);
+    const qf = tr.q[tr.q.length - 1];
+    let duracion = tr.duracion;
+    if (puntos.length && mueve) duracion = (await enviar('/api/trayectoria', { puntos })).duracion ?? tr.duracion;
+    // Se espera a que el robot MEDIDO llegue al final del tramo antes de seguir: Gazebo con
+    // renderizado por software va más lento que el tiempo real y el servo real se queda un
+    // poco atrás. Sin esta espera, el tramo siguiente empezaría lejos de donde está el robot.
+    const fin = Array.from(qf).slice(0, 5);
     const t0 = performance.now();
+    let quieto = 0, previo = null;
     await new Promise((resolver, rechazar) => {
       const paso = () => {
         if (this.ejecutor.detener) return rechazar(new Detenido());
         const t = (performance.now() - t0) / 1000;
-        const m = muestrear(tr, t);
+        const m = muestrear(tr, Math.min(t, tr.duracion));
         this.marcarLinea(tr.linea[m.i]);
         this.app.qManual = [...m.q, this.qPinza];
-        if (t >= tr.duracion + 0.3) return resolver();
+        const medida = this.app.posturaActual().slice(0, 5);
+        const error = Math.max(...medida.map((v, j) => Math.abs(v - fin[j])));
+        const mov = previo ? Math.max(...medida.map((v, j) => Math.abs(v - previo[j]))) : 1;
+        previo = medida;
+        quieto = mov < 0.002 ? quieto + 1 : 0;
+        if (t >= duracion && (error < 0.03 || (quieto > 20 && error < 0.2))) return resolver();
+        if (t > duracion * 8 + 8) {
+          return rechazar(Object.assign(new Error(`El robot no llegó al final del movimiento (queda a ${(error * 180 / Math.PI).toFixed(0)}° en alguna articulación). Revise la sesión y la fuente.`), { linea: tr.linea[tr.linea.length - 1] }));
+        }
         requestAnimationFrame(paso);
       };
       paso();

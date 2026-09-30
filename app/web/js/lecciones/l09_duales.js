@@ -1,7 +1,7 @@
 // Lección 9: teoría de tornillos, cuaterniones duales, ScLERP y producto de exponenciales.
 import * as THREE from 'three';
 import { el } from '../ui.js';
-import { animar, mini, marco, linea, lectura, formula, botones, expTornillo, logTornillo, cuaternionDual, BRAZO, NOMBRE, grados } from './comun.js';
+import { animar, mini, marco, linea, lectura, formula, expTornillo, logTornillo, cuaternionDual, BRAZO, NOMBRE, grados } from './comun.js';
 
 const APARTE = [1.0, -0.35, 0.7, 0.5, 0, 0.5];
 const A = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(0.2, -0.3, 0.1)).setPosition(-0.12, -0.3, 0.1);

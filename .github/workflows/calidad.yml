@@ -1,0 +1,72 @@
+# Calidad de SO-ARM100 Estudio: se ejecuta en cada push y en cada pull request.
+# Los nombres de los trabajos (js, python, e2e, auditoria) son los que se exigen
+# en la regla de protección de la rama main.
+name: Calidad
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: calidad-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  js:
+    name: js (lint, knip, duplicados, pruebas)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run knip
+      - run: npm run duplicados
+      - run: npm test
+
+  python:
+    name: python (ruff, pytest)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.10' }
+      - run: pip install ruff pytest
+      - run: ruff check app pruebas/py
+      - run: pytest
+
+  e2e:
+    name: e2e (Playwright)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.10' }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: informe-playwright, path: playwright-report, retention-days: 7 }
+
+  auditoria:
+    name: auditoria (dependencias)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - run: npm audit --audit-level=high
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.10' }
+      # Informativo: requirements.txt fija versiones viejas a propósito (MediaPipe 0.10.21,
+      # NumPy 1.x) porque las nuevas rompen la teleoperación; ver el propio archivo.
+      - run: pip install pip-audit && pip-audit -r requirements.txt || true

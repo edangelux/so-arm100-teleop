@@ -37,8 +37,8 @@ def cargar_modelo():
     s = re.sub(r'</?xacro:[^>]*>', '', s)
     raiz = ET.fromstring(s)
     eslabones = {}
-    for l in raiz.iter('link'):
-        visual = l.find('visual')
+    for enlace in raiz.iter('link'):
+        visual = enlace.find('visual')
         malla = None
         if visual is not None:
             g = visual.find('geometry/mesh')
@@ -51,9 +51,9 @@ def cargar_modelo():
                     'rpy': _vec(o.get('rpy') if o is not None else None),
                     'color': _vec(c.get('rgba'), '1 1 1 1') if c is not None else [1, 1, 1, 1],
                 }
-        masa = l.find('inertial/mass')
-        cdm = l.find('inertial/origin')
-        eslabones[l.get('name')] = {'malla': malla, 'masa': float(masa.get('value')) if masa is not None else 0.0,
+        masa = enlace.find('inertial/mass')
+        cdm = enlace.find('inertial/origin')
+        eslabones[enlace.get('name')] = {'malla': malla, 'masa': float(masa.get('value')) if masa is not None else 0.0,
                                     'cdm': _vec(cdm.get('xyz')) if cdm is not None else [0.0, 0.0, 0.0]}
     juntas = []
     for j in raiz.iter('joint'):

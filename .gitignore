@@ -41,3 +41,12 @@ rosbag2_*/
 teleop_config.json
 .env
 .env.*
+node_modules/
+
+# --- Herramientas de calidad (npm run calidad) ---------------------------
+playwright-report/
+test-results/
+reports/
+.stryker-tmp/
+.claude/settings.local.json
+CLAUDE.local.md

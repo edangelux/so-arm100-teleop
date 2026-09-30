@@ -80,7 +80,7 @@ class CamaraNavegador {
       this.stream = await navigator.mediaDevices.getUserMedia({ video: id ? { deviceId: { exact: id }, ...restr } : restr, audio: false });
     } catch (e) {
       this.stream = null;
-      throw new Error(textoError(e));
+      throw new Error(textoError(e), { cause: e });
     }
     const pista = this.stream.getVideoTracks()[0];
     this.id = pista.getSettings().deviceId || id;

@@ -2,18 +2,9 @@
 import * as THREE from 'three';
 import { el, grados } from '../ui.js';
 import { COLORES } from '../escena.js';
+import { BRAZO, NOMBRE, animar } from './comun.js';
 
-const BRAZO = ['Shoulder_Rotation', 'Shoulder_Pitch', 'Elbow', 'Wrist_Pitch', 'Wrist_Roll'];
-const NOMBRE = { Shoulder_Rotation: 'Giro de la base', Shoulder_Pitch: 'Hombro', Elbow: 'Codo', Wrist_Pitch: 'Flexión de muñeca', Wrist_Roll: 'Giro de muñeca', Gripper: 'Pinza' };
 const POSE = [0.35, 0.35, -0.55, 0.45, 0, 0.5];
-
-function animar(f) {
-  let vivo = true;
-  const t0 = performance.now();
-  const paso = () => { if (!vivo) return; f((performance.now() - t0) / 1000); requestAnimationFrame(paso); };
-  paso();
-  return () => { vivo = false; };
-}
 
 function mini(app, q, alCambiar) {
   // Cinco deslizadores compactos que mueven el robot virtual.

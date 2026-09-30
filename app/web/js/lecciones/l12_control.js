@@ -2,7 +2,7 @@
 // (ensayo A5), error por carga (A1) y control de impedancia.
 import * as THREE from 'three';
 import { el } from '../ui.js';
-import { animar, grafica, deslizador, lectura, botones, formula, figura, esfera, linea, GRADO, grados } from './comun.js';
+import { animar, grafica, deslizador, lectura, botones, formula, linea, grados } from './comun.js';
 
 // Articulación simulada: J·θ̈ = u − b·θ̇ − τ_carga, con u = PID saturado a ±τmax.
 function simular({ kp, ki, kd, carga = 0, paso = 0.3, T = 1.5, retardo = 0 }) {

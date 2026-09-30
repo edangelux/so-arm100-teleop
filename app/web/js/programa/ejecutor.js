@@ -7,7 +7,7 @@ import { ErrorPrograma } from './lenguaje.js';
 import { GRADO, Planificador, ErrorMovimiento, marcoHerramienta } from './movimiento.js';
 
 export const PINZA = { abierta: 1.2, cerrada: -0.1, conPieza: 0.25 };   // rad de la articulación Gripper
-export const pinzaDesdePorcentaje = (pct) => -0.1 + (Math.max(0, Math.min(100, pct)) / 100) * 1.5;
+const pinzaDesdePorcentaje = (pct) => -0.1 + (Math.max(0, Math.min(100, pct)) / 100) * 1.5;
 
 class Detenido extends Error {}
 

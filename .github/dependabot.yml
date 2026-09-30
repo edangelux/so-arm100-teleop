@@ -1,0 +1,15 @@
+# Actualizaciones automáticas: herramientas de npm y acciones de GitHub.
+# No se incluye pip: requirements.txt fija versiones a propósito (ver el archivo).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      herramientas:
+        patterns: ['*']
+    ignore:
+      - dependency-name: three      # debe coincidir con app/web/vendor/three (r169)
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }

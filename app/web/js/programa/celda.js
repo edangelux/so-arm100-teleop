@@ -5,8 +5,8 @@
 import * as THREE from 'three';
 
 const COLORES = { fucsia: 0xfd44b0, lima: 0xc2ef4e, durazno: 0xffb287, violeta: 0x7553ff, blanco: 0xf2f2f2 };
-export const DISTANCIA_AGARRE = 0.025;         // m entre el centro de la pieza y el punto de agarre
-export const ADELANTO_AGARRE = 0.012;          // m desde la punta hacia la muñeca: centro de los dedos
+const DISTANCIA_AGARRE = 0.025;         // m entre el centro de la pieza y el punto de agarre
+const ADELANTO_AGARRE = 0.012;          // m desde la punta hacia la muñeca: centro de los dedos
 
 // Distribución inicial. Coordenadas del marco de la base (URDF), en mm; el brazo mira hacia −y.
 export const DISPOSICION = {
