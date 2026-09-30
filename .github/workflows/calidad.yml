@@ -21,7 +21,7 @@ jobs:
     name: js (lint, knip, duplicados, pruebas)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: 22, cache: npm }
       - run: npm ci
@@ -34,7 +34,7 @@ jobs:
     name: python (ruff, pytest)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with: { python-version: '3.10' }
       - run: pip install ruff pytest
@@ -45,7 +45,7 @@ jobs:
     name: e2e (Playwright)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: 22, cache: npm }
       - uses: actions/setup-python@v7
@@ -61,7 +61,7 @@ jobs:
     name: auditoria (dependencias)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: 22, cache: npm }
       - run: npm audit --audit-level=high
