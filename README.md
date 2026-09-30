@@ -301,6 +301,7 @@ Después de instalar, basta escribir **`teleop`**, o abrir el icono **SO-ARM100 
 | 18 | [**SO-ARM100 Estudio**](docs/18-aplicacion-estudio.md) | Aplicación con botones y brazo en 3D: sesión, movimiento, ensayos, diagnóstico y 18 lecciones de robótica |
 | 19 | [**Programar**](docs/19-programar.md) | Programación tipo robot industrial: MoveJ, MoveL, MoveC, pinza, señales, bucles, celda virtual, ejemplos y retos |
 | 20 | [**Protecciones del brazo físico**](docs/20-protecciones-del-brazo.md) | Limitador de saltos, comprobación de fuente y servos, centrado suave y reglas de encendido |
+| 21 | [**Mapa del repositorio**](docs/21-mapa-del-repositorio.md) | Grafo de conocimiento del código: zonas, dependencias, puentes críticos y el grafo interactivo |
 | — | [**Modelo cinemático completo**](analisis/cinematica/ANALISIS_CINEMATICO.md) | Tabla D-H, cinemática directa e inversa, jacobiano, singularidades, verificación cruzada |
 | — | [**Documentos entregados**](docs/entregables/README.md) | Documento técnico, formulación y evaluación, y las dos presentaciones |
 
@@ -324,6 +325,10 @@ Después de instalar, basta escribir **`teleop`**, o abrir el icono **SO-ARM100 
 ---
 
 ## Estructura del repositorio
+
+![Mapa del repositorio](docs/img/mapa_repositorio.svg)
+
+*Mapa del repositorio generado con graphify: zonas, cuántos nodos tiene cada una y quién depende de quién. Explicación completa y grafo interactivo en el [capítulo 21](docs/21-mapa-del-repositorio.md).*
 
 ```
 so-arm100-teleop/

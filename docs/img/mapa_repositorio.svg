@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1480 1100" width="1480" height="1100" font-family="Rubik, Segoe UI, Helvetica, Arial, sans-serif">
+<defs><marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c2ef4e"/></marker></defs>
+<rect width="1480" height="1100" rx="18" fill="#1f1633"/>
+<text x="40" y="52" font-size="28" font-weight="700" fill="#fff">Mapa del repositorio so-arm100-teleop</text>
+<text x="40" y="80" font-size="15" fill="#bdb8c0">2162 nodos · 4548 aristas · 132 comunidades · graphify sobre el commit 34bc9b7</text>
+<line x1="374" y1="816" x2="632" y2="504" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="4.4" stroke-linecap="round"/>
+<line x1="1238" y1="214" x2="700" y2="452" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="4.4" stroke-linecap="round"/>
+<line x1="1018" y1="873" x2="1258" y2="233" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="4.9" stroke-linecap="round"/>
+<line x1="528" y1="659" x2="282" y2="421" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="5.4" stroke-linecap="round"/>
+<line x1="917" y1="450" x2="339" y2="188" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="5.4" stroke-linecap="round"/>
+<line x1="294" y1="399" x2="617" y2="462" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="5.8" stroke-linecap="round"/>
+<line x1="1238" y1="687" x2="398" y2="856" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="5.8" stroke-linecap="round"/>
+<line x1="617" y1="870" x2="277" y2="426" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="6.4" stroke-linecap="round"/>
+<line x1="858" y1="656" x2="622" y2="193" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="7.1" stroke-linecap="round"/>
+<line x1="913" y1="465" x2="295" y2="395" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="7.3" stroke-linecap="round"/>
+<line x1="319" y1="801" x2="257" y2="435" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="7.6" stroke-linecap="round"/>
+<line x1="947" y1="424" x2="911" y2="289" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="7.8" stroke-linecap="round"/>
+<line x1="924" y1="438" x2="636" y2="182" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="8.2" stroke-linecap="round"/>
+<line x1="831" y1="698" x2="604" y2="691" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="8.8" stroke-linecap="round"/>
+<line x1="860" y1="245" x2="342" y2="176" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="9.1" stroke-linecap="round"/>
+<line x1="646" y1="165" x2="862" y2="237" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="10.0" stroke-linecap="round"/>
+<line x1="603" y1="896" x2="399" y2="877" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="10.4" stroke-linecap="round"/>
+<line x1="836" y1="678" x2="291" y2="410" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="11.1" stroke-linecap="round"/>
+<line x1="846" y1="665" x2="690" y2="502" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="11.2" stroke-linecap="round"/>
+<line x1="944" y1="515" x2="896" y2="654" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="11.7" stroke-linecap="round"/>
+<line x1="976" y1="876" x2="903" y2="743" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="11.7" stroke-linecap="round"/>
+<line x1="669" y1="876" x2="842" y2="731" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="11.8" stroke-linecap="round"/>
+<line x1="552" y1="153" x2="342" y2="167" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="12.9" stroke-linecap="round"/>
+<line x1="833" y1="714" x2="397" y2="849" stroke="#6a5fc1" stroke-opacity="0.75" stroke-width="15.7" stroke-linecap="round"/>
+<rect x="721" y="414" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="740" y="429" font-size="12" fill="#fff" text-anchor="middle">11</text>
+<rect x="585" y="419" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="604" y="434" font-size="12" fill="#fff" text-anchor="middle">12</text>
+<rect x="269" y="607" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="288" y="622" font-size="12" fill="#fff" text-anchor="middle">14</text>
+<rect x="910" y="345" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="929" y="360" font-size="12" fill="#fff" text-anchor="middle">15</text>
+<rect x="761" y="299" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="780" y="314" font-size="12" fill="#fff" text-anchor="middle">18</text>
+<rect x="699" y="684" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="718" y="699" font-size="12" fill="#fff" text-anchor="middle">23</text>
+<rect x="696" y="214" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="715" y="229" font-size="12" fill="#fff" text-anchor="middle">26</text>
+<rect x="735" y="190" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="754" y="205" font-size="12" fill="#fff" text-anchor="middle">38</text>
+<rect x="482" y="876" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="501" y="891" font-size="12" fill="#fff" text-anchor="middle">45</text>
+<rect x="610" y="565" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="629" y="580" font-size="12" fill="#fff" text-anchor="middle">60</text>
+<rect x="749" y="572" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="768" y="587" font-size="12" fill="#fff" text-anchor="middle">64</text>
+<rect x="901" y="573" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="920" y="588" font-size="12" fill="#fff" text-anchor="middle">76</text>
+<rect x="921" y="799" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="940" y="814" font-size="12" fill="#fff" text-anchor="middle">77</text>
+<rect x="736" y="793" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="755" y="808" font-size="12" fill="#fff" text-anchor="middle">82</text>
+<rect x="428" y="149" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="447" y="164" font-size="12" fill="#fff" text-anchor="middle">127</text>
+<rect x="543" y="787" width="38" height="20" rx="10" fill="#150f23" stroke="#6a5fc1"/><text x="562" y="802" font-size="12" fill="#fff" text-anchor="middle">408</text>
+<path d="M289,217 Q237,269 262,338" fill="none" stroke="#c2ef4e" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#p)"/>
+<path d="M287,426 Q377,568 522,654" fill="none" stroke="#c2ef4e" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#p)"/>
+<path d="M258,441 Q248,624 317,793" fill="none" stroke="#c2ef4e" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#p)"/>
+<path d="M520,721 Q480,803 391,822" fill="none" stroke="#c2ef4e" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#p)"/>
+<path d="M581,644 Q573,564 639,517" fill="none" stroke="#c2ef4e" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#p)"/>
+<path d="M628,508 Q473,634 379,810" fill="none" stroke="#c2ef4e" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#p)"/>
+<path d="M405,877 Q496,926 595,896" fill="none" stroke="#c2ef4e" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#p)"/>
+<circle cx="300" cy="170" r="42" fill="#37276c" stroke="#7553ff" stroke-width="3"/>
+<text x="300" y="176" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">121</text>
+<rect x="245" y="218" width="110" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="300" y="236" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Página web</text>
+<text x="300" y="254" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">app/web/js</text>
+<circle cx="600" cy="150" r="48" fill="#37276c" stroke="#7553ff" stroke-width="3"/>
+<text x="600" y="156" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">179</text>
+<rect x="508" y="204" width="184" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="600" y="222" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Lecciones y taller</text>
+<text x="600" y="240" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">app/web/js/lecciones</text>
+<circle cx="900" cy="250" r="40" fill="#37276c" stroke="#7553ff" stroke-width="3"/>
+<text x="900" y="256" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">104</text>
+<rect x="813" y="296" width="174" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="900" y="314" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Programar (RAPID)</text>
+<text x="900" y="332" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">app/web/js/programa</text>
+<circle cx="250" cy="390" r="45" fill="#5d2356" stroke="#fd44b0" stroke-width="3"/>
+<text x="250" y="396" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">148</text>
+<rect x="131" y="441" width="238" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="250" y="459" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Servidor Estudio</text>
+<text x="250" y="477" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">app/servidor.py · app/estudio</text>
+<circle cx="960" cy="470" r="48" fill="#4d533b" stroke="#c2ef4e" stroke-width="3"/>
+<text x="960" y="476" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">175</text>
+<rect x="864" y="524" width="193" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="960" y="542" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Pruebas y calidad</text>
+<text x="960" y="560" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">pruebas · e2e · .github</text>
+<circle cx="560" cy="690" r="44" fill="#5d2356" stroke="#fd44b0" stroke-width="3"/>
+<text x="560" y="696" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">138</text>
+<rect x="468" y="740" width="184" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="560" y="758" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Lanzador y scripts</text>
+<text x="560" y="776" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">scripts (soarm.sh)</text>
+<circle cx="660" cy="470" r="44" fill="#5d2356" stroke="#fd44b0" stroke-width="3"/>
+<text x="660" y="476" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">135</text>
+<rect x="541" y="520" width="239" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="660" y="538" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Teleoperación por visión</text>
+<text x="660" y="556" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">teleop_vision</text>
+<circle cx="880" cy="700" r="49" fill="#3e3650" stroke="#8f879a" stroke-width="3"/>
+<text x="880" y="706" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">189</text>
+<rect x="774" y="755" width="211" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="880" y="773" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Bibliotecas y tópicos</text>
+<text x="880" y="791" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">ROS 2, MediaPipe, OpenCV…</text>
+<circle cx="330" cy="870" r="70" fill="#5e424b" stroke="#ffb287" stroke-width="3"/>
+<text x="330" y="876" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">500</text>
+<rect x="256" y="946" width="147" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="330" y="964" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Paquetes ROS 2</text>
+<text x="330" y="982" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">entrega · overlay</text>
+<circle cx="640" cy="900" r="37" fill="#5e424b" stroke="#ffb287" stroke-width="3"/>
+<text x="640" y="906" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">78</text>
+<rect x="532" y="943" width="216" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="640" y="961" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Brazo físico</text>
+<text x="640" y="979" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">brazo-fisico (driver, SDK)</text>
+<circle cx="1000" cy="920" r="50" fill="#5e424b" stroke="#ffb287" stroke-width="3"/>
+<text x="1000" y="926" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">201</text>
+<rect x="904" y="976" width="193" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="1000" y="994" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Análisis cinemático</text>
+<text x="1000" y="1012" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">analisis · cad</text>
+<circle cx="1270" cy="200" r="35" fill="#4b435a" stroke="#bdb8c0" stroke-width="3"/>
+<text x="1270" y="206" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">66</text>
+<rect x="1193" y="241" width="155" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="1270" y="259" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Documentación</text>
+<text x="1270" y="277" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">docs/*.md · README</text>
+<circle cx="1270" cy="440" r="37" fill="#4b435a" stroke="#bdb8c0" stroke-width="3"/>
+<text x="1270" y="446" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">78</text>
+<rect x="1178" y="483" width="184" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="1270" y="501" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Capturas y figuras</text>
+<text x="1270" y="519" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">docs/img</text>
+<circle cx="1270" cy="680" r="33" fill="#4b435a" stroke="#bdb8c0" stroke-width="3"/>
+<text x="1270" y="686" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">50</text>
+<rect x="1200" y="719" width="140" height="42" rx="8" fill="#1f1633" fill-opacity="0.9"/>
+<text x="1270" y="737" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Entregables</text>
+<text x="1270" y="755" font-size="12.5" fill="#bdb8c0" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace">docs/entregables</text>
+<rect x="177" y="260" width="158" height="22" rx="6" fill="#150f23" fill-opacity="0.92"/><text x="256" y="275" font-size="12.5" fill="#c2ef4e" text-anchor="middle">HTTP y eventos (SSE)</text>
+<rect x="333" y="541" width="115" height="22" rx="6" fill="#150f23" fill-opacity="0.92"/><text x="391" y="556" font-size="12.5" fill="#c2ef4e" text-anchor="middle">lanza soarm.sh</text>
+<rect x="189" y="607" width="158" height="22" rx="6" fill="#150f23" fill-opacity="0.92"/><text x="268" y="622" font-size="12.5" fill="#c2ef4e" text-anchor="middle">nodo puente: tópicos</text>
+<rect x="408" y="783" width="93" height="22" rx="6" fill="#150f23" fill-opacity="0.92"/><text x="455" y="799" font-size="12.5" fill="#c2ef4e" text-anchor="middle">ros2 launch</text>
+<rect x="505" y="559" width="172" height="22" rx="6" fill="#150f23" fill-opacity="0.92"/><text x="591" y="574" font-size="12.5" fill="#c2ef4e" text-anchor="middle">lanza la teleoperación</text>
+<rect x="438" y="633" width="100" height="22" rx="6" fill="#150f23" fill-opacity="0.92"/><text x="488" y="649" font-size="12.5" fill="#c2ef4e" text-anchor="middle">trayectorias</text>
+<rect x="459" y="893" width="79" height="22" rx="6" fill="#150f23" fill-opacity="0.92"/><text x="498" y="908" font-size="12.5" fill="#c2ef4e" text-anchor="middle">bus serie</text>
+<line x1="40" y1="1064" x2="80" y2="1064" stroke="#6a5fc1" stroke-width="5"/><text x="90" y="1069" font-size="13" fill="#bdb8c0">dependencias en el código (número de aristas del grafo)</text>
+<line x1="470" y1="1064" x2="510" y2="1064" stroke="#c2ef4e" stroke-width="2" stroke-dasharray="7 6"/><text x="520" y="1069" font-size="13" fill="#bdb8c0">conexión en ejecución: HTTP, procesos o tópicos de ROS 2</text>
+<text x="920" y="1069" font-size="13" fill="#bdb8c0">número en el círculo: nodos de la zona</text>
+</svg>

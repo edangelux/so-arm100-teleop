@@ -48,7 +48,10 @@ class Sesion:
             self._estado('teleop')
         elif 'Llevando el brazo a init' in linea:
             self._estado('moviendo')
-        elif '[Enter] reabrir' in linea:
+        elif '[Enter] reabrir' in linea or 'No se pudo llevar el brazo a home' in linea:
+            # Si «llevar a home» falla, el lanzador vuelve a esperar en su menú (reintentar
+            # [h] o apagar [x]); la aplicación tiene que volver a mostrar esos botones en
+            # lugar de quedarse en «Cerrando…» con Gazebo y MoveIt abiertos.
             self._estado('menu')
         elif 'Procesos de esta sesión cerrados' in linea:
             self._estado('cerrando')

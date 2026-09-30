@@ -1,6 +1,6 @@
 # 20 — Protecciones del brazo físico
 
-[← Anterior: Programar](19-programar.md) · [Volver al inicio](../README.md)
+[← Anterior: Programar](19-programar.md) · [Volver al inicio](../README.md) · [Siguiente: Mapa del repositorio →](21-mapa-del-repositorio.md)
 
 ---
 
@@ -61,4 +61,4 @@ Debe terminar con «Protección contra saltos instalada». `bash scripts/soarm.s
 
 ---
 
-[← Anterior: Programar](19-programar.md) · [Volver al inicio](../README.md)
+[← Anterior: Programar](19-programar.md) · [Volver al inicio](../README.md) · [Siguiente: Mapa del repositorio →](21-mapa-del-repositorio.md)

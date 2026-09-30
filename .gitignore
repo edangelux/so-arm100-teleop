@@ -50,3 +50,6 @@ reports/
 .stryker-tmp/
 .claude/settings.local.json
 CLAUDE.local.md
+
+# --- Mapa del repositorio generado por graphify --------------------------
+graphify-out/

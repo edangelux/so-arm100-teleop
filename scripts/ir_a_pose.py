@@ -40,11 +40,15 @@ class IrAPose(Node):
         super().__init__('soarm_ir_a_pose')
         self.pubs = [self.create_publisher(JointTrajectory, t, 10) for t in topicos]
         self.q = {}
+        self.t_robot = 0.0       # tiempo del último estado articular, según el reloj del robot
         self.create_subscription(JointState, estados, self._estado, 10)
 
     def _estado(self, msg):
         for nombre, valor in zip(msg.name, msg.position):
             self.q[nombre] = valor
+        t = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        if t > 0:
+            self.t_robot = t
 
     def actual(self):
         if all(n in self.q for n in ARTICULACIONES):
@@ -52,11 +56,23 @@ class IrAPose(Node):
         return None
 
     def esperar(self, condicion, limite):
-        fin = time.time() + limite
-        while time.time() < fin:
+        """Espera hasta `limite` segundos del reloj del ROBOT. En Gazebo es el tiempo
+        simulado (las marcas de /joint_states), que con renderizado por software en
+        WSL avanza más lento que el real: si se midiera con el reloj de la pared, el
+        brazo quedaría a medio camino cuando se acaba la espera (pasó el 30-09-2026:
+        «No se alcanzó home» con cada articulación al 43 % del recorrido). Con el
+        brazo real las marcas son la hora del equipo y no cambia nada. Por si el
+        reloj simulado se detuviera, hay además un tope de pared de 6 veces más."""
+        usar_robot = self.t_robot > 0
+        inicio = self.t_robot if usar_robot else time.time()
+        tope_pared = time.time() + limite * 6 + 10
+        while time.time() < tope_pared:
             rclpy.spin_once(self, timeout_sec=0.05)
             if condicion():
                 return True
+            ahora = self.t_robot if usar_robot else time.time()
+            if ahora - inicio >= limite:
+                return False
         return False
 
 
