@@ -483,7 +483,11 @@ body.panel-ancho { grid-template-columns: 1fr 640px; }
 
 /* Retos de Programar */
 .retos { display: flex; flex-direction: column; gap: 8px; }
-.reto { display: grid; grid-template-columns: 76px 1fr; gap: 12px; align-items: start; padding: 10px 12px; border-radius: 8px; background: rgba(21, 15, 35, .6); box-shadow: inset 4px 0 0 #362d59; }
+.reto { display: grid; grid-template-columns: 76px 1fr auto; gap: 12px; align-items: center; width: 100%; padding: 10px 12px; border: 0; border-radius: 8px; background: rgba(21, 15, 35, .6); box-shadow: inset 4px 0 0 #362d59; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: background .2s; }
+.reto:hover { background: rgba(117, 83, 255, .16); }
+.reto .ir { font: 700 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .04em; color: #fff; padding: 6px 10px; border: 1px solid var(--linea); border-radius: 6px; }
+.reto.activo { box-shadow: inset 4px 0 0 var(--fucsia); background: rgba(253, 68, 176, .08); }
+.reto.activo .ir { border-color: var(--fucsia); color: var(--fucsia); }
 .reto b { display: block; color: #fff; font-size: 14px; margin-bottom: 2px; }
 .reto span { display: block; font-size: 13px; color: #d7d0f0; line-height: 1.45; }
 .reto .pista { color: #9e86ff; margin-top: 4px; font-size: 12px; }
@@ -502,3 +506,44 @@ body.panel-ancho { grid-template-columns: 1fr 640px; }
 .opcion.opcion-camara { display: flex; align-items: center; gap: 14px; }
 .mini-camara { flex: none; width: 96px; aspect-ratio: 4 / 3; object-fit: contain; border-radius: 6px; background: #150f23; }
 .mini-camara.vacia { display: flex; align-items: center; justify-content: center; font-size: 11px; color: #8a80a0; }
+
+/* Reto en curso, encima del programa */
+.banda-reto { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 12px 14px; border-radius: 8px; background: rgba(253, 68, 176, .1); box-shadow: inset 4px 0 0 var(--fucsia); }
+.banda-reto b { display: block; font-size: 15px; margin: 2px 0; }
+.banda-reto .etq { display: block; color: var(--fucsia); }
+.banda-reto .nota { display: block; margin: 0; }
+
+/* Ventana ancha (enunciado de un reto) */
+.modal-caja.ancha { width: min(760px, 94vw); max-height: 90vh; overflow-y: auto; }
+.modal-caja .marca-reto { font: 700 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--lima); margin-bottom: 10px; }
+.modal-caja .objetivo-reto { font-size: 18px; opacity: 1; margin-bottom: 16px; }
+.modal-caja .nota { font-size: 14px; margin: 0 0 10px; }
+.dos-plantas { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 16px; }
+.dos-plantas figure { margin: 0; }
+.dos-plantas figcaption { font: 700 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--texto-2); margin-top: 6px; text-align: center; }
+.pista-reto { margin-top: 6px; padding: 10px 12px; border-radius: 8px; background: var(--noche); }
+.pista-reto summary { cursor: pointer; font-weight: 600; color: #9e86ff; }
+.pista-reto p { margin: 10px 0 0; font-size: 14px; }
+.faltan-reto { margin: 0 0 16px; padding-left: 20px; line-height: 1.6; }
+@media (max-width: 640px) { .dos-plantas { grid-template-columns: 1fr; } }
+
+/* Planta de la celda de trabajo */
+.planta-caja { margin: 8px 0 12px; }
+.planta { display: block; width: 100%; height: auto; border-radius: 8px; background: var(--noche); }
+.planta text { font: 11px var(--mono); fill: #d7d0f0; }
+.planta-rejilla line { stroke: #2a2145; stroke-width: 1; }
+.planta-base circle { fill: #2a2145; stroke: var(--violeta-barra); stroke-width: 2; }
+.planta-base text { fill: #fff; }
+.planta-ejes line { stroke: #9e86ff; stroke-width: 1.5; }
+.planta-flecha { fill: #9e86ff; }
+.planta-ejes text { fill: #9e86ff; }
+.planta-bandeja rect { fill: rgba(117, 83, 255, .18); stroke: var(--violeta-barra); stroke-width: 3; }
+.planta-sensor circle { fill: none; stroke: var(--lima); stroke-width: 2; stroke-dasharray: 4 3; }
+.planta-torre circle { fill: var(--fucsia); }
+.planta-piezas rect { stroke: #150f23; stroke-width: 1.5; }
+.planta-piezas rect.sujeta { stroke: #fff; stroke-dasharray: 3 2; }
+.tabla-celda { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.5; margin-bottom: 8px; }
+.tabla-celda th { text-align: left; font: 700 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--texto-2); padding: 6px 8px; border-bottom: 1px solid var(--linea); }
+.tabla-celda td { padding: 8px; border-bottom: 1px solid var(--linea); vertical-align: top; color: #d7d0f0; }
+.tabla-celda td:first-child { color: #fff; font-weight: 600; white-space: nowrap; }
+.tabla-celda code, .modal-caja code { font-family: var(--mono); font-size: 12px; background: var(--noche); padding: 1px 5px; border-radius: 4px; }

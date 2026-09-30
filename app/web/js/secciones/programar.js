@@ -5,12 +5,14 @@
 // vistas son el mismo programa.
 import * as THREE from 'three';
 import { enviar, obtener } from '../api.js';
-import { el, aviso, confirmar, preguntar } from '../ui.js';
+import { el, aviso, confirmar, preguntar, ventana } from '../ui.js';
 import { analizar, instruccionTexto, resaltar, INSTRUCCIONES, destinoTexto, exprTexto } from '../programa/lenguaje.js';
 import { Ejecutor, Detenido, PINZA } from '../programa/ejecutor.js';
 import { muestrear, GRADO } from '../programa/movimiento.js';
 import { Celda } from '../programa/celda.js';
 import { EJEMPLOS, NUEVO } from '../programa/ejemplos.js';
+import { RETOS, plantilla, retosHechos, marcarHecho } from '../programa/retos.js';
+import { planta, NOMBRE_COLOR } from '../programa/planta.js';
 
 const GUARDADO = 'soarm-programa-borrador';
 const VELOCIDADES = [20, 50, 80, 100, 150, 200, 300, 500, 1000];
@@ -20,34 +22,6 @@ const COLOR_CAMINO = { MoveJ: 0x7553ff, MoveAbsJ: 0x7553ff, MoveL: 0xc2ef4e, Mov
 const r1 = (v) => Math.round(v * 10) / 10;
 const leer = () => { try { return localStorage.getItem(GUARDADO); } catch { return null; } };
 const escribirLocal = (t) => { try { localStorage.setItem(GUARDADO, t); } catch { /* sin almacenamiento */ } };
-
-// Retos de la celda: cada uno comprueba dónde quedaron los cubos (mm, marco de la base).
-const enBandeja = (p) => p && !p.sujeta && Math.abs(p.x - 110) < 46 && Math.abs(p.y + 200) < 46;
-const cerca = (p, x, y, tol = 10) => p && !p.sujeta && Math.hypot(p.x - x, p.y - y) < tol;
-const RETOS = [
-  { id: 'lima', nivel: 'Fácil', titulo: 'El cubo lima a la bandeja',
-    texto: 'Lleve cubo2 (lima, el del medio de la fila) a la bandeja y deje los otros dos donde están.',
-    pista: 'Copie el ejemplo 2 y cambie el punto de toma a [-110, -200, 10, -90, 0].',
-    cumple: (c) => enBandeja(c.cubo2) && cerca(c.cubo1, -110, -150) && cerca(c.cubo3, -110, -250) },
-  { id: 'todos', nivel: 'Medio', titulo: 'Los tres a la bandeja',
-    texto: 'Lleve los tres cubos a la bandeja, cada uno en un sitio distinto, con un solo programa.',
-    pista: 'Un FOR con Offs sobre la fila y sobre la bandeja evita escribir tres veces lo mismo.',
-    cumple: (c) => ['cubo1', 'cubo2', 'cubo3'].every((n) => enBandeja(c[n])) },
-  { id: 'torre', nivel: 'Medio', titulo: 'Una torre en la bandeja',
-    texto: 'Apile los tres cubos, uno encima del otro, dentro de la bandeja.',
-    pista: 'Mire el ejemplo 6: cada cubo se deja 25 mm más arriba que el anterior.',
-    cumple: (c) => {
-      const t = ['cubo1', 'cubo2', 'cubo3'].map((n) => c[n]);
-      if (!t.every(enBandeja)) return false;
-      const z = t.map((p) => p.z).sort((a, b) => a - b);
-      return z[2] - z[0] > 40 && Math.max(...t.map((p) => Math.hypot(p.x - t[0].x, p.y - t[0].y))) < 15;
-    } },
-  { id: 'inversa', nivel: 'Difícil', titulo: 'La fila al revés',
-    texto: 'Deje la fila en orden inverso: cubo3 (durazno) donde estaba cubo1, y cubo1 (fucsia) donde estaba cubo3. El lima vuelve a su sitio.',
-    pista: 'Hace falta un lugar libre para dejar un cubo mientras se mueve otro: la bandeja sirve.',
-    cumple: (c) => cerca(c.cubo3, -110, -150) && cerca(c.cubo2, -110, -200) && cerca(c.cubo1, -110, -250) },
-];
-const retosHechos = () => { try { return new Set(JSON.parse(localStorage.getItem('soarm-retos') || '[]')); } catch { return new Set(); } };
 
 const seccion = {
   id: 'programar', titulo: 'Programar el robot', corto: 'Programar', icono: 'programar',
@@ -186,6 +160,7 @@ const seccion = {
         this.estado, this.consola),
       el('div', { class: 'tarjeta' },
         el('div', { class: 'fila', style: 'margin-bottom:12px' }, el('h3', { style: 'margin:0' }, 'Programa'), this.titulo, el('span', { class: 'crece' })),
+        this.bandaReto = el('div', { class: 'banda-reto oculto' }),
         this.segVista, this.errores,
         el('div', { class: 'vista-lista' }, this.barraInsertar, this.lista, this.barraFila),
         this.editorCaja),
@@ -200,17 +175,31 @@ const seccion = {
         el('div', { class: 'fila' }, this.segJog, this.selPaso),
         this.rejillaJog, this.lecturaPose),
       el('div', { class: 'tarjeta' },
+        el('h3', {}, 'Retos'),
+        el('p', { class: 'nota' }, 'Problemas para practicar con la celda de trabajo. Toque uno para ver qué hay que lograr; al empezarlo, la celda vuelve a su sitio y el editor queda en blanco para que escriba su programa. Se comprueba solo cada vez que lo ejecuta en el robot virtual.'),
+        this.listaRetos = el('div', { class: 'retos' })),
+      el('div', { class: 'tarjeta' },
         el('h3', {}, 'Celda de trabajo'),
-        el('p', { class: 'nota' }, 'Tres cubos de 25 mm, una bandeja, un sensor de presencia (di1, el anillo bajo cubo1) y una torre de luces (do1 a do3). Si la pinza se cierra con una pieza entre los dedos, la sujeta; al abrirse, la suelta.'),
+        el('p', { class: 'nota' }, 'Es la mesa que se ve alrededor del robot en esta pestaña: los objetos con los que trabajan los ejemplos y los retos. Sólo existe en el robot virtual (en el brazo real no hay cubos ni sensores). Así se ve desde arriba, con las coordenadas que se escriben en los puntos del programa:'),
+        this.plantaNodo = el('div', { class: 'planta-caja' }),
+        el('table', { class: 'tabla-celda' },
+          el('tr', {}, el('th', {}, 'Objeto'), el('th', {}, 'Qué es'), el('th', {}, 'Cómo se usa en el programa')),
+          el('tr', {}, el('td', {}, 'cubo1, cubo2, cubo3'), el('td', {}, 'Cubos de 25 mm (fucsia, lima, durazno) en fila, cada 50 mm'),
+            el('td', { html: 'Se toman con la pinza hacia abajo en <code>[x, y, 10, -90, 0]</code>: bajar con <code>MoveL</code>, <code>GripperClose</code> y subir. Si la pinza se cierra con un cubo entre los dedos, lo sujeta; al abrirla, cae recto.' })),
+          el('tr', {}, el('td', {}, 'Bandeja'), el('td', {}, '100 × 100 mm, centro en [110, −200]'),
+            el('td', { html: 'Se deja un cubo en <code>[110, -200, 13, -90, 0]</code> (el fondo tiene 3 mm). Encima de otro cubo, 25 mm más arriba.' })),
+          el('tr', {}, el('td', {}, 'di1'), el('td', {}, 'Sensor de presencia: el anillo bajo cubo1'),
+            el('td', { html: 'Vale 1 si hay un cubo encima. <code>WaitDI di1, 1;</code> espera una pieza; <code>IF di1 = 1 THEN</code> pregunta.' })),
+          el('tr', {}, el('td', {}, 'di2'), el('td', {}, 'Botón del operador'),
+            el('td', { html: 'Se pulsa abajo, en «Entradas». <code>WaitDI di2, 1;</code> espera a que lo pulse.' })),
+          el('tr', {}, el('td', {}, 'do1, do2, do3'), el('td', {}, 'Torre de luces: lima, durazno, fucsia'),
+            el('td', { html: '<code>SetDO do1, 1;</code> enciende la lima; <code>SetDO do1, 0;</code> la apaga.' }))),
+        el('p', { class: 'nota' }, 'Coordenadas en mm desde el centro de la base: x hacia la derecha, y negativa hacia el frente del brazo, z hacia arriba desde la mesa. El cuarto valor es el cabeceo de la pinza (−90° = apuntando hacia abajo) y el quinto, el giro de la muñeca.'),
+        el('div', { class: 'etq', style: 'margin-top:10px' }, 'Dónde están ahora los cubos'),
         this.listaCelda, this.senalesNodo,
         el('div', { class: 'fila', style: 'margin-top:10px' },
           b('Reiniciar la celda', () => { this.celda.reiniciar(); this.pintarCelda(); }, 'pequeno'),
           el('label', { class: 'fila etq', style: 'margin-left:auto' }, this.verCamino, 'Mostrar el camino planificado'))),
-      el('div', { class: 'tarjeta' },
-        el('h3', {}, 'Retos'),
-        el('p', { class: 'nota' }, 'Escriba un programa que deje la celda como pide cada reto. Se comprueban solos al terminar cada ejecución en el robot virtual; «Reiniciar la celda» devuelve los cubos a su sitio.'),
-        this.listaRetos = el('div', { class: 'retos' }),
-        el('div', { class: 'fila', style: 'margin-top:8px' }, b('Comprobar ahora', () => this.comprobarRetos(true), 'pequeno'))),
     );
     this.pintarRetos();
     this.fijarVista('lista');
@@ -488,9 +477,14 @@ const seccion = {
     return [ps.p.x * 1000, ps.p.y * 1000, ps.p.z * 1000, ps.cab / GRADO, this.app.qManual[4] / GRADO].map(r1);
   },
 
-  ensenar(nombre) {
+  async ensenar(nombre) {
     const d = this.analisis.decls.find((x) => x.nombre.toLowerCase() === nombre.toLowerCase());
     if (!d) return aviso(`El punto ${nombre} no está declarado.`, 'mal');
+    // Enseñar reemplaza el punto por la pose actual del robot virtual: se confirma, porque
+    // todas las instrucciones que usan el punto (también con Offs) cambian con él.
+    const nuevo = d.clase === 'jointtarget' ? this.app.qManual.slice(0, 5).map((v) => r1(v / GRADO)) : this.poseActual();
+    const antes = `[${d.valor.map((e) => exprTexto(e)).join(', ')}]`;
+    if (!(await confirmar(`Enseñar ${d.nombre}`, `El punto <b>${d.nombre}</b> pasa de <code>${antes}</code> a la pose actual del robot, <code>[${nuevo.join(', ')}]</code>. Cambian todas las instrucciones que lo usan.`, { aceptar: 'Reemplazar' }))) return;
     const ln = this.analisis.lineas[d.linea - 1];
     const sangria = /^\s*/.exec(ln.texto)[0];
     const prefijo = /^\s*((VAR|CONST|PERS)\s+)?/i.exec(ln.texto)[1] || 'CONST ';
@@ -594,6 +588,7 @@ const seccion = {
 
   // ------------------------------------------------------------ celda y señales
   pintarCelda() {
+    this.plantaNodo?.replaceChildren(planta(this.celda.resumen()));
     this.listaCelda.replaceChildren(...this.celda.resumen().map((p) => el('div', { class: 'pieza' },
       el('b', {}, p.nombre), ` [${p.x.toFixed(0)}, ${p.y.toFixed(0)}, ${p.z.toFixed(0)}] mm`, p.sujeta ? el('span', { class: 'dato' }, 'en la pinza') : null)));
     this.pintarSenales();
@@ -608,29 +603,111 @@ const seccion = {
       el('div', { class: 'grupo-senales' }, el('span', { class: 'etq' }, 'Entradas'),
         entrada('di1', 'sensor', true), entrada('di2', 'botón'), entrada('di3', ''), entrada('di4', '')),
       el('div', { class: 'grupo-senales' }, el('span', { class: 'etq' }, 'Salidas'),
-        salida('do1', 'lima'), salida('do2', 'durazno'), salida('do3', 'fucsia'), salida('do4', '')));
+        salida('do1', 'lima'), salida('do2', 'durazno'), salida('do3', 'fucsia'), salida('do4', '')),
+      el('p', { class: 'nota' }, 'di1 la enciende el sensor solo. di2 a di4 se pulsan aquí para simular un botón. Las salidas las cambia el programa con SetDO.'));
   },
 
   // ------------------------------------------------------------ retos
   pintarRetos(recien = []) {
     if (!this.listaRetos) return;
     const hechos = retosHechos();
-    this.listaRetos.replaceChildren(...RETOS.map((r) => el('div', { class: `reto ${hechos.has(r.id) ? 'hecho' : ''} ${recien.includes(r.id) ? 'recien' : ''}` },
-      el('span', { class: 'marca' }, hechos.has(r.id) ? 'Logrado' : r.nivel),
-      el('div', {}, el('b', {}, r.titulo), el('span', {}, r.texto), el('span', { class: 'pista' }, `Pista: ${r.pista}`)))));
+    this.listaRetos.replaceChildren(...RETOS.map((r, i) => el('button', {
+      class: `reto ${hechos.has(r.id) ? 'hecho' : ''} ${recien.includes(r.id) ? 'recien' : ''} ${this.reto?.id === r.id ? 'activo' : ''}`,
+      onclick: () => this.verReto(r) },
+    el('span', { class: 'marca' }, hechos.has(r.id) ? 'Logrado' : r.nivel),
+    el('div', {}, el('b', {}, `${i + 1}. ${r.titulo}`), el('span', {}, r.objetivo)),
+    el('span', { class: 'ir' }, this.reto?.id === r.id ? 'En curso' : 'Ver'))));
   },
 
-  comprobarRetos(manual) {
+  // Enunciado del reto en una ventana: objetivo, cómo debe quedar la celda, datos y pista.
+  async verReto(r) {
+    const activo = this.reto?.id === r.id;
+    const pista = el('details', { class: 'pista-reto' }, el('summary', {}, 'Ver una pista'), el('p', {}, r.pista));
+    const dosPlantas = el('div', { class: 'dos-plantas' },
+      el('figure', {}, planta(this.celdaInicial(), { cotas: false, titulo: 'Así empieza' }), el('figcaption', {}, 'Así empieza')),
+      el('figure', {}, planta(r.meta, { cotas: false, titulo: 'Así debe quedar' }), el('figcaption', {}, 'Así debe quedar')));
+    const contenido = [
+      el('div', { class: 'marca-reto' }, `${r.nivel}${retosHechos().has(r.id) ? ' · ya logrado' : ''}`),
+      el('p', { class: 'objetivo-reto' }, r.objetivo),
+      dosPlantas,
+      el('p', { class: 'nota' }, el('b', {}, 'Datos: '), 'cubos en [-110, -150], [-110, -200] y [-110, -250], se toman en z = 10 con cabeceo −90°; la bandeja tiene el centro en [110, -200] y se deja en z = 13. Más detalle en la tarjeta «Celda de trabajo».'),
+      el('p', { class: 'nota' }, el('b', {}, 'Qué se practica: '), r.aprende),
+      pista,
+    ];
+    const botones = activo
+      ? [['Abandonar el reto', 'salir', 'silencioso'], ['Reiniciar la celda', 'celda'], ['Seguir programando', null, 'primario']]
+      : [['Cerrar', null], ['Empezar el reto', 'empezar', 'primario']];
+    const v = await ventana(`Reto: ${r.titulo}`, contenido, botones, { ancha: true });
+    if (v === 'empezar') this.empezarReto(r);
+    else if (v === 'salir') this.salirReto();
+    else if (v === 'celda') { this.celda.reiniciar(); this.pintarCelda(); }
+  },
+
+  celdaInicial() { return [{ nombre: 'cubo1', x: -110, y: -150 }, { nombre: 'cubo2', x: -110, y: -200 }, { nombre: 'cubo3', x: -110, y: -250 }]; },
+
+  async empezarReto(r) {
+    if (this.corriendo) return aviso('Detenga el programa antes de empezar un reto.', 'mal');
+    if (!this.nombre && this.texto && this.texto !== NUEVO && !EJEMPLOS.some((e) => e.texto === this.texto) && !this.esPlantilla(this.texto)
+      && !(await confirmar('Empezar el reto', 'El editor queda en blanco para el reto y se pierde el programa abierto, que no está guardado. ¿Seguir?', { aceptar: 'Empezar' }))) return;
+    this.reto = r;
+    this.celda.reiniciar();
+    this.pintarCelda();
+    this.fijarDestino('virtual');
+    this.abrirTexto(plantilla(r), null);
+    this.app.fijarManual([0, 0, 0, 0, 0, this.app.qManual[5] ?? 0]);
+    this.fijarVista('codigo');
+    this.pintarBandaReto();
+    this.pintarRetos();
+    this.editorCaja.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const fin = this.editor.value.length;
+    this.editor.focus();
+    this.editor.setSelectionRange(fin, fin);
+  },
+
+  esPlantilla(t) { return RETOS.some((r) => t === plantilla(r)); },
+
+  salirReto() {
+    this.reto = null;
+    this.pintarBandaReto();
+    this.pintarRetos();
+  },
+
+  pintarBandaReto() {
+    const r = this.reto;
+    this.bandaReto.classList.toggle('oculto', !r);
+    if (!r) return this.bandaReto.replaceChildren();
+    const b = (t, f, c = '') => el('button', { class: `boton pequeno ${c}`, onclick: f }, t);
+    this.bandaReto.replaceChildren(
+      el('div', {}, el('span', { class: 'etq' }, `Reto en curso · ${r.nivel}`), el('b', {}, r.titulo),
+        el('span', { class: 'nota' }, 'Ejecute en el robot virtual: al terminar se comprueba solo.')),
+      el('div', { class: 'fila' }, b('Ver el reto', () => this.verReto(r)), b('Comprobar', () => this.revisarReto(true)), b('Salir', () => this.salirReto(), 'silencioso')));
+  },
+
+  // Al terminar una ejecución en el robot virtual (o con «Comprobar»): ¿quedó la celda como pide el reto?
+  async revisarReto(manual) {
+    const r = this.reto;
+    if (!r) return;
     const piezas = Object.fromEntries(this.celda.resumen().map((p) => [p.nombre, p]));
-    const hechos = retosHechos();
-    const nuevos = RETOS.filter((r) => !hechos.has(r.id) && r.cumple(piezas)).map((r) => r.id);
-    nuevos.forEach((id) => hechos.add(id));
-    try { localStorage.setItem('soarm-retos', JSON.stringify([...hechos])); } catch { /* sin almacenamiento */ }
-    this.pintarRetos(nuevos);
-    if (nuevos.length) aviso(`Reto logrado: ${RETOS.find((r) => r.id === nuevos[0]).titulo}.`, 'ok');
-    else if (manual) {
-      const ahora = RETOS.filter((r) => r.cumple(piezas)).map((r) => r.titulo);
-      aviso(ahora.length ? `La celda cumple: ${ahora.join(', ')}.` : 'La celda todavía no cumple ningún reto.', ahora.length ? 'ok' : '');
+    const faltan = r.revisar(piezas);
+    if (!faltan.length) {
+      const nuevo = !retosHechos().has(r.id);
+      marcarHecho(r.id);
+      this.pintarRetos([r.id]);
+      const sig = RETOS.find((x) => !retosHechos().has(x.id));
+      const v = await ventana('¡Reto logrado!', [el('p', {}, `${r.titulo}: la celda quedó como pedía el reto.${nuevo ? '' : ' (Ya lo había logrado antes.)'}`),
+        el('p', { class: 'nota' }, 'Guarde el programa si quiere conservarlo («Guardar como»).')],
+      [['Quedarme aquí', null], ...(sig ? [[`Siguiente: ${sig.titulo}`, 'sig', 'primario']] : [])]);
+      this.reto = null;
+      this.pintarBandaReto();
+      this.pintarRetos();
+      if (v === 'sig' && sig) this.verReto(sig);
+      return;
+    }
+    if (manual || faltan.length) {
+      await ventana('Todavía no', [el('p', {}, 'El programa terminó, pero la celda no quedó como pide el reto:'),
+        el('ul', { class: 'faltan-reto' }, ...faltan.map((f) => el('li', {}, f))),
+        el('p', { class: 'nota' }, '«Reiniciar la celda» devuelve los cubos a su sitio antes de volver a probar.')],
+      [['Reiniciar la celda', 'celda'], ['Seguir', null, 'primario']]).then((v) => { if (v === 'celda') { this.celda.reiniciar(); this.pintarCelda(); } });
     }
   },
 
@@ -736,6 +813,7 @@ const seccion = {
       this.mensaje(`${e.linea != null ? `Línea ${e.linea}: ` : ''}${e.message}`, 'l-error');
       if (e.linea) { this.seleccion = e.linea; this.marcarLinea(null); this.pintarLista(); }
       this.estado.textContent = 'La verificación encontró un problema.';
+      this.ultimoError = `${e.linea != null ? `Línea ${e.linea}: ` : ''}${e.message}`;
       if (!silencioso) aviso(`${e.linea != null ? `Línea ${e.linea}: ` : ''}${e.message}`, 'mal');
       return false;
     }
@@ -750,7 +828,7 @@ const seccion = {
     if (this.analisis.errores.length) return aviso('Corrija los errores del programa antes de ejecutarlo.', 'mal');
     if (this.destino === 'robot') {
       if (!this.sesionLista()) return aviso(this.app.diagnosticoBrazo().motivo, 'mal');
-      if (!(await this.verificar({ silencioso: true }))) return aviso('La verificación encontró un problema; revise la consola.', 'mal');
+      if (!(await this.verificar({ silencioso: true }))) return aviso(`No se ejecutó. ${this.ultimoError || 'La verificación encontró un problema.'}`, 'mal');
       const m = this.app.estado.sesion.modo;
       const ok = await confirmar('Ejecutar en el robot', `El programa moverá ${m === 'sim' ? 'el robot de Gazebo' : '<b>el brazo físico</b>'} a ${Math.round(this.override * 100)} % de velocidad. Deje libre el espacio de trabajo y tenga a mano el interruptor de la fuente.`, { aceptar: 'Ejecutar' });
       if (!ok) return;
@@ -786,7 +864,7 @@ const seccion = {
       }, { override: this.override });
       this.mensaje(`Fin del programa (${((performance.now() - t0) / 1000).toFixed(1)} s).`, 'l-ok');
       this.estado.textContent = 'Programa terminado.';
-      if (!robot) setTimeout(() => this.comprobarRetos(false), 900);
+      if (!robot && this.reto) setTimeout(() => this.revisarReto(false), 900);
     } catch (e) {
       if (e instanceof Detenido) { this.mensaje('Programa detenido.', 'l-aviso'); this.estado.textContent = 'Detenido.'; }
       else {

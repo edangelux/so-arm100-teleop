@@ -12,8 +12,12 @@ export function el(etiqueta, attrs = {}, ...hijos) {
 }
 
 export function aviso(texto, tipo = '') {
+  const caja = document.getElementById('avisos');
+  // El mismo aviso no se apila: se quita el anterior y vuelve a contar. Como mucho tres a la vez.
+  for (const v of [...caja.children]) if (v.textContent === texto) v.remove();
+  while (caja.children.length >= 3) caja.firstElementChild.remove();
   const a = el('div', { class: `aviso-flotante ${tipo}` }, texto);
-  document.getElementById('avisos').append(a);
+  caja.append(a);
   setTimeout(() => a.remove(), tipo === 'mal' ? 9000 : 4500);
 }
 
@@ -27,6 +31,22 @@ export function confirmar(titulo, texto, { aceptar = 'Continuar', peligro = fals
       el('div', { class: 'fila' },
         el('button', { class: 'boton', onclick: () => cerrar(false) }, 'Cancelar'),
         el('button', { class: `boton ${peligro ? 'peligro' : 'primario'}`, onclick: () => cerrar(true) }, aceptar)));
+    modal.classList.remove('oculto');
+  });
+}
+
+// Ventana flotante con contenido libre. botones: [[texto, valor, clase]]; Escape o el fondo devuelven null.
+export function ventana(titulo, contenido, botones, { ancha = false } = {}) {
+  return new Promise((resolver) => {
+    const modal = document.getElementById('modal');
+    const caja = document.getElementById('modal-caja');
+    const cerrar = (v) => { modal.classList.add('oculto'); caja.classList.remove('ancha'); modal.onclick = null; document.removeEventListener('keydown', tecla); resolver(v); };
+    const tecla = (e) => { if (e.key === 'Escape') cerrar(null); };
+    caja.classList.toggle('ancha', ancha);
+    caja.replaceChildren(el('h3', {}, titulo), ...[contenido].flat(),
+      el('div', { class: 'fila', style: 'margin-top:20px' }, ...botones.map(([t, v, c]) => el('button', { class: `boton ${c || ''}`, onclick: () => cerrar(v) }, t))));
+    modal.onclick = (e) => { if (e.target === modal) cerrar(null); };
+    document.addEventListener('keydown', tecla);
     modal.classList.remove('oculto');
   });
 }

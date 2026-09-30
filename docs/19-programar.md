@@ -32,8 +32,8 @@ La pestaña **Programar** de SO-ARM100 Estudio enseña a mover el brazo como se 
 | **Programa** | El programa en dos vistas sincronizadas: **Instrucciones**, una lista como la de una consola de programación, donde cada línea se edita con un formulario; y **Código**, un editor de texto con colores y números de línea. Lo que se cambia en una aparece en la otra. |
 | **Puntos** | Los puntos del programa (`robtarget`). **Ir** lleva el robot virtual al punto; **Enseñar** guarda en el punto la pose actual. |
 | **Mover a mano** | El mando de movimiento paso a paso (*jog*): cartesiano (la pinza en línea recta sobre x, y, z, cabeceo) o articular (cada articulación), con pasos de 1 a 20 mm o grados, y la pinza. |
-| **Celda de trabajo** | Tres cubos, una bandeja, un sensor (`di1`) y una torre de luces (`do1` a `do3`), con el estado de cada pieza y de cada señal. |
-| **Retos** | Cuatro ejercicios que se comprueban solos al terminar el programa. |
+| **Celda de trabajo** | Tres cubos, una bandeja, un sensor (`di1`) y una torre de luces (`do1` a `do3`). La tarjeta la dibuja en planta con sus coordenadas, explica cómo se usa cada objeto en el programa y muestra el estado de cada pieza y de cada señal. |
+| **Retos** | Cuatro ejercicios. Al tocar uno se abre su enunciado; al empezarlo, el editor queda en blanco y la celda vuelve a su sitio. Se comprueba solo al terminar cada ejecución. |
 
 Arriba del panel están los **ejemplos**, los **programas guardados** y los botones Nuevo, Guardar, Guardar como, Exportar `.mod` e Importar. Los programas se guardan en `~/.local/share/soarm/programas/` como archivos `.mod` de texto. El último texto escrito se conserva también en el navegador, para no perderlo al cerrar la ventana.
 
@@ -143,6 +143,12 @@ La **zona** decide qué pasa en cada punto: `fine` se detiene exactamente; `z10`
 | Sensor `di1` | x −110, y −150 | Vale 1 si hay una pieza encima (el anillo se pone lima) |
 | Torre de luces | x 200, y −300 | `do1` lima, `do2` durazno, `do3` fucsia |
 
+La tarjeta **Celda de trabajo** de la pestaña dibuja la mesa vista desde arriba (figura 19.3), con la base del robot, los ejes y la posición actual de cada cubo, y una tabla con la manera de usar cada objeto en un programa. La planta se vuelve a dibujar después de cada ejecución, así que muestra dónde quedaron los cubos.
+
+![Tarjeta Celda de trabajo: planta con coordenadas y tabla de objetos](img/estudio_11_celda.png)
+
+*Figura 19.3. La celda en planta. El brazo trabaja hacia −y (abajo en el dibujo); el anillo punteado es el sensor `di1`, bajo cubo1. Las coordenadas son las que se escriben en los puntos del programa.*
+
 Para tomar una pieza, la pinza debe cerrarse con la pieza entre los dedos: el centro de los dedos a menos de 25 mm del centro del cubo. Al abrirse, la pieza cae hasta la mesa, la bandeja o el cubo de abajo. Las entradas `di2` a `di4` se pulsan a mano en la tarjeta de la celda, para simular botones.
 
 ## Ejemplos y retos
@@ -158,12 +164,27 @@ Para tomar una pieza, la pinza debe cerrarse con la pieza entre los dedos: el ce
 | 7. Señales: esperar al sensor | `WaitDI`, `SetDO`, torre de luces | 11,1 s |
 | 8. Paletizado en cuadrícula | `FOR` anidados, `IF`, contador (tres cubos en una cuadrícula de 2 × 2) | 27,9 s |
 
-Los **retos** proponen un estado final de la celda y se comprueban solos cuando termina un programa en el robot virtual (o con **Comprobar ahora**). Quedan marcados como logrados en ese navegador.
+Los **retos** proponen un estado final de la celda. El recorrido es este:
+
+1. En la tarjeta **Retos** se toca uno. Se abre una ventana con el objetivo, dos plantas de la celda (cómo empieza y cómo debe quedar), los datos de posición, qué se practica y una pista escondida (figura 19.4).
+2. **Empezar el reto** devuelve los cubos a su sitio, pone el robot virtual en `init`, elige *Robot virtual* y deja el editor de código con el enunciado como comentario y nada más, listo para escribir. Si el programa abierto no estaba guardado, primero lo pregunta.
+3. Encima del programa queda la banda **Reto en curso**, con *Ver el reto* (vuelve a abrir el enunciado), *Comprobar* y *Salir*.
+4. Al terminar cada ejecución en el robot virtual se revisa la celda. Si cumple, aparece **¡Reto logrado!** con el acceso al siguiente; si no, una lista de lo que falta, por ejemplo «cubo2 (lima) no está dentro de la bandeja: está en [−110, −200]».
+
+Los retos logrados quedan marcados en ese navegador. Los cuatro se resolvieron con programas de prueba en el robot virtual antes de publicarlos, y el ejemplo 6 resuelve el reto de la torre.
+
+![Ventana de un reto: objetivo, planta inicial y final, datos y pista](img/estudio_10_reto.png)
+
+*Figura 19.4. Enunciado del reto 1. A la izquierda la celda al empezar; a la derecha, cómo debe quedar.*
+
+![Banda de reto en curso sobre el editor en blanco](img/estudio_12_reto_en_curso.png)
+
+*Figura 19.5. Reto en curso: el editor queda sólo con el enunciado como comentario.*
 
 | Reto | Nivel | Qué se pide |
 |---|---|---|
 | El cubo lima a la bandeja | Fácil | Sólo cubo2 en la bandeja; los demás, en su sitio |
-| Los tres a la bandeja | Medio | Los tres cubos dentro de la bandeja |
+| Los tres a la bandeja | Medio | Los tres cubos dentro de la bandeja, uno al lado del otro (sin apilar) |
 | Una torre en la bandeja | Medio | Los tres apilados dentro de la bandeja |
 | La fila al revés | Difícil | cubo3 y cubo1 intercambiados; cubo2 en su sitio |
 
@@ -206,6 +227,8 @@ flowchart LR
 | `app/web/js/programa/movimiento.js` | Planificador de MoveJ, MoveL, MoveC y zonas |
 | `app/web/js/programa/celda.js` | Celda virtual: piezas, bandeja, sensor y luces |
 | `app/web/js/programa/ejemplos.js` | Los ocho ejemplos |
+| `app/web/js/programa/retos.js` | Los cuatro retos: objetivo, pista, celda final y qué falta |
+| `app/web/js/programa/planta.js` | Planta de la celda en SVG (tarjeta Celda y ventana de los retos) |
 | `app/web/js/cinematica.js` | `pose()` e `ikPose()`: pose de la pinza y su inversa |
 | `app/servidor.py` | Rutas `/api/trayectoria`, `/api/parar` y `/api/programas*` |
 | `app/estudio/puente_ros.py` | Publicación de trayectorias y parada en ROS 2 |

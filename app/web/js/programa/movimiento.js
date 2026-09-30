@@ -72,7 +72,7 @@ export class Planificador {
     const p = new THREE.Vector3(d.p[0] / 1000, d.p[1] / 1000, d.p[2] / 1000);
     const r = this.cadena.ikPose(p, d.cab * GRADO, d.giro * GRADO, qRef);
     if (!r.alcanzado) {
-      throw new ErrorMovimiento(linea, `El punto [${d.p.map((v) => v.toFixed(0)).join(', ')}] con cabeceo ${d.cab.toFixed(0)}° está fuera del alcance del brazo (queda a ${(r.error * 1000).toFixed(0)} mm y ${(r.errorCab / GRADO).toFixed(0)}°).`);
+      throw new ErrorMovimiento(linea, `El punto [${d.p.map((v) => v.toFixed(0)).join(', ')}] con cabeceo ${d.cab.toFixed(0)}° está fuera del alcance del brazo: la pinza queda a ${(r.error * 1000).toFixed(0)} mm del punto y a ${(r.errorCab / GRADO).toFixed(0)}° del cabeceo pedido. Acerque el punto a la base, bájelo o use un cabeceo menos inclinado; revise también si «Enseñar» cambió un punto del programa.`);
     }
     return r.q;
   }

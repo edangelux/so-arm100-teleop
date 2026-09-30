@@ -230,20 +230,35 @@ check_aux() {
     done
 }
 alive() { for pid in "${pids[@]}"; do kill -0 "$pid" 2>/dev/null || die "Un proceso terminó de forma inesperada. Registros: $RUN_DIR"; done; }
+restart_ros2_daemon() {
+    # El daemon de la CLI de ROS 2 (lo usan «ros2 control», «ros2 topic»...) es un proceso
+    # que queda vivo entre sesiones. Tras suspender el equipo o cerrar una sesión a la
+    # fuerza puede quedar roto y responder «!rclpy.ok()» a todo: entonces el lanzamiento
+    # no puede cargar los controladores. Se reinicia al empezar cada sesión.
+    timeout 15 ros2 daemon stop >/dev/null 2>&1 || pkill -u "$USER" -f '_ros2_daemon' 2>/dev/null || true
+    timeout 15 ros2 daemon start >/dev/null 2>&1 || true
+}
 wait_controllers() {
-    local manager="$1" result deadline=$((SECONDS+120))
+    local manager="$1" result deadline=$((SECONDS+120)) reiniciado=0
     while (( SECONDS < deadline )); do
         alive
         # Humble imprime códigos de color ANSI al inicio de cada línea; se quitan antes
         # de buscar. Se aceptan los dos formatos de Humble: «nombre  tipo  estado» y
         # «nombre[tipo] estado».
-        result="$(timeout 6 ros2 control list_controllers -c "$manager" 2>/dev/null | sed 's/\x1b\[[0-9;]*m//g' || true)"
+        result="$(timeout 6 ros2 control list_controllers -c "$manager" 2>&1 | sed 's/\x1b\[[0-9;]*m//g' || true)"
+        if [[ "$result" == *'rclpy.ok()'* ]] && (( ! reiniciado )); then
+            printf 'El daemon de ROS 2 no respondía; se reinicia.\n'
+            restart_ros2_daemon
+            reiniciado=1
+            continue
+        fi
         if grep -Eq '^arm_controller([[:space:]]|\[).*[[:space:]]active' <<<"$result" &&
            grep -Eq '^gripper_controller([[:space:]]|\[).*[[:space:]]active' <<<"$result"; then return; fi
         sleep 1
     done
     die "Los controladores de $manager no se activaron en 120 s. Registros: $RUN_DIR"
 }
+restart_ros2_daemon
 if [[ "$ACTION" != real ]]; then
     start gazebo ros2 launch so_arm_100_bringup gz.launch.py
     wait_controllers /controller_manager
