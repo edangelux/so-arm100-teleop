@@ -7,8 +7,10 @@ import { Cadena } from '../../app/web/js/cinematica.js';
 import { Ejecutor } from '../../app/web/js/programa/ejecutor.js';
 import { analizar } from '../../app/web/js/programa/lenguaje.js';
 
+// En Windows el Python se llama con «py»; en Linux, python3. PYTHON lo cambia.
+const PYTHON = process.env.PYTHON || (process.platform === 'win32' ? 'py' : 'python3');
 const APP = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../app');
-const modelo = JSON.parse(execFileSync('python3', ['-c', 'import json; from estudio.modelo import cargar_modelo; print(json.dumps(cargar_modelo()))'], { cwd: APP, encoding: 'utf-8' }));
+const modelo = JSON.parse(execFileSync(PYTHON, ['-c', 'import json; from estudio.modelo import cargar_modelo; print(json.dumps(cargar_modelo()))'], { cwd: APP, encoding: 'utf-8' }));
 export const cadena = new Cadena(modelo);
 
 // Ejecuta un programa sin animar y devuelve los tramos planificados y lo que escribió.

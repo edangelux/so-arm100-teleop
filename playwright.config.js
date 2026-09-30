@@ -27,7 +27,7 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1400, height: 900 }, deviceScaleFactor: 0.5 } }],
   webServer: {
-    command: `python3 app/servidor.py --sin-ros --puerto ${PUERTO}`,
+    command: `${process.env.PYTHON || (process.platform === 'win32' ? 'py' : 'python3')} app/servidor.py --sin-ros --puerto ${PUERTO}`,
     url: `http://127.0.0.1:${PUERTO}/api/estado`,
     reuseExistingServer: false,
     timeout: 60_000,
