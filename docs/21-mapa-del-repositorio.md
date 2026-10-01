@@ -55,7 +55,7 @@ Las **líneas discontinuas** no salen del grafo: se agregaron a mano porque el a
 | Paquetes ROS 2 | `entrega`, `overlay` | 500 | Paquetes del brazo tal como se entregaron: descripción, lanzamientos, MoveIt, driver |
 | Brazo físico | `brazo-fisico` | 78 | Driver del brazo real, SDK de los servos, espejo simulación y brazo real, protecciones |
 | Análisis cinemático | `analisis`, `cad` | 201 | Modelo D-H, cinemática directa e inversa, jacobiano, figuras |
-| Documentación | `docs/*.md`, `README.md` | 66 | Los 21 capítulos |
+| Documentación | `docs/*.md`, `README.md` | 66 | Los capítulos 01 a 21 y el README |
 | Capturas y figuras | `docs/img` | 78 | Capturas de pantalla y figuras de los capítulos |
 | Entregables | `docs/entregables` | 50 | Documento técnico, estudio económico y presentaciones |
 

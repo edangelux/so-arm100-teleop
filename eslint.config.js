@@ -18,6 +18,12 @@ export default [
     },
   },
   {
+    // El video del proyecto: escenas que corren en el navegador y herramientas de Node.
+    files: ['showreel/**/*.js', 'showreel/**/*.mjs'],
+    languageOptions: { ecmaVersion: 2024, sourceType: 'module', globals: { ...globals.browser, ...globals.node } },
+    rules: { 'no-unused-vars': ['error', { args: 'none', caughtErrors: 'none' }], 'prefer-const': 'error' },
+  },
+  {
     files: ['pruebas/js/**/*.js', 'e2e/**/*.js', '*.config.js', '*.config.mjs'],
     languageOptions: { ecmaVersion: 2024, sourceType: 'module', globals: { ...globals.node, ...globals.browser } },
   },
