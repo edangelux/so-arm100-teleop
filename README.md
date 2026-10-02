@@ -302,7 +302,7 @@ Después de instalar, basta escribir **`teleop`**, o abrir el icono **SO-ARM100 
 | 19 | [**Programar**](docs/19-programar.md) | Programación tipo robot industrial: MoveJ, MoveL, MoveC, pinza, señales, bucles, celda virtual, ejemplos y retos |
 | 20 | [**Protecciones del brazo físico**](docs/20-protecciones-del-brazo.md) | Limitador de saltos, comprobación de fuente y servos, centrado suave y reglas de encendido |
 | 21 | [**Mapa del repositorio**](docs/21-mapa-del-repositorio.md) | Grafo de conocimiento del código: zonas, dependencias, puentes críticos y el grafo interactivo |
-| — | [**Video del proyecto**](showreel/README.md) | Cómo se produce el video de presentación (2:56) y el teaser: brazo 3D con las mallas reales, la aplicación grabada, el grafo y música original |
+| — | [**Video del proyecto**](showreel/README.md) | El video de presentación (5:15), el teaser de 60 s en horizontal y vertical, la música original, la miniatura, el QR del repositorio y los recursos multimedia que se usaron |
 | — | [**Modelo cinemático completo**](analisis/cinematica/ANALISIS_CINEMATICO.md) | Tabla D-H, cinemática directa e inversa, jacobiano, singularidades, verificación cruzada |
 | — | [**Documentos entregados**](docs/entregables/README.md) | Documento técnico, formulación y evaluación, y las dos presentaciones |
 

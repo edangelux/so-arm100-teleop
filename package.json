@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "lint": "eslint app/web/js pruebas/js e2e showreel",
+    "lint": "eslint app/web/js pruebas/js e2e",
     "knip": "knip",
     "duplicados": "jscpd",
     "test": "node --test \"pruebas/js/*.test.js\"",

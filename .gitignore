@@ -54,7 +54,11 @@ CLAUDE.local.md
 # --- Mapa del repositorio generado por graphify --------------------------
 graphify-out/
 
-# --- Showreel: videos originales, recursos y cuadros generados ------------
-showreel/originales/
-showreel/recursos/
-showreel/salida/
+# --- Showreel: en el repositorio sólo van el video terminado, su música, -----
+# --- sus imágenes y su explicación ------------------------------------------
+showreel/*
+!showreel/README.md
+!showreel/videos/
+!showreel/videos/*.mp4
+!showreel/musica/
+!showreel/imagenes/
